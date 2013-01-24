@@ -1,3 +1,5 @@
+#!/bin/sh
+#
 # Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
@@ -14,17 +16,29 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-ACLOCAL_AMFLAGS = -I m4
+list_paths()
+{
+    variable_name=$1
+    echo "$variable_name = \\"
+    LC_ALL=C sort | \
+    sed \
+      -e 's,^,\t,' \
+      -e 's,$, \\,'
+    echo "\t\$(NULL)"
+    echo
+}
 
-SUBDIRS =					\
-	normalizers				\
-	test
+find . -type f -name '*.test' | \
+    sed -e 's,\./,,' | \
+    sort | \
+    list_paths "test_files"
 
-echo-groonga:
-	@echo $(GROONGA)
+find . -type f -name '*.expected' | \
+    sed -e 's,\./,,' | \
+    sort | \
+    list_paths "expected_files"
 
-echo-groonga-httpd:
-	@echo $(GROONGA_HTTPD)
-
-echo-ruby:
-	@echo $(RUBY)
+find . -type f -name '*.grn' | \
+    sed -e 's,\./,,' | \
+    sort | \
+    list_paths "fixture_files"

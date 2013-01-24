@@ -1,0 +1,11 @@
+test_files = \
+	suite/normalizers/mysql/general_ci/plane00.test \
+	$(NULL)
+
+expected_files = \
+	suite/normalizers/mysql/general_ci/plane00.expected \
+	$(NULL)
+
+fixture_files = \
+	$(NULL)
+

@@ -14,17 +14,23 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-ACLOCAL_AMFLAGS = -I m4
+if WITH_TEST
+TESTS = run-test.sh
+endif
+TESTS_ENVIRONMENT =								\
+	NO_MAKE=yes								\
+	BUILD_DIR="$(builddir)"							\
+	RUBY="$(RUBY)"								\
+	GROONGA="$(GROONGA)"							\
+	GROONGA_SUGGEST_CREATE_DATASET="$(GROONGA_SUGGEST_CREATE_DATASET)"
 
-SUBDIRS =					\
-	normalizers				\
-	test
+update-files:
+	cd $(srcdir) && ./update-files.sh > files.am
 
-echo-groonga:
-	@echo $(GROONGA)
+include files.am
 
-echo-groonga-httpd:
-	@echo $(GROONGA_HTTPD)
+EXTRA_DIST =					\
+	run-test.sh				\
+	fixture					\
+	suite
 
-echo-ruby:
-	@echo $(RUBY)

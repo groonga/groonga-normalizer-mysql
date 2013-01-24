@@ -17,3 +17,6 @@ Makefile.in
 /m4/
 /missing
 /stamp-*
+/tmp
+/test/grntest
+/test/groonga-command
