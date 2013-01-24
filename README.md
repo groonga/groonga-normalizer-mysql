@@ -16,14 +16,14 @@ to `utf8mb4_general_ci`.  `NormalizerMySQLUnicodeCI` corresponds to
 
 ### Debian GNU/Linux
 
-[Add apt-line for the groonga deb package repository](http://groonga.org/ja/docs/install/debian.html)
+[Add apt-line for the groonga deb package repository](http://groonga.org/docs/install/debian.html)
 and install `groonga-normalizer-mysql` package:
 
     % sudo aptitude -V -D -y install groonga-normalizer-mysql
 
 ### Ubuntu
 
-[Add apt-line for the groonga deb package repository](http://groonga.org/ja/docs/install/ubuntu.html)
+[Add apt-line for the groonga deb package repository](http://groonga.org/docs/install/ubuntu.html)
 and install `groonga-normalizer-mysql` package:
 
     % sudo aptitude -V -D -y install groonga-normalizer-mysql
