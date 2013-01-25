@@ -25,6 +25,11 @@ AM_INIT_AUTOMAKE($PACKAGE_NAME, $PACKAGE_VERSION)
 
 AC_PROG_LIBTOOL
 
+if test "$GCC" = "yes"; then
+  CFLAGS="$CFLAGS -Wall -Wextra"
+  CFLAGS="$CFLAGS -Wmissing-declarations -Wmissing-prototypes"
+fi
+
 PKG_CHECK_MODULES([GROONGA], [groonga >= 2.1.2])
 
 _PKG_CONFIG(GROONGA_PLUGINS_DIR, [variable=pluginsdir],    [groonga])
