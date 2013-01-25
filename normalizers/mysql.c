@@ -47,9 +47,6 @@
 
 #include <stdint.h>
 
-/* FIXME */
-const char *grn_enctostr(grn_encoding);
-
 /* based on mysql-5.5.29/strings/ctype-utf8.c: start */
 static uint32_t plane00[] = {
   0x0000,  0x0001,
@@ -1673,7 +1670,7 @@ mysql_general_ci_next(grn_ctx *ctx, int nargs, grn_obj **args,
                      GRN_FUNCTION_NOT_IMPLEMENTED,
                      "[normalizer][mysql-general-ci] "
                      "UTF-8 encoding is only supported: %s",
-                     grn_enctostr(encoding));
+                     grn_encoding_to_string(encoding));
     return NULL;
   }
   normalize(ctx, string);
