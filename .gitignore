@@ -18,5 +18,6 @@ Makefile.in
 /missing
 /stamp-*
 /tmp
+/groonga-normalizer-mysql.pc
 /test/grntest
 /test/groonga-command
