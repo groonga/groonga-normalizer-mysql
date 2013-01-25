@@ -89,6 +89,7 @@ AM_CONDITIONAL([WITH_TEST], [test "$ac_cv_ruby_available" = "yes"])
 
 AC_CONFIG_FILES([
   Makefile
+  groonga-normalizer-mysql.pc
   normalizers/Makefile
   test/Makefile
 ])
