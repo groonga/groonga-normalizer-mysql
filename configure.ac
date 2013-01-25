@@ -42,7 +42,7 @@ AC_SUBST(GROONGA_HTTPD)
 normalizers_pluginsdir="\${GROONGA_PLUGINS_DIR}/normalizers"
 AC_SUBST(normalizers_pluginsdir)
 
-# check Ruby for HTTP test
+# check Ruby for test
 ac_cv_ruby_available="no"
 AC_ARG_WITH([ruby19],
             AS_HELP_STRING([--with-ruby19=PATH],
