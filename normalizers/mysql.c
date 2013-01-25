@@ -47,6 +47,12 @@
 
 #include <stdint.h>
 
+#ifdef __GNUC__
+#  define GNUC_UNUSED __attribute__((__unused__))
+#else
+#  define GNUC_UNUSED
+#endif
+
 /* based on mysql-5.5.29/strings/ctype-utf8.c: start */
 static uint32_t plane00[] = {
   0x0000,  0x0001,
@@ -1658,8 +1664,10 @@ normalize(grn_ctx *ctx, grn_obj *string)
 }
 
 static grn_obj *
-mysql_general_ci_next(grn_ctx *ctx, int nargs, grn_obj **args,
-                      grn_user_data *user_data)
+mysql_general_ci_next(GNUC_UNUSED grn_ctx *ctx,
+                      GNUC_UNUSED int nargs,
+                      grn_obj **args,
+                      GNUC_UNUSED grn_user_data *user_data)
 {
   grn_obj *string = args[0];
   grn_encoding encoding;
@@ -1692,7 +1700,7 @@ GRN_PLUGIN_REGISTER(grn_ctx *ctx)
 }
 
 grn_rc
-GRN_PLUGIN_FIN(grn_ctx *ctx)
+GRN_PLUGIN_FIN(GNUC_UNUSED grn_ctx *ctx)
 {
   return GRN_SUCCESS;
 }
