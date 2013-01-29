@@ -92,10 +92,25 @@ fi
 AC_SUBST(RUBY)
 AM_CONDITIONAL([WITH_TEST], [test "$ac_cv_ruby_available" = "yes"])
 
+# For package
+AC_ARG_WITH(rsync-path,
+            [AS_HELP_STRING([--with-rsync-path=PATH],
+            [specify rsync path to upload groonga packages.])],
+            [RSYNC_PATH="$withval"],
+            [RSYNC_PATH="packages@packages.groonga.org:public"])
+AC_SUBST(RSYNC_PATH)
+
 AC_CONFIG_FILES([
   Makefile
   groonga-normalizer-mysql.pc
   normalizers/Makefile
+  packages/Makefile
+  packages/apt/Makefile
+  packages/rpm/Makefile
+  packages/rpm/centos/Makefile
+  packages/rpm/fedora/Makefile
+  packages/yum/Makefile
+  packages/source/Makefile
   test/Makefile
 ])
 

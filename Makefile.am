@@ -18,6 +18,7 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS =					\
 	normalizers				\
+	packages				\
 	test
 
 echo-groonga:
