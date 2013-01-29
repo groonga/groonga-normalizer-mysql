@@ -21,6 +21,11 @@ SUBDIRS =					\
 	packages				\
 	test
 
+docdir = $(datadir)/doc/@PACKAGE@
+dist_doc_DATA = \
+	doc					\
+	README.md
+
 echo-groonga:
 	@echo $(GROONGA)
 
