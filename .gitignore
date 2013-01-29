@@ -21,3 +21,6 @@ Makefile.in
 /groonga-normalizer-mysql.pc
 /test/grntest
 /test/groonga-command
+/packages/apt/tmp/*
+/packages/yum/tmp/*
+/packages/rpm/*/*.spec
