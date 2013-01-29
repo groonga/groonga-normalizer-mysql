@@ -19,7 +19,7 @@ sign-packages:
 	./sign-rpm.sh '$(GPG_UID)' '$(REPOSITORIES_PATH)/' \
 	  '$(DISTRIBUTIONS)'
 
-update-repository:
+update-repository: RPM-GPG-KEY-$(PACKAGE)
 	./update-repository.sh '$(PACKAGE)' '$(REPOSITORIES_PATH)/' \
 	  '$(DISTRIBUTIONS)'
 
