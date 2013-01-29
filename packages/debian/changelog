@@ -1,0 +1,5 @@
+groonga-normalizer-mysql (1.0.0-1) unstable; urgency=low
+
+  * Initial release
+
+ -- Kouhei Sutou <kou@clear-code.com>  Sat, 9 Feb 2013 00:00:00 +0900
