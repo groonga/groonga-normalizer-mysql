@@ -100,6 +100,9 @@ AC_ARG_WITH(rsync-path,
             [RSYNC_PATH="packages@packages.groonga.org:public"])
 AC_SUBST(RSYNC_PATH)
 
+GPG_UID=m4_include(gpg_uid)
+AC_SUBST(GPG_UID)
+
 AC_CONFIG_FILES([
   Makefile
   groonga-normalizer-mysql.pc
