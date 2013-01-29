@@ -111,16 +111,15 @@ AC_CONFIG_FILES([
   packages/apt/Makefile
   packages/rpm/Makefile
   packages/rpm/centos/Makefile
+  packages/rpm/centos/groonga-normalizer-mysql.spec
   packages/rpm/fedora/Makefile
+  packages/rpm/fedora/groonga-normalizer-mysql.spec
   packages/yum/Makefile
   packages/source/Makefile
   test/Makefile
 ])
 
-AC_OUTPUT([
-  packages/rpm/centos/groonga-normalizer-mysql.spec
-  packages/rpm/fedora/groonga-normalizer-mysql.spec
-])
+AC_OUTPUT
 
 echo "$PACKAGE_NAME $PACKAGE_VERSION configuration:"
 echo "-----------------------"
