@@ -9,8 +9,6 @@ export DH_OPTIONS
 %:
 	dh $@
 
-override_dh_auto_configure:
-
 # disable 'make check'.
 override_dh_auto_test:
 
