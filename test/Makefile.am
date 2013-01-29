@@ -31,6 +31,5 @@ include files.am
 
 EXTRA_DIST =					\
 	run-test.sh				\
-	fixture					\
 	suite
 
