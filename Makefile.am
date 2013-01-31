@@ -21,7 +21,7 @@ SUBDIRS =					\
 	packages				\
 	test
 
-docdir = $(datadir)/doc/@PACKAGE@
+docdir = $(datadir)/doc/$(PACKAGE)
 dist_doc_DATA = \
 	doc					\
 	README.md
