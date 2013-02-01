@@ -44,6 +44,7 @@
 
 #include <groonga/normalizer.h>
 #include <groonga/tokenizer.h>
+#include <groonga/nfkc.h>
 
 #include <stdint.h>
 
@@ -1614,9 +1615,12 @@ normalize(grn_ctx *ctx, grn_obj *string)
 {
   const char *original, *rest;
   unsigned int original_length_in_bytes, rest_length;
+  unsigned int initial_data_size;
   char *normalized;
   unsigned int normalized_length_in_bytes = 0;
   unsigned int normalized_n_characters = 0;
+  unsigned char *types = NULL;
+  unsigned char *current_type = NULL;
   grn_encoding encoding;
   int flags;
   grn_bool remove_blank_p;
@@ -1625,7 +1629,13 @@ normalize(grn_ctx *ctx, grn_obj *string)
   flags = grn_string_get_flags(ctx, string);
   remove_blank_p = flags & GRN_STRING_REMOVE_BLANK;
   grn_string_get_original(ctx, string, &original, &original_length_in_bytes);
-  normalized = GRN_PLUGIN_MALLOC(ctx, original_length_in_bytes + 1);
+  /* Whey 3? It is derived from utf8_normalize in groonga/lib/normalizer.c. */
+  initial_data_size = original_length_in_bytes * 3;
+  normalized = GRN_PLUGIN_MALLOC(ctx, initial_data_size + 1);
+  if (flags & GRN_STRING_WITH_TYPES) {
+    types = GRN_PLUGIN_MALLOC(ctx, initial_data_size + 1);
+    current_type = types;
+  }
   rest = original;
   rest_length = original_length_in_bytes;
   while (rest_length > 0) {
@@ -1640,7 +1650,9 @@ normalize(grn_ctx *ctx, grn_obj *string)
 
     decompose_character(rest, character_length, &plane, &low_code);
     if (remove_blank_p && character_length == 1 && rest[0] == ' ') {
-      /* TODO: set GRN_CHAR_BLANK */
+      if (current_type > types) {
+        current_type[-1] |= GRN_CHAR_BLANK;
+      }
     } else {
       if (plane >= 0x00 && mysql_unicode_normalize_table[plane]) {
         uint32_t normalized_code;
@@ -1656,6 +1668,14 @@ normalize(grn_ctx *ctx, grn_obj *string)
         }
         normalized_length_in_bytes += character_length;
       }
+      if (current_type) {
+        char *current_normalized;
+        current_normalized =
+          normalized + normalized_length_in_bytes - character_length;
+        current_type[0] =
+          grn_nfkc_char_type((unsigned char *)current_normalized);
+        current_type++;
+      }
       normalized_n_characters++;
     }
 
@@ -1669,6 +1689,7 @@ normalize(grn_ctx *ctx, grn_obj *string)
                               normalized,
                               normalized_length_in_bytes,
                               normalized_n_characters);
+    grn_string_set_types(ctx, string, types);
   } else {
     /* TODO: report error */
     GRN_PLUGIN_FREE(ctx, normalized);
