@@ -1528,7 +1528,6 @@ static uint32_t *mysql_unicode_normalize_table[256] = {
     NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
     NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL,
     NULL,    NULL,    NULL,    NULL,    NULL,    NULL,    NULL, planeFF
-
 };
 /* based on mysql-5.5.29/strings/ctype-utf8.c: end */
 
