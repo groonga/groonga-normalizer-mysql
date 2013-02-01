@@ -24,3 +24,4 @@ Makefile.in
 /packages/apt/tmp/*
 /packages/yum/tmp/*
 /packages/rpm/*/*.spec
+/.gdb_history
