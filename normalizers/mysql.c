@@ -1584,23 +1584,19 @@ decompose_character(const char *rest, int character_length,
     *low_code = rest[0] & 0x7f;
     break;
   case 2 :
-    *plane = 0x00;
-    *low_code = (rest[0] & 0x1f << 6) + (rest[1] & 0x3f);
+    *plane = rest[0] & 0x1c;
+    *low_code = ((rest[0] & 0x03) << 6) + (rest[1] & 0x3f);
     break;
   case 3 :
-    *plane = rest[0] & 0x0f;
-    *low_code =
-      ((rest[0] & 0x0f) << 12) +
-      ((rest[1] & 0x3f) << 6) +
-      (rest[2] & 0x3f);
+    *plane = ((rest[0] & 0x0f) << 4) + ((rest[1] & 0x3c));
+    *low_code = ((rest[1] & 0x03) << 6) + (rest[2] & 0x3f);
     break;
   case 4 :
-    *plane = ((rest[0] & 0x07) << 6) + (rest[1] & 0x3f);
-    *low_code =
-      ((rest[0] & 0x07) << 15) +
-      ((rest[1] & 0x3f) << 12) +
-      ((rest[2] & 0x3f) << 6) +
-      (rest[3] & 0x3f);
+    *plane =
+      ((rest[0] & 0x07) << 10) +
+      ((rest[1] & 0x3f) << 4) +
+      ((rest[2]) & 0x3c);
+    *low_code = ((rest[1] & 0x03) << 6) + (rest[2] & 0x3f);
     if (*plane > 0xff) {
       *plane = -1;
     }
