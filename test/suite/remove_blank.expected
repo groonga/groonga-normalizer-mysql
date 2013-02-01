@@ -1,0 +1,4 @@
+register normalizers/mysql
+[[0,0.0,0.0],true]
+normalize NormalizerMySQLGeneralCI "a b c" REMOVE_BLANK
+[[0,0.0,0.0],"ABC"]

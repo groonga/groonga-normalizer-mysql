@@ -1584,8 +1584,12 @@ normalize(grn_ctx *ctx, grn_obj *string)
   unsigned int normalized_length_in_bytes = 0;
   unsigned int normalized_n_characters = 0;
   grn_encoding encoding;
+  int flags;
+  grn_bool remove_blank_p;
 
   encoding = grn_string_get_encoding(ctx, string);
+  flags = grn_string_get_flags(ctx, string);
+  remove_blank_p = flags & GRN_STRING_REMOVE_BLANK;
   grn_string_get_original(ctx, string, &original, &original_length_in_bytes);
   normalized = GRN_PLUGIN_MALLOC(ctx, original_length_in_bytes + 1);
   rest = original;
@@ -1633,20 +1637,26 @@ normalize(grn_ctx *ctx, grn_obj *string)
       break;
     }
 
-    if (plane >= 0x00 && mysql_unicode_normalize_table[plane]) {
-      uint32_t normalized_code = mysql_unicode_normalize_table[plane][low_code];
-      unsigned int n_bytes;
-      n_bytes = unichar_to_utf8(normalized_code,
-                                normalized + normalized_length_in_bytes);
-      normalized_length_in_bytes += n_bytes;
+    if (remove_blank_p && character_length == 1 && rest[0] == ' ') {
+      /* TODO: set GRN_CHAR_BLANK */
     } else {
-      int i;
-      for (i = 0; i < character_length; i++) {
-        normalized[normalized_length_in_bytes + i] = rest[i];
+      if (plane >= 0x00 && mysql_unicode_normalize_table[plane]) {
+        uint32_t normalized_code;
+        unsigned int n_bytes;
+        normalized_code = mysql_unicode_normalize_table[plane][low_code];
+        n_bytes = unichar_to_utf8(normalized_code,
+                                  normalized + normalized_length_in_bytes);
+        normalized_length_in_bytes += n_bytes;
+      } else {
+        int i;
+        for (i = 0; i < character_length; i++) {
+          normalized[normalized_length_in_bytes + i] = rest[i];
+        }
+        normalized_length_in_bytes += character_length;
       }
-      normalized_length_in_bytes += character_length;
+      normalized_n_characters++;
     }
-    normalized_n_characters++;
+
     rest += character_length;
     rest_length -= character_length;
   }
