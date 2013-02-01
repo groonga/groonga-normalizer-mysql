@@ -26,6 +26,9 @@ dist_doc_DATA = \
 	doc					\
 	README.md
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = groonga-normalizer-mysql.pc
+
 echo-groonga:
 	@echo $(GROONGA)
 
