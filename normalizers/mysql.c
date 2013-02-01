@@ -1575,6 +1575,45 @@ unichar_to_utf8(uint32_t unichar, char *output)
   return n_bytes;
 }
 
+static inline void
+decompose_character(const char *rest, int character_length,
+                    int *plane, uint32_t *low_code)
+{
+  switch (character_length) {
+  case 1 :
+    *plane = 0x00;
+    *low_code = rest[0] & 0x7f;
+    break;
+  case 2 :
+    *plane = 0x00;
+    *low_code = (rest[0] & 0x1f << 6) + (rest[1] & 0x3f);
+    break;
+  case 3 :
+    *plane = rest[0] & 0x0f;
+    *low_code =
+      ((rest[0] & 0x0f) << 12) +
+      ((rest[1] & 0x3f) << 6) +
+      (rest[2] & 0x3f);
+    break;
+  case 4 :
+    *plane = ((rest[0] & 0x07) << 6) + (rest[1] & 0x3f);
+    *low_code =
+      ((rest[0] & 0x07) << 15) +
+      ((rest[1] & 0x3f) << 12) +
+      ((rest[2] & 0x3f) << 6) +
+      (rest[3] & 0x3f);
+    if (*plane > 0xff) {
+      *plane = -1;
+    }
+    break;
+  default :
+    *plane = -1;
+    *low_code = 0x00;
+    break;
+  }
+}
+
+
 static void
 normalize(grn_ctx *ctx, grn_obj *string)
 {
@@ -1604,39 +1643,7 @@ normalize(grn_ctx *ctx, grn_obj *string)
       break;
     }
 
-    switch (character_length) {
-    case 1 :
-      plane = 0x00;
-      low_code = rest[0] & 0x7f;
-      break;
-    case 2 :
-      plane = 0x00;
-      low_code = (rest[0] & 0x1f << 6) + (rest[1] & 0x3f);
-      break;
-    case 3 :
-      plane = rest[0] & 0x0f;
-      low_code =
-        ((rest[0] & 0x0f) << 12) +
-        ((rest[1] & 0x3f) << 6) +
-        (rest[2] & 0x3f);
-      break;
-    case 4 :
-      plane = ((rest[0] & 0x07) << 6) + (rest[1] & 0x3f);
-      low_code =
-        ((rest[0] & 0x07) << 15) +
-        ((rest[1] & 0x3f) << 12) +
-        ((rest[2] & 0x3f) << 6) +
-        (rest[3] & 0x3f);
-      if (plane > 0xff) {
-        plane = -1;
-      }
-      break;
-    default :
-      plane = -1;
-      low_code = 0x00;
-      break;
-    }
-
+    decompose_character(rest, character_length, &plane, &low_code);
     if (remove_blank_p && character_length == 1 && rest[0] == ' ') {
       /* TODO: set GRN_CHAR_BLANK */
     } else {
