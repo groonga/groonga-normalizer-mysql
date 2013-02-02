@@ -117,6 +117,8 @@ AC_CONFIG_FILES([
   packages/yum/Makefile
   packages/source/Makefile
   test/Makefile
+  doc/Makefile
+  doc/text/Makefile
 ])
 
 AC_OUTPUT

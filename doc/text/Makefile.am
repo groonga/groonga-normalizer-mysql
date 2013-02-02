@@ -14,26 +14,6 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-ACLOCAL_AMFLAGS = -I m4
-
-SUBDIRS =					\
-	normalizers				\
-	packages				\
-	test					\
-	doc
-
 docdir = $(datadir)/doc/$(PACKAGE)
 dist_doc_DATA =					\
-	README.md
-
-pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = groonga-normalizer-mysql.pc
-
-echo-groonga:
-	@echo $(GROONGA)
-
-echo-groonga-httpd:
-	@echo $(GROONGA_HTTPD)
-
-echo-ruby:
-	@echo $(RUBY)
+	lgpl-2.0.txt
