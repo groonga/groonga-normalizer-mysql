@@ -1633,7 +1633,8 @@ normalize(grn_ctx *ctx, grn_obj *string)
   initial_data_size = original_length_in_bytes * 3;
   normalized = GRN_PLUGIN_MALLOC(ctx, initial_data_size + 1);
   if (flags & GRN_STRING_WITH_TYPES) {
-    types = GRN_PLUGIN_MALLOC(ctx, initial_data_size + 1);
+    unsigned int max_normalized_n_characters = original_length_in_bytes;
+    types = GRN_PLUGIN_MALLOC(ctx, max_normalized_n_characters);
     current_type = types;
   }
   rest = original;
