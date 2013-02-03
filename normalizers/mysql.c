@@ -1615,7 +1615,6 @@ normalize(grn_ctx *ctx, grn_obj *string)
 {
   const char *original, *rest;
   unsigned int original_length_in_bytes, rest_length;
-  unsigned int initial_data_size;
   char *normalized;
   unsigned int normalized_length_in_bytes = 0;
   unsigned int normalized_n_characters = 0;
@@ -1629,9 +1628,10 @@ normalize(grn_ctx *ctx, grn_obj *string)
   flags = grn_string_get_flags(ctx, string);
   remove_blank_p = flags & GRN_STRING_REMOVE_BLANK;
   grn_string_get_original(ctx, string, &original, &original_length_in_bytes);
-  /* Whey 3? It is derived from utf8_normalize in groonga/lib/normalizer.c. */
-  initial_data_size = original_length_in_bytes * 3;
-  normalized = GRN_PLUGIN_MALLOC(ctx, initial_data_size + 1);
+  {
+    unsigned int max_normalized_length_in_bytes = original_length_in_bytes;
+    normalized = GRN_PLUGIN_MALLOC(ctx, max_normalized_length_in_bytes);
+  }
   if (flags & GRN_STRING_WITH_TYPES) {
     unsigned int max_normalized_n_characters = original_length_in_bytes;
     types = GRN_PLUGIN_MALLOC(ctx, max_normalized_n_characters);
