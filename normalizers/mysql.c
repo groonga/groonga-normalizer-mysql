@@ -1598,9 +1598,6 @@ decompose_character(const char *rest, int character_length,
       ((rest[1] & 0x3f) << 4) +
       ((rest[2]) & 0x3c);
     *low_code = ((rest[1] & 0x03) << 6) + (rest[2] & 0x3f);
-    if (*plane > 0xff) {
-      *plane = -1;
-    }
     break;
   default :
     *plane = -1;
@@ -1655,7 +1652,8 @@ normalize(grn_ctx *ctx, grn_obj *string)
         current_type[-1] |= GRN_CHAR_BLANK;
       }
     } else {
-      if (plane >= 0x00 && mysql_unicode_normalize_table[plane]) {
+      if ((0x00 <= plane && plane <= 0xff) &&
+          mysql_unicode_normalize_table[plane]) {
         uint32_t normalized_code;
         unsigned int n_bytes;
         normalized_code = mysql_unicode_normalize_table[plane][low_code];
