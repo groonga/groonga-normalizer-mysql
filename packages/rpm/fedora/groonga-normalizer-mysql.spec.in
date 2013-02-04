@@ -36,6 +36,8 @@ rm $RPM_BUILD_ROOT%{_libdir}/groonga/plugins/*/*.la
 %dir %{_libdir}/groonga/plugins
 %dir %{_libdir}/groonga/plugins/normalizers
 %{_libdir}/groonga/plugins/normalizers/mysql.so
+%{_libdir}/pkgconfig/groonga-normalizer-mysql.pc
+%{_datadir}/doc/groonga-normalizer-mysql/
 
 %changelog
 * Tue Jan 29 2013 HAYASHI Kentaro <hayashi@clear-code.com> - 1.0.0-1
