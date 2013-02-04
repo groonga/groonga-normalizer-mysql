@@ -43,7 +43,6 @@
 */
 
 #include <groonga/normalizer.h>
-#include <groonga/tokenizer.h>
 #include <groonga/nfkc.h>
 
 #include <stdint.h>
@@ -1641,7 +1640,7 @@ normalize(grn_ctx *ctx, grn_obj *string)
     int plane;
     uint32_t low_code;
 
-    character_length = grn_tokenizer_charlen(ctx, rest, rest_length, encoding);
+    character_length = grn_plugin_charlen(ctx, rest, rest_length, encoding);
     if (character_length == 0) {
       break;
     }
