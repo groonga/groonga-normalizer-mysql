@@ -11,8 +11,8 @@ URL:		http://groonga.org/
 Source0:	http://packages.groonga.org/source/%{name}/%{name}-%{version}.tar.gz
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%(%{__id_u} -n)
-BuildRequires:	groonga-devel >= 2.1.2
-Requires:	groonga >= 2.1.2
+BuildRequires:	groonga-devel >= 3.0.0
+Requires:	groonga >= 3.0.0
 
 %description
 This package provides MySQL compatible normalizer plugin.
