@@ -41,7 +41,7 @@ Then, you can use `NormalizerMySQLGeneralCI` and
 
 ## Dependencies
 
-* groonga >= 2.1.2
+* groonga >= 3.0.0
 
 ## Mailing list
 
