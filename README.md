@@ -28,6 +28,29 @@ and install `groonga-normalizer-mysql` package:
 
     % sudo aptitude -V -D -y install groonga-normalizer-mysql
 
+
+### CentOS
+
+Install `groonga-repository` package:
+
+    % sudo rpm -ivh http://packages.groonga.org/centos/groonga-release-1.1.0-1.noarch.rpm
+    % sudo yum makecache
+
+Then install `groonga-normalizer-mysql` package:
+
+    % sudo yum install -y groonga-normalizer-mysql
+
+### Fedora
+
+Install `groonga-repository` package:
+
+    % sudo rpm -ivh http://packages.groonga.org/fedora/groonga-release-1.1.0-1.noarch.rpm
+    % sudo yum makecache
+
+Then install `groonga-normalizer-mysql` package:
+
+    % sudo yum install -y groonga-normalizer-mysql
+
 ## Usage
 
 First, you need to register `normalizers/mysql` plugin:
