@@ -19,7 +19,9 @@
 set -e
 
 if [ "$GROONGA_NORMALIZER_MYSQL_MASTER" = "yes" ]; then
-    sudo apt-get install -qq -y -V libgroonga-dev
+    if ! pkg-config --exist groonga; then
+      sudo apt-get install -qq -y -V libgroonga-dev
+    fi
     git clone --depth 1 https://github.com/groonga/groonga-normalizer-mysql.git
     cd groonga-normalizer-mysql
     ./autogen.sh
