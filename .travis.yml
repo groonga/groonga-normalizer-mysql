@@ -1,0 +1,15 @@
+notifications:
+  recipients:
+    - groonga-commit@lists.sourceforge.jp
+    - travis@clear-code.com
+language: c
+compiler:
+  - gcc
+  - clang
+install:
+  - tool/travis/install.sh
+before_script:
+  - rvm use 1.9.3
+  - tool/travis/before_script.sh
+script:
+  - test/run-test.sh
