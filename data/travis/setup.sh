@@ -25,7 +25,7 @@ if [ "$GROONGA_NORMALIZER_MYSQL_MASTER" = "yes" ]; then
     git clone --depth 1 https://github.com/groonga/groonga-normalizer-mysql.git
     cd groonga-normalizer-mysql
     ./autogen.sh
-    ./configure --prefix=/usr --with-debug
+    ./configure CFLAGS="-O0 -ggdb3" CXXFLAGS="-O0 -ggdb3" --prefix=/usr
     make -j$(grep '^processor' /proc/cpuinfo | wc -l) > /dev/null
     sudo make install > /dev/null
     cd ..
