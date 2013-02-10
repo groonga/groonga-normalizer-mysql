@@ -23,7 +23,7 @@ module Unicode
   end
 
   def from_utf8(utf8)
-    utf8.unpack("U")
+    utf8.unpack("U")[0]
   end
 end
 
