@@ -104,7 +104,7 @@ end
 target_planes.each do |plane, characters|
   puts(<<-PLANE_HEADER)
 
-static uint32_t #{plane_name(plane)} = {
+static uint32_t #{plane_name(plane)}[] = {
 PLANE_HEADER
   lines = characters.each_with_index.each_slice(8).collect do |characters_group|
     formatted_code_points = characters_group.collect do |normalized, low_code|
