@@ -26,9 +26,17 @@ parser = CTypeUCAParser.new
 parser.parse(ARGF)
 
 n_idencials = 0
+n_expanded_characters = 0
 parser.weight_based_characters.each do |weight, characters|
   next if characters.size == 1
   n_idencials += 1
+  representative_character = characters.first
+  rest_characters = characters[1..-1]
+  rest_characters.each do |character|
+    if representative_character[:utf8].bytesize > character[:utf8].bytesize
+      n_expanded_characters += 1
+    end
+  end
   formatted_weight = weight.collect {|component| '%#07x' % component}.join(', ')
   puts "weight: #{formatted_weight}"
   characters.each do |character|
@@ -39,3 +47,4 @@ parser.weight_based_characters.each do |weight, characters|
 end
 
 puts "Number of idencial weights #{n_idencials}"
+puts "Number of expanded characters: #{n_expanded_characters}"
