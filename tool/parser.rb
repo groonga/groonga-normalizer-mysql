@@ -88,12 +88,11 @@ class CTypeUCAParser
   def parse(input)
     parse_ctype_uca(input)
     normalize_pages
-    sort_pages
   end
 
   def weight_based_characters
     weight_based_characters = {}
-    @sorted_pages.each do |page, characters|
+    sorted_pages.each do |page, characters|
       characters.each do |character|
         weight = character[:weight]
         weight_based_characters[weight] ||= []
@@ -101,6 +100,12 @@ class CTypeUCAParser
       end
     end
     weight_based_characters
+  end
+
+  def sorted_pages
+    @pages.sort_by do |page, characters|
+      page
+    end
   end
 
   private
@@ -151,12 +156,6 @@ class CTypeUCAParser
           :utf8       => Unicode.to_utf8(code_point),
         }
       end
-    end
-  end
-
-  def sort_pages
-    @sorted_pages = @pages.sort_by do |page, characters|
-      page
     end
   end
 end
