@@ -48,7 +48,7 @@ class CTypeUTF8Parser
     current_plane = nil
     input.each_line do |line|
       case line
-      when / plane(\d{2})\[\]=/
+      when / plane([\da-fA-F]{2})\[\]=/
         current_plane = $1.to_i(16)
         @planes[current_plane] = []
       when /^\s*
@@ -114,7 +114,7 @@ class CTypeUCAParser
     in_length = false
     input.each_line do |line|
       case line
-      when / page(\d{3})data\[\]=/
+      when / page([\da-fA-F]{3})data\[\]=/
         current_page = $1.to_i(16)
         @pages[current_page] = []
       when /^\s*0x(?:[\da-z]+)(?:,\s*0x(?:[\da-z]+))*,?$/i
