@@ -32,3 +32,12 @@ normalizers_plugins_LTLIBRARIES =
 normalizers_plugins_LTLIBRARIES += mysql.la
 
 include mysql_sources.am
+
+update-general-ci-table:
+	@if test -z "$(MYSQL_SOURCE_DIR)"; then		\
+	  echo "\$$(MYSQL_SOURCE_DIR) is missing";	\
+	  exit 1;					\
+	fi
+	$(top_srcdir)/tool/generate-utf8-table.rb	\
+	  $(MYSQL_SOURCE_DIR)/strings/ctype-utf8.c >	\
+	  $(srcdir)/mysql_general_ci_table.h
