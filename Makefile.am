@@ -29,6 +29,9 @@ dist_doc_DATA =					\
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = groonga-normalizer-mysql.pc
 
+update-tables:
+	cd normalizers && $(MAKE) update-tables
+
 echo-groonga:
 	@echo $(GROONGA)
 

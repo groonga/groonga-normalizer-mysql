@@ -39,6 +39,8 @@ ensure-mysql-source-dir:
 	  exit 1;					\
 	fi
 
+update-tables: update-general-ci-table update-unicode-ci-table
+
 update-general-ci-table: ensure-mysql-source-dir
 	$(top_srcdir)/tool/generate_utf8_table.rb	\
 	  $(MYSQL_SOURCE_DIR)/strings/ctype-utf8.c >	\
