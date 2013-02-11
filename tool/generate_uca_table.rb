@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
 #
@@ -31,12 +32,32 @@ File.open(ctype_uca_c_path) do |ctype_uca_c|
   parser.parse(ctype_uca_c)
 end
 
+def find_representative_character(characters)
+  representative_character = nil
+  case characters.first[:utf8]
+  when "⺄", "⺇", "⺈", "⺊", "⺌", "⺗"
+    representative_character = characters.last
+  when "⺜", "⺝", "⺧", "⺫", "⺬", "⺮", "⺶", "⺻", "⺼", "⺽"
+    representative_character = characters[1]
+  when "⻆", "⻊", "⻏", "⻑", "⻕", "⻗", "⻝", "⻡", "⻣", "⻤"
+    representative_character = characters.last
+  when "⻱", "⼀", "⼆", "⼈"
+    representative_character = characters[1]
+  when "ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "っ", "ゃ", "ゅ", "ょ", "ゎ"
+    representative_character = characters[1]
+  end
+  representative_character ||= characters.first
+  representative_character
+end
+
 target_pages = {}
 parser.weight_based_characters.each do |weight, characters|
   next if characters.size == 1
-  representative_character = characters.first
+  representative_character = find_representative_character(characters)
   representative_code_point = representative_character[:code_point]
-  rest_characters = characters[1..-1]
+  rest_characters = characters.reject do |character|
+    character == representative_character
+  end
   rest_characters.each do |character|
     code_point = character[:code_point]
     page = code_point >> 8
