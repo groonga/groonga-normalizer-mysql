@@ -29,50 +29,50 @@ end
 
 class CTypeUTF8Parser
   def initialize
-    @planes = {}
+    @pages = {}
   end
 
   def parse(input)
     parse_ctype_utf8(input)
-    normalize_planes
+    normalize_pages
   end
 
-  def sorted_planes
-    @planes.sort_by do |plane, characters|
-      plane
+  def sorted_pages
+    @pages.sort_by do |page, characters|
+      page
     end
   end
 
   private
   def parse_ctype_utf8(input)
-    current_plane = nil
+    current_page = nil
     input.each_line do |line|
       case line
       when / plane([\da-fA-F]{2})\[\]=/
-        current_plane = $1.to_i(16)
-        @planes[current_plane] = []
+        current_page = $1.to_i(16)
+        @pages[current_page] = []
       when /^\s*
              \{0x([\da-z]+),0x([\da-z]+),0x([\da-z]+)\},
              \s*
              \{0x([\da-z]+),0x([\da-z]+),0x([\da-z]+)\},?$/ix
-        next if current_plane.nil?
+        next if current_page.nil?
         parsed_characters = $LAST_MATCH_INFO.captures.collect do |value|
           Unicode.to_utf8(value.to_i(16))
         end
         upper1, lower1, sort1, upper2, lower2, sort2 = parsed_characters
-        characters = @planes[current_plane]
+        characters = @pages[current_page]
         characters << {:upper => upper1, :lower => lower1, :sort => sort1}
         characters << {:upper => upper2, :lower => lower2, :sort => sort2}
       when /^\};$/
-        current_plane = nil
+        current_page = nil
       end
     end
   end
 
-  def normalize_planes
-    @planes.each do |plane, characters|
+  def normalize_pages
+    @pages.each do |page, characters|
       characters.each_with_index do |character, i|
-        character[:base] = Unicode.to_utf8((plane << 8) + i)
+        character[:base] = Unicode.to_utf8((page << 8) + i)
       end
     end
   end

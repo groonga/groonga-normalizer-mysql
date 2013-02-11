@@ -31,17 +31,17 @@ File.open(ctype_utf8_c_path) do |ctype_utf8_c|
   parser.parse(ctype_utf8_c)
 end
 
-target_planes = {}
-parser.sorted_planes.each do |plane, characters|
+target_pages = {}
+parser.sorted_pages.each do |page, characters|
   characters.each do |character|
     base = character[:base]
     upper = character[:upper]
     lower = character[:lower]
     sort = character[:sort]
     next if base == sort
-    target_planes[plane] ||= [nil] * 256
+    target_pages[page] ||= [nil] * 256
     low_code = Unicode.from_utf8(base) & 0xff
-    target_planes[plane][low_code] = Unicode.from_utf8(sort)
+    target_pages[page][low_code] = Unicode.from_utf8(sort)
   end
 end
 
@@ -97,48 +97,48 @@ puts(<<-HEADER)
 #include <stdint.h>
 HEADER
 
-def plane_name(plane)
-  "general_ci_plane_%02x" % plane
+def page_name(page)
+  "general_ci_page_%02x" % page
 end
 
-target_planes.each do |plane, characters|
-  puts(<<-PLANE_HEADER)
+target_pages.each do |page, characters|
+  puts(<<-PAGE_HEADER)
 
-static uint32_t #{plane_name(plane)}[] = {
-PLANE_HEADER
+static uint32_t #{page_name(page)}[] = {
+PAGE_HEADER
   lines = characters.each_with_index.each_slice(8).collect do |characters_group|
     formatted_code_points = characters_group.collect do |normalized, low_code|
-      normalized ||= (plane << 8) + low_code
+      normalized ||= (page << 8) + low_code
       "0x%05x" % normalized
     end
     "  " + formatted_code_points.join(", ")
   end
   puts(lines.join(",\n"))
-  puts(<<-PLANE_FOOTER)
+  puts(<<-PAGE_FOOTER)
 };
-PLANE_FOOTER
+PAGE_FOOTER
 end
 
-puts(<<-PLANES_HEADER)
+puts(<<-PAGES_HEADER)
 
 static uint32_t *general_ci_table[256] = {
-PLANES_HEADER
+PAGES_HEADER
 
-planes = ["NULL"] * 256
-target_planes.each do |plane, characters|
-  planes[plane] = plane_name(plane)
+pages = ["NULL"] * 256
+target_pages.each do |page, characters|
+  pages[page] = page_name(page)
 end
-lines = planes.each_slice(2).collect do |planes_group|
-  formatted_planes = planes_group.collect do |plane|
-    "%19s" % plane
+lines = pages.each_slice(2).collect do |pages_group|
+  formatted_pages = pages_group.collect do |page|
+    "%18s" % page
   end
-  "  " + formatted_planes.join(", ")
+  "  " + formatted_pages.join(", ")
 end
 puts(lines.join(",\n"))
 
-puts(<<-PLANES_FOOTER)
+puts(<<-PAGES_FOOTER)
 };
-PLANES_FOOTER
+PAGES_FOOTER
 
 puts(<<-FOOTER)
 

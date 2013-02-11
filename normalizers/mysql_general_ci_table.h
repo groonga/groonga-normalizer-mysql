@@ -46,7 +46,7 @@
 
 #include <stdint.h>
 
-static uint32_t general_ci_plane_00[] = {
+static uint32_t general_ci_page_00[] = {
   0x00000, 0x00001, 0x00002, 0x00003, 0x00004, 0x00005, 0x00006, 0x00007,
   0x00008, 0x00009, 0x0000a, 0x0000b, 0x0000c, 0x0000d, 0x0000e, 0x0000f,
   0x00010, 0x00011, 0x00012, 0x00013, 0x00014, 0x00015, 0x00016, 0x00017,
@@ -81,7 +81,7 @@ static uint32_t general_ci_plane_00[] = {
   0x000d8, 0x00055, 0x00055, 0x00055, 0x00055, 0x00059, 0x000de, 0x00059
 };
 
-static uint32_t general_ci_plane_01[] = {
+static uint32_t general_ci_page_01[] = {
   0x00041, 0x00041, 0x00041, 0x00041, 0x00041, 0x00041, 0x00043, 0x00043,
   0x00043, 0x00043, 0x00043, 0x00043, 0x00043, 0x00043, 0x00044, 0x00044,
   0x00110, 0x00110, 0x00045, 0x00045, 0x00045, 0x00045, 0x00045, 0x00045,
@@ -116,7 +116,7 @@ static uint32_t general_ci_plane_01[] = {
   0x0004e, 0x0004e, 0x00041, 0x00041, 0x000c6, 0x000c6, 0x000d8, 0x000d8
 };
 
-static uint32_t general_ci_plane_02[] = {
+static uint32_t general_ci_page_02[] = {
   0x00041, 0x00041, 0x00041, 0x00041, 0x00045, 0x00045, 0x00045, 0x00045,
   0x00049, 0x00049, 0x00049, 0x00049, 0x0004f, 0x0004f, 0x0004f, 0x0004f,
   0x00052, 0x00052, 0x00052, 0x00052, 0x00055, 0x00055, 0x00055, 0x00055,
@@ -151,7 +151,7 @@ static uint32_t general_ci_plane_02[] = {
   0x002f8, 0x002f9, 0x002fa, 0x002fb, 0x002fc, 0x002fd, 0x002fe, 0x002ff
 };
 
-static uint32_t general_ci_plane_03[] = {
+static uint32_t general_ci_page_03[] = {
   0x00300, 0x00301, 0x00302, 0x00303, 0x00304, 0x00305, 0x00306, 0x00307,
   0x00308, 0x00309, 0x0030a, 0x0030b, 0x0030c, 0x0030d, 0x0030e, 0x0030f,
   0x00310, 0x00311, 0x00312, 0x00313, 0x00314, 0x00315, 0x00316, 0x00317,
@@ -186,7 +186,7 @@ static uint32_t general_ci_plane_03[] = {
   0x003f8, 0x003f9, 0x003fa, 0x003fb, 0x003fc, 0x003fd, 0x003fe, 0x003ff
 };
 
-static uint32_t general_ci_plane_04[] = {
+static uint32_t general_ci_page_04[] = {
   0x00415, 0x00415, 0x00402, 0x00413, 0x00404, 0x00405, 0x00406, 0x00406,
   0x00408, 0x00409, 0x0040a, 0x0040b, 0x0041a, 0x00418, 0x00423, 0x0040f,
   0x00410, 0x00411, 0x00412, 0x00413, 0x00414, 0x00415, 0x00416, 0x00417,
@@ -221,7 +221,7 @@ static uint32_t general_ci_plane_04[] = {
   0x0042b, 0x0042b, 0x004fa, 0x004fb, 0x004fc, 0x004fd, 0x004fe, 0x004ff
 };
 
-static uint32_t general_ci_plane_05[] = {
+static uint32_t general_ci_page_05[] = {
   0x00500, 0x00501, 0x00502, 0x00503, 0x00504, 0x00505, 0x00506, 0x00507,
   0x00508, 0x00509, 0x0050a, 0x0050b, 0x0050c, 0x0050d, 0x0050e, 0x0050f,
   0x00510, 0x00511, 0x00512, 0x00513, 0x00514, 0x00515, 0x00516, 0x00517,
@@ -256,7 +256,7 @@ static uint32_t general_ci_plane_05[] = {
   0x005f8, 0x005f9, 0x005fa, 0x005fb, 0x005fc, 0x005fd, 0x005fe, 0x005ff
 };
 
-static uint32_t general_ci_plane_1e[] = {
+static uint32_t general_ci_page_1e[] = {
   0x00041, 0x00041, 0x00042, 0x00042, 0x00042, 0x00042, 0x00042, 0x00042,
   0x00043, 0x00043, 0x00044, 0x00044, 0x00044, 0x00044, 0x00044, 0x00044,
   0x00044, 0x00044, 0x00044, 0x00044, 0x00045, 0x00045, 0x00045, 0x00045,
@@ -291,7 +291,7 @@ static uint32_t general_ci_plane_1e[] = {
   0x00059, 0x00059, 0x01efa, 0x01efb, 0x01efc, 0x01efd, 0x01efe, 0x01eff
 };
 
-static uint32_t general_ci_plane_1f[] = {
+static uint32_t general_ci_page_1f[] = {
   0x00391, 0x00391, 0x00391, 0x00391, 0x00391, 0x00391, 0x00391, 0x00391,
   0x00391, 0x00391, 0x00391, 0x00391, 0x00391, 0x00391, 0x00391, 0x00391,
   0x00395, 0x00395, 0x00395, 0x00395, 0x00395, 0x00395, 0x01f16, 0x01f17,
@@ -326,7 +326,7 @@ static uint32_t general_ci_plane_1f[] = {
   0x0039f, 0x01ff9, 0x003a9, 0x01ffb, 0x003a9, 0x01ffd, 0x01ffe, 0x01fff
 };
 
-static uint32_t general_ci_plane_21[] = {
+static uint32_t general_ci_page_21[] = {
   0x02100, 0x02101, 0x02102, 0x02103, 0x02104, 0x02105, 0x02106, 0x02107,
   0x02108, 0x02109, 0x0210a, 0x0210b, 0x0210c, 0x0210d, 0x0210e, 0x0210f,
   0x02110, 0x02111, 0x02112, 0x02113, 0x02114, 0x02115, 0x02116, 0x02117,
@@ -361,7 +361,7 @@ static uint32_t general_ci_plane_21[] = {
   0x021f8, 0x021f9, 0x021fa, 0x021fb, 0x021fc, 0x021fd, 0x021fe, 0x021ff
 };
 
-static uint32_t general_ci_plane_24[] = {
+static uint32_t general_ci_page_24[] = {
   0x02400, 0x02401, 0x02402, 0x02403, 0x02404, 0x02405, 0x02406, 0x02407,
   0x02408, 0x02409, 0x0240a, 0x0240b, 0x0240c, 0x0240d, 0x0240e, 0x0240f,
   0x02410, 0x02411, 0x02412, 0x02413, 0x02414, 0x02415, 0x02416, 0x02417,
@@ -396,7 +396,7 @@ static uint32_t general_ci_plane_24[] = {
   0x024f8, 0x024f9, 0x024fa, 0x024fb, 0x024fc, 0x024fd, 0x024fe, 0x024ff
 };
 
-static uint32_t general_ci_plane_ff[] = {
+static uint32_t general_ci_page_ff[] = {
   0x0ff00, 0x0ff01, 0x0ff02, 0x0ff03, 0x0ff04, 0x0ff05, 0x0ff06, 0x0ff07,
   0x0ff08, 0x0ff09, 0x0ff0a, 0x0ff0b, 0x0ff0c, 0x0ff0d, 0x0ff0e, 0x0ff0f,
   0x0ff10, 0x0ff11, 0x0ff12, 0x0ff13, 0x0ff14, 0x0ff15, 0x0ff16, 0x0ff17,
@@ -432,134 +432,134 @@ static uint32_t general_ci_plane_ff[] = {
 };
 
 static uint32_t *general_ci_table[256] = {
-  general_ci_plane_00, general_ci_plane_01,
-  general_ci_plane_02, general_ci_plane_03,
-  general_ci_plane_04, general_ci_plane_05,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-  general_ci_plane_1e, general_ci_plane_1f,
-                 NULL, general_ci_plane_21,
-                 NULL,                NULL,
-  general_ci_plane_24,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL,                NULL,
-                 NULL, general_ci_plane_ff
+  general_ci_page_00, general_ci_page_01,
+  general_ci_page_02, general_ci_page_03,
+  general_ci_page_04, general_ci_page_05,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+  general_ci_page_1e, general_ci_page_1f,
+                NULL, general_ci_page_21,
+                NULL,               NULL,
+  general_ci_page_24,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL,               NULL,
+                NULL, general_ci_page_ff
 };
 
 #endif

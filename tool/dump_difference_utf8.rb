@@ -27,7 +27,7 @@ parser.parse(ARGF)
 
 n_differences = 0
 n_expanded_sort_characters = 0
-parser.sorted_planes.each do |plane, characters|
+parser.sorted_pages.each do |page, characters|
   characters.each do |character|
     base = character[:base]
     upper = character[:upper]

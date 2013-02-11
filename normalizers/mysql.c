@@ -75,30 +75,30 @@ unichar_to_utf8(uint32_t unichar, char *output)
 
 static inline void
 decompose_character(const char *rest, int character_length,
-                    int *plane, uint32_t *low_code)
+                    int *page, uint32_t *low_code)
 {
   switch (character_length) {
   case 1 :
-    *plane = 0x00;
+    *page = 0x00;
     *low_code = rest[0] & 0x7f;
     break;
   case 2 :
-    *plane = rest[0] & 0x1c;
+    *page = rest[0] & 0x1c;
     *low_code = ((rest[0] & 0x03) << 6) + (rest[1] & 0x3f);
     break;
   case 3 :
-    *plane = ((rest[0] & 0x0f) << 4) + ((rest[1] & 0x3c));
+    *page = ((rest[0] & 0x0f) << 4) + ((rest[1] & 0x3c));
     *low_code = ((rest[1] & 0x03) << 6) + (rest[2] & 0x3f);
     break;
   case 4 :
-    *plane =
+    *page =
       ((rest[0] & 0x07) << 10) +
       ((rest[1] & 0x3f) << 4) +
       ((rest[2]) & 0x3c);
     *low_code = ((rest[1] & 0x03) << 6) + (rest[2] & 0x3f);
     break;
   default :
-    *plane = -1;
+    *page = -1;
     *low_code = 0x00;
     break;
   }
@@ -136,7 +136,7 @@ normalize(grn_ctx *ctx, grn_obj *string, uint32_t **normalize_table)
   rest_length = original_length_in_bytes;
   while (rest_length > 0) {
     int character_length;
-    int plane;
+    int page;
     uint32_t low_code;
 
     character_length = grn_plugin_charlen(ctx, rest, rest_length, encoding);
@@ -144,16 +144,16 @@ normalize(grn_ctx *ctx, grn_obj *string, uint32_t **normalize_table)
       break;
     }
 
-    decompose_character(rest, character_length, &plane, &low_code);
+    decompose_character(rest, character_length, &page, &low_code);
     if (remove_blank_p && character_length == 1 && rest[0] == ' ') {
       if (current_type > types) {
         current_type[-1] |= GRN_CHAR_BLANK;
       }
     } else {
-      if ((0x00 <= plane && plane <= 0xff) && normalize_table[plane]) {
+      if ((0x00 <= page && page <= 0xff) && normalize_table[page]) {
         uint32_t normalized_code;
         unsigned int n_bytes;
-        normalized_code = normalize_table[plane][low_code];
+        normalized_code = normalize_table[page][low_code];
         n_bytes = unichar_to_utf8(normalized_code,
                                   normalized + normalized_length_in_bytes);
         normalized_length_in_bytes += n_bytes;
