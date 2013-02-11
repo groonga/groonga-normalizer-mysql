@@ -42,11 +42,13 @@ ensure-mysql-source-dir:
 update-tables: update-general-ci-table update-unicode-ci-table
 
 update-general-ci-table: ensure-mysql-source-dir
-	$(top_srcdir)/tool/generate_utf8_table.rb	\
+	$(RUBY)						\
+	  $(top_srcdir)/tool/generate_utf8_table.rb	\
 	  $(MYSQL_SOURCE_DIR)/strings/ctype-utf8.c >	\
 	  $(srcdir)/mysql_general_ci_table.h
 
 update-unicode-ci-table: ensure-mysql-source-dir
-	$(top_srcdir)/tool/generate_uca_table.rb	\
+	$(RUBY)						\
+	  $(top_srcdir)/tool/generate_uca_table.rb	\
 	  $(MYSQL_SOURCE_DIR)/strings/ctype-uca.c >	\
 	  $(srcdir)/mysql_unicode_ci_table.h
