@@ -1,2 +1,4 @@
 mysql_la_SOURCES =				\
-	mysql.c
+	mysql.c					\
+	mysql_general_ci_table.h		\
+	mysql_unicode_ci_table.h

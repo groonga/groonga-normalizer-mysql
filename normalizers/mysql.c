@@ -22,6 +22,7 @@
 #include <groonga/nfkc.h>
 
 #include "mysql_general_ci_table.h"
+#include "mysql_unicode_ci_table.h"
 
 #ifdef __GNUC__
 #  define GNUC_UNUSED __attribute__((__unused__))
@@ -105,7 +106,7 @@ decompose_character(const char *rest, int character_length,
 
 
 static void
-normalize(grn_ctx *ctx, grn_obj *string)
+normalize(grn_ctx *ctx, grn_obj *string, uint32_t **normalize_table)
 {
   const char *original, *rest;
   unsigned int original_length_in_bytes, rest_length;
@@ -149,10 +150,10 @@ normalize(grn_ctx *ctx, grn_obj *string)
         current_type[-1] |= GRN_CHAR_BLANK;
       }
     } else {
-      if ((0x00 <= plane && plane <= 0xff) && general_ci_table[plane]) {
+      if ((0x00 <= plane && plane <= 0xff) && normalize_table[plane]) {
         uint32_t normalized_code;
         unsigned int n_bytes;
-        normalized_code = general_ci_table[plane][low_code];
+        normalized_code = normalize_table[plane][low_code];
         n_bytes = unichar_to_utf8(normalized_code,
                                   normalized + normalized_length_in_bytes);
         normalized_length_in_bytes += n_bytes;
@@ -209,7 +210,29 @@ mysql_general_ci_next(GNUC_UNUSED grn_ctx *ctx,
                      grn_encoding_to_string(encoding));
     return NULL;
   }
-  normalize(ctx, string);
+  normalize(ctx, string, general_ci_table);
+  return NULL;
+}
+
+static grn_obj *
+mysql_unicode_ci_next(GNUC_UNUSED grn_ctx *ctx,
+                      GNUC_UNUSED int nargs,
+                      grn_obj **args,
+                      GNUC_UNUSED grn_user_data *user_data)
+{
+  grn_obj *string = args[0];
+  grn_encoding encoding;
+
+  encoding = grn_string_get_encoding(ctx, string);
+  if (encoding != GRN_ENC_UTF8) {
+    GRN_PLUGIN_ERROR(ctx,
+                     GRN_FUNCTION_NOT_IMPLEMENTED,
+                     "[normalizer][mysql-unicode-ci] "
+                     "UTF-8 encoding is only supported: %s",
+                     grn_encoding_to_string(encoding));
+    return NULL;
+  }
+  normalize(ctx, string, unicode_ci_table);
   return NULL;
 }
 
@@ -224,6 +247,8 @@ GRN_PLUGIN_REGISTER(grn_ctx *ctx)
 {
   grn_normalizer_register(ctx, "NormalizerMySQLGeneralCI", -1,
                           NULL, mysql_general_ci_next, NULL);
+  grn_normalizer_register(ctx, "NormalizerMySQLUnicodeCI", -1,
+                          NULL, mysql_unicode_ci_next, NULL);
   return GRN_SUCCESS;
 }
 
