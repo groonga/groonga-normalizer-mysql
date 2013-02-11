@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_PREREQ(2.59)
-AC_INIT([groonga-normalizer-mysql], 1.0.0, [groonga@razil.jp])
+AC_INIT([groonga-normalizer-mysql], 1.0.1, [groonga@razil.jp])
 
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([normalizers/mysql.c])
