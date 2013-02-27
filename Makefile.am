@@ -40,3 +40,6 @@ echo-groonga-httpd:
 
 echo-ruby:
 	@echo $(RUBY)
+
+tag:
+	cd $(top_srcdir) && git tag v$(VERSION) -a -m 'groonga-normalizer-mysql $(VERSION)!!!'
