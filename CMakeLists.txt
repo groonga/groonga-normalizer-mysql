@@ -23,7 +23,7 @@ file(READ "${CMAKE_SOURCE_DIR}/version" VERSION)
 include(FindPkgConfig)
 include(${CMAKE_SOURCE_DIR}/build/cmake_modules/ReadFileList.cmake)
 
-file(READ ${CAMKE_SOURCE_DIR}/required_groonga_version GROONGA_REQUIRED_VERSION)
+file(READ ${CMAKE_SOURCE_DIR}/required_groonga_version GROONGA_REQUIRED_VERSION)
 string(STRIP "${GROONGA_REQUIRED_VERSION}" GROONGA_REQUIRED_VERSION)
 
 pkg_check_modules(GROONGA REQUIRED "groonga >= ${GROONGA_REQUIRED_VERSION}")
@@ -35,7 +35,7 @@ add_definitions(
 
 include_directories(
   ${CMAKE_BINARY_DIR}
-  ${GROOGNA_INCLUDE_DIRS}
+  ${GROONGA_INCLUDE_DIRS}
   )
 
 link_directories(
@@ -44,8 +44,11 @@ link_directories(
 
 add_subdirectory(normalizers)
 
-configure_file(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+configure_file(
+  groonga-normalizer-mysql.pc.in
+  ${CMAKE_CURRENT_BINARY_DIR}/groonga-normalizer-mysql.pc
+  @ONLY)
 
-configure_file(groonga.pc.in ${CMAKE_CURRENT_BINARY_DIR}/groonga.pc @ONLY)
-
-install(FILES groonga-normalizer-mysql.pc DESTINATION "${LIB_DIR}/pkgconfig/")
+install(
+  FILES groonga-normalizer-mysql.pc
+  DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig/")
