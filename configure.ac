@@ -111,6 +111,8 @@ AC_SUBST(GPG_UID)
 AC_CONFIG_FILES([
   Makefile
   groonga-normalizer-mysql.pc
+  build/Makefile
+  build/cmake_modules/Makefile
   normalizers/Makefile
   packages/Makefile
   packages/apt/Makefile
