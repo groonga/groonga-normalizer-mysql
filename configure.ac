@@ -18,7 +18,7 @@ AC_PREREQ(2.59)
 m4_define([groonga_normalizer_mysql_version], m4_include(version))
 AC_INIT([groonga-normalizer-mysql],
         groonga_normalizer_mysql_version,
-        [groonga@razil.jp])
+        [groonga-talk@lists.sourceforge.net])
 
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([normalizers/mysql.c])
