@@ -33,7 +33,9 @@ if test "$GCC" = "yes"; then
   CFLAGS="$CFLAGS -Wmissing-declarations -Wmissing-prototypes"
 fi
 
-PKG_CHECK_MODULES([GROONGA], [groonga >= 2.1.2])
+m4_define([groonga_required_version], m4_include(required_groonga_version))
+GROONGA_REQUIRED_VERSION=groonga_required_version
+PKG_CHECK_MODULES([GROONGA], [groonga >= ${GROONGA_REQUIRED_VERSION}])
 
 _PKG_CONFIG(GROONGA_PLUGINS_DIR, [variable=pluginsdir],    [groonga])
 _PKG_CONFIG(GROONGA,             [variable=groonga],       [groonga])
