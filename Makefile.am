@@ -43,3 +43,10 @@ echo-ruby:
 
 tag:
 	cd $(top_srcdir) && git tag v$(VERSION) -a -m 'groonga-normalizer-mysql $(VERSION)!!!'
+
+update-version:
+	@if test -z "$(NEW_VERSION)"; then	\
+	  echo "\$$(NEW_VERSION) is missing";	\
+	  exit 1;				\
+	fi
+	@echo -n $(NEW_VERSION) > $(srcdir)/version
