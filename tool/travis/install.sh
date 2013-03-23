@@ -24,4 +24,3 @@ curl https://raw.github.com/groonga/groonga/master/data/travis/setup.sh | sh
 if ! pkg-config --exists groonga; then
     sudo apt-get install -qq -y libgroonga-dev
 fi
-
