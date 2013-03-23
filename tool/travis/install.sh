@@ -27,3 +27,4 @@ fi
 
 mount
 ls -lah /dev/shm/
+ls -lah /run/shm/
