@@ -26,4 +26,4 @@ if ! pkg-config --exists groonga; then
 fi
 
 mount
-ls -lAh /dev/shm
+ls -lah /dev/shm/
