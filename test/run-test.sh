@@ -137,7 +137,7 @@ if test "$have_targets" != "true"; then
 fi
 
 tmpfs=/run/shm
-if test -e $tmpfs; then
+if test -d $tmpfs -a -w $tmpfs; then
     rm -rf "tmp"
     ln -s $tmpfs "tmp"
 fi
