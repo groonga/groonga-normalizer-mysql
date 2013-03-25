@@ -105,6 +105,21 @@ AC_ARG_WITH(rsync-path,
             [RSYNC_PATH="packages@packages.groonga.org:public"])
 AC_SUBST(RSYNC_PATH)
 
+AC_ARG_WITH([cutter-source-path],
+            AS_HELP_STRING([--with-cutter-source-path=PATH],
+                           [Specify Cutter source path for
+			    groonga-normalizer-mysql's release manager.]),
+			   [CUTTER_SOURCE_PATH="$withval"])
+case "$CUTTER_SOURCE_PATH" in
+  ""|/*)
+    : # do nothing
+    ;;
+  *)
+    CUTTER_SOURCE_PATH="\$(top_builddir)/${CUTTER_SOURCE_PATH}"
+    ;;
+esac
+AC_SUBST(CUTTER_SOURCE_PATH)
+
 GPG_UID=m4_include(gpg_uid)
 AC_SUBST(GPG_UID)
 
