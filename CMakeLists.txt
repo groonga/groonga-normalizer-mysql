@@ -46,7 +46,7 @@ add_subdirectory(normalizers)
 
 configure_file(
   groonga-normalizer-mysql.pc.in
-  ${CMAKE_CURRENT_BINARY_DIR}/groonga-normalizer-mysql.pc
+  "${CMAKE_CURRENT_BINARY_DIR}/groonga-normalizer-mysql.pc"
   @ONLY)
 
 install(
