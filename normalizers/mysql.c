@@ -30,6 +30,10 @@
 #  define GNUC_UNUSED
 #endif
 
+#ifdef _MSC_VER
+#  define inline _inline
+#endif
+
 static inline unsigned int
 unichar_to_utf8(uint32_t unichar, char *output)
 {
