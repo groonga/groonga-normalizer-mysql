@@ -96,9 +96,9 @@ IMPORTANT!!!: Set `PKG_CONFIG_PATH` environment variable:
 
     groonga-normalizer-mysql-X.Y.Z> set PKG_CONFIG_PATH=C:\groongalocal\lib\pkgconfig
 
-Run CMake:
+Run CMake. Here is a command line to install groonga to `C:\groonga` folder:
 
-    groonga-normalizer-mysql-X.Y.Z> cmake . -G "Visual Studio 10 Win64"
+    groonga-normalizer-mysql-X.Y.Z> cmake . -G "Visual Studio 10 Win64" -DCMAKE_INSTALL_PREFIX=C:\groonga
 
 Build by Visual C++ 2010 Express:
 
