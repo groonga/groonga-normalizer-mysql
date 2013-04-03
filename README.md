@@ -51,6 +51,63 @@ Then install `groonga-normalizer-mysql` package:
 
     % sudo yum install -y groonga-normalizer-mysql
 
+### Windows
+
+You need to build from source. Here are build instructions.
+
+#### Build system
+
+Install the following build tools:
+
+* [Microsoft Visual Studio 2010 Express](http://www.microsoft.com/japan/msdn/vstudio/express/): 2012 isn't tested yet.
+* [CMake](http://www.cmake.org/)
+
+#### Build groonga
+
+Download the latest groonga source from [packages.groonga.org](http://packages.groonga.org/source/groonga/). Source file name is formatted as `groonga-X.Y.Z.zip`.
+
+Extract the source and move to the source folder:
+
+    > cd ...\groonga-X.Y.Z
+    groonga-X.Y.Z>
+
+Run CMake. Here is a command line to install groonga to `C:\groonga` folder:
+
+    groonga-X.Y.Z> cmake . -G "Visual Studio 10 Win64" -DCMAKE_INSTALL_PREFIX=C:\groonga
+
+Build by Visual C++ 2010 Express:
+
+    groonga-X.Y.Z> msbuild groonga.sln /p:Configuration=Release
+
+Install by Visual C++ 2010 Express:
+
+    groonga-X.Y.Z> msbuild groonga.sln /p:Configuration=Release /t:Install
+
+#### Build groonga-normalizer-mysql
+
+Download the latest groonga-normalizer-mysql source from [packages.groonga.org](http://packages.groonga.org/source/groonga-normalizer-mysql/). Source file name is formatted as `groonga-normalizer-X.Y.Z.zip`.
+
+Extract the source and move to the source folder:
+
+    > cd ...\groonga-normalizer-mysql-X.Y.Z
+    groonga-normalizer-mysql-X.Y.Z>
+
+IMPORTANT!!!: Set `PKG_CONFIG_PATH` environment variable:
+
+    groonga-normalizer-mysql-X.Y.Z> set PKG_CONFIG_PATH=C:\groongalocal\lib\pkgconfig
+
+Run CMake:
+
+    groonga-normalizer-mysql-X.Y.Z> cmake . -G "Visual Studio 10 Win64"
+
+Build by Visual C++ 2010 Express:
+
+    groonga-normalizer-mysql-X.Y.Z> msbuild groonga-normalizer-mysql.sln /p:Configuration=Release
+
+Install by Visual C++ 2010 Express:
+
+    groonga-normalizer-mysql-X.Y.Z> msbuild groonga-normalizer-mysql.sln /p:Configuration=Release /t:Install
+
 ## Usage
 
 First, you need to register `normalizers/mysql` plugin:
