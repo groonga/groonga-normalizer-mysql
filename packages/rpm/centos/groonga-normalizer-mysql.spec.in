@@ -12,7 +12,7 @@ Source0:	http://packages.groonga.org/source/%{name}/%{name}-%{version}.tar.gz
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%(%{__id_u} -n)
 BuildRequires:	groonga-devel >= 3.0.0
-Requires:	groonga >= 3.0.0
+Requires:	groonga-libs >= 3.0.0
 
 %description
 This package provides MySQL compatible normalizer plugin.
@@ -43,6 +43,10 @@ rm $RPM_BUILD_ROOT%{_libdir}/groonga/plugins/*/*.la
 %{_datadir}/doc/groonga-normalizer-mysql/
 
 %changelog
+* Mon Apr 29 2013 HAYASHI Kentaro <hayashi@clear-code.com> - 1.0.3-0
+- new upstream release.
+- Reduce required packages. groonga-libs is only required.
+
 * Fri Mar 29 2013 HAYASHI Kentaro <hayashi@clear-code.com> - 1.0.2-0
 - new upstream release.
 
