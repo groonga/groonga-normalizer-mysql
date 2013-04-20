@@ -32,6 +32,13 @@ File.open(ctype_uca_c_path) do |ctype_uca_c|
   parser.parse(ctype_uca_c)
 end
 
+GREEK_CAPITAL_UNICODE_RANGE = Unicode.from_utf8("Α")..Unicode.from_utf8("Ω")
+def find_greek_capital_character(characters)
+  characters.find do |character|
+    GREEK_CAPITAL_UNICODE_RANGE.cover?(character[:code_point])
+  end
+end
+
 def find_representative_character(characters)
   representative_character = nil
   case characters.first[:utf8]
@@ -45,6 +52,8 @@ def find_representative_character(characters)
     representative_character = characters[1]
   when "ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "っ", "ゃ", "ゅ", "ょ", "ゎ"
     representative_character = characters[1]
+  else
+    representative_character ||= find_greek_capital_character(characters)
   end
   representative_character ||= characters.first
   representative_character
