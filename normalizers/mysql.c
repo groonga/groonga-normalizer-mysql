@@ -98,7 +98,7 @@ decompose_character(const char *rest, int character_length,
     *page =
       ((rest[0] & 0x07) << 10) +
       ((rest[1] & 0x3f) << 4) +
-      ((rest[2]) & 0x3c);
+      ((rest[2] & 0x3c) >> 2);
     *low_code = ((rest[1] & 0x03) << 6) + (rest[2] & 0x3f);
     break;
   default :
