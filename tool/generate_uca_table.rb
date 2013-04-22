@@ -17,11 +17,51 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "optparse"
+
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 require "parser"
 
+@suffix = ""
+@split_small_kana_p = false
+@split_kana_with_voiced_sound_mark_p = false
+@split_kana_with_semi_voiced_sound_mark_p = false
+
+option_parser = OptionParser.new
+option_parser.banner += " MYSQL_SOURCE/strings/ctype-uca.c"
+
+option_parser.on("--suffix=SUFFIX", "Add SUFFIX to names") do |suffix|
+  @suffix = suffix
+end
+
+option_parser.on("--[no-]split-small-kana",
+                 "Split small hiragana (katakana) and " +
+                   "large hiragana (katakana)",
+                 "(#{@split_small_kana_p})") do |boolean|
+  @split_small_kana_p = boolean
+end
+
+option_parser.on("--[no-]split-kana-with-voiced-sound-mark",
+                 "Split hiragana (katakana) with voiced sound mark",
+                 "(#{@split_kana_with_voiced_sound_mark})") do |boolean|
+  @split_kana_with_voiced_sound_mark_p = boolean
+end
+
+option_parser.on("--[no-]split-kana-with-semi-voiced-sound-mark",
+                 "Split hiragana (katakana) with semi-voiced sound mark",
+                 "(#{@split_kana_with_semi_voiced_sound_mark})") do |boolean|
+  @split_kana_with_semi_voiced_sound_mark_p = boolean
+end
+
+begin
+  option_parser.parse!(ARGV)
+rescue OptionParser::Error
+  puts($!)
+  exit(false)
+end
+
 if ARGV.size != 1
-  puts("Usage: #{$0} MYSQL_SOURCE/strings/ctype-uca.c")
+  puts(option_parser)
   exit(false)
 end
 
@@ -30,6 +70,67 @@ ctype_uca_c_path = ARGV[0]
 parser = CTypeUCAParser.new
 File.open(ctype_uca_c_path) do |ctype_uca_c|
   parser.parse(ctype_uca_c)
+end
+
+SMALL_KANAS = [
+  "ぁ", "ぃ", "ぅ", "ぇ", "ぉ",
+  "っ",
+  "ゃ", "ゅ", "ょ",
+  "ゎ",
+  "ァ", "ィ", "ゥ", "ェ", "ォ",
+  "ッ",
+  "ャ", "ュ", "ョ",
+  "ヮ",
+  "ｧ", "ｨ", "ｩ", "ｪ", "ｫ",
+  "ｯ",
+  "ｬ", "ｭ", "ｮ",
+]
+def small_kana?(character)
+  SMALL_KANAS.include?(character[:utf8])
+end
+
+KANA_WITH_VOICED_SOUND_MARKS = [
+  "が", "ぎ", "ぐ", "げ", "ご",
+  "ざ", "じ", "ず", "ぜ", "ぞ",
+  "だ", "ぢ", "づ", "で", "ど",
+  "ば", "び", "ぶ", "べ", "ぼ",
+  "ガ", "ギ", "グ", "ゲ", "ゴ",
+  "ザ", "ジ", "ズ", "ゼ", "ゾ",
+  "ダ", "ヂ", "ヅ", "デ", "ド",
+  "バ", "ビ", "ブ", "ベ", "ボ",
+]
+def kana_with_voiced_sound_mark?(character)
+  KANA_WITH_VOICED_SOUND_MARKS.include?(character[:utf8])
+end
+
+KANA_WITH_SEMI_VOICED_SOUND_MARKS = [
+  "ぱ", "ぴ", "ぷ", "ぺ", "ぽ",
+  "パ", "ピ", "プ", "ペ", "ポ",
+]
+def kana_with_semi_voiced_sound_mark?(character)
+  KANA_WITH_SEMI_VOICED_SOUND_MARKS.include?(character[:utf8])
+end
+
+def split_characters(characters)
+  grouped_characters = characters.group_by do |character|
+    if @split_small_kana_p and small_kana?(character)
+      :small_kana
+    elsif @split_kana_with_voiced_sound_mark_p and
+        kana_with_voiced_sound_mark?(character)
+      :kana_with_voiced_sound_mark
+    elsif @split_kana_with_semi_voiced_sound_mark_p and
+        kana_with_semi_voiced_sound_mark?(character)
+      :kana_with_semi_voiced_sound_mark
+    else
+      :other
+    end
+  end
+  grouped_characters.values
+end
+
+grouped_characters = []
+parser.weight_based_characters.each do |weight, characters|
+  grouped_characters.concat(split_characters(characters))
 end
 
 GREEK_CAPITAL_UNICODE_RANGE = Unicode.from_utf8("Α")..Unicode.from_utf8("Ω")
@@ -51,7 +152,7 @@ def find_representative_character(characters)
   when "⻱", "⼀", "⼆", "⼈"
     representative_character = characters[1]
   when "ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "っ", "ゃ", "ゅ", "ょ", "ゎ"
-    representative_character = characters[1]
+    representative_character = characters[1] unless @split_small_kana_p
   else
     representative_character ||= find_greek_capital_character(characters)
   end
@@ -60,7 +161,7 @@ def find_representative_character(characters)
 end
 
 target_pages = {}
-parser.weight_based_characters.each do |weight, characters|
+grouped_characters.each do |characters|
   next if characters.size == 1
   representative_character = find_representative_character(characters)
   representative_code_point = representative_character[:code_point]
@@ -80,8 +181,12 @@ sorted_target_pages = target_pages.sort_by do |page, code_points|
   page
 end
 
+
 normalized_ctype_uca_c_path =
   ctype_uca_c_path.sub(/\A.*\/([^\/]+\/strings\/ctype-uca\.c)\z/, "\\1")
+
+@suffix_upper_case = @suffix.upcase
+
 puts(<<-HEADER)
 /*
   Copyright(C) 2013  Kouhei Sutou <kou@clear-code.com>
@@ -126,14 +231,14 @@ puts(<<-HEADER)
     Written by Alexander Barkov <bar@mysql.com>
 */
 
-#ifndef MYSQL_UCA_H
-#define MYSQL_UCA_H
+#ifndef MYSQL_UCA#{@suffix_upper_case}_H
+#define MYSQL_UCA#{@suffix_upper_case}_H
 
 #include <stdint.h>
 HEADER
 
 def page_name(page)
-  "unicode_ci_page_%02x" % page
+  "unicode_ci#{@suffix}_page_%02x" % page
 end
 
 sorted_target_pages.each do |page, characters|
@@ -156,7 +261,7 @@ end
 
 puts(<<-PAGES_HEADER)
 
-static uint32_t *unicode_ci_table[256] = {
+static uint32_t *unicode_ci#{@suffix}_table[256] = {
 PAGES_HEADER
 
 pages = ["NULL"] * 256

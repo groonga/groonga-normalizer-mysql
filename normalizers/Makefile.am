@@ -39,7 +39,12 @@ ensure-mysql-source-dir:
 	  exit 1;					\
 	fi
 
-update-tables: update-general-ci-table update-unicode-ci-table
+UPDATE_TABLES_TARGETS =			\
+	update-general-ci-table		\
+	update-unicode-ci-table		\
+	update-unicode-ci-except-kana-ci-kana-with-voiced-sound-mark-table
+
+update-tables: $(UPDATE_TABLES_TARGETS)
 
 update-general-ci-table: ensure-mysql-source-dir
 	$(RUBY)						\
@@ -52,3 +57,13 @@ update-unicode-ci-table: ensure-mysql-source-dir
 	  $(top_srcdir)/tool/generate_uca_table.rb	\
 	  $(MYSQL_SOURCE_DIR)/strings/ctype-uca.c >	\
 	  $(srcdir)/mysql_unicode_ci_table.h
+
+update-unicode-ci-except-kana-ci-kana-with-voiced-sound-mark-table: ensure-mysql-source-dir
+	$(RUBY)							\
+	  $(top_srcdir)/tool/generate_uca_table.rb		\
+	  --split-small-kana					\
+	  --split-kana-with-voiced-sound-mark			\
+	  --split-kana-with-semi-voiced-sound-mark		\
+	  --suffix _except_kana_ci_kana_with_voiced_sound_mark	\
+	  $(MYSQL_SOURCE_DIR)/strings/ctype-uca.c >		\
+	  $(srcdir)/mysql_unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_table.h
