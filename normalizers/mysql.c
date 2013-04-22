@@ -23,6 +23,7 @@
 
 #include "mysql_general_ci_table.h"
 #include "mysql_unicode_ci_table.h"
+#include "mysql_unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_table.h"
 
 #ifdef __GNUC__
 #  define GNUC_UNUSED __attribute__((__unused__))
@@ -240,6 +241,31 @@ mysql_unicode_ci_next(GNUC_UNUSED grn_ctx *ctx,
   return NULL;
 }
 
+static grn_obj *
+mysql_unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_next(
+  GNUC_UNUSED grn_ctx *ctx,
+  GNUC_UNUSED int nargs,
+  grn_obj **args,
+  GNUC_UNUSED grn_user_data *user_data)
+{
+  grn_obj *string = args[0];
+  grn_encoding encoding;
+
+  encoding = grn_string_get_encoding(ctx, string);
+  if (encoding != GRN_ENC_UTF8) {
+    GRN_PLUGIN_ERROR(ctx,
+                     GRN_FUNCTION_NOT_IMPLEMENTED,
+                     "[normalizer]"
+                     "[mysql-unicode-ci-except-kana-ci-kana-with-voiced-sound-mark] "
+                     "UTF-8 encoding is only supported: %s",
+                     grn_encoding_to_string(encoding));
+    return NULL;
+  }
+  normalize(ctx, string,
+            unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_table);
+  return NULL;
+}
+
 grn_rc
 GRN_PLUGIN_INIT(grn_ctx *ctx)
 {
@@ -253,6 +279,15 @@ GRN_PLUGIN_REGISTER(grn_ctx *ctx)
                           NULL, mysql_general_ci_next, NULL);
   grn_normalizer_register(ctx, "NormalizerMySQLUnicodeCI", -1,
                           NULL, mysql_unicode_ci_next, NULL);
+  grn_normalizer_register(ctx,
+                          "NormalizerMySQLUnicodeCI"
+                          "Except"
+                          "KanaCI"
+                          "KanaWithVoicedSoundMark",
+                          -1,
+                          NULL,
+                          mysql_unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_next,
+                          NULL);
   return GRN_SUCCESS;
 }
 
