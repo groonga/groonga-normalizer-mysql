@@ -16,6 +16,14 @@ ExclusiveArch:	%{ix86} x86_64
 This package provides MySQL compatible normalizer plugin.
 You can use NormalizerMySQLGeneralCI and NormalizerMySQLUnicodeCI as normalizer.
 
+%package devel
+Summary:        Development files for groonga-normalizer-mysql
+Group:          Development/Libraries
+Requires:       %{name} = %{version}-%{release}
+
+%description devel
+This package provides development files for groonga-normalizer-mysql.
+
 %prep
 %setup -q
 
@@ -36,14 +44,17 @@ rm $RPM_BUILD_ROOT%{_libdir}/groonga/plugins/*/*.la
 %dir %{_libdir}/groonga/plugins
 %dir %{_libdir}/groonga/plugins/normalizers
 %{_libdir}/groonga/plugins/normalizers/mysql.so
-%{_libdir}/pkgconfig/groonga-normalizer-mysql.pc
 %{_datadir}/doc/groonga-normalizer-mysql/
+
+%files devel
+%{_libdir}/pkgconfig/groonga-normalizer-mysql.pc
 
 %changelog
 * Mon Apr 29 2013 HAYASHI Kentaro <hayashi@clear-code.com> - 1.0.3-1
 - new upstream release.
 - Reduce required packages. groonga-libs is only required.
 - Require groonga 3.0.3 or later.
+- Split development files into -devel package.
 
 * Fri Mar 29 2013 HAYASHI Kentaro <hayashi@clear-code.com> - 1.0.2-0
 - new upstream release.
