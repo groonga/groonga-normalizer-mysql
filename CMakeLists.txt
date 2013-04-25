@@ -34,7 +34,9 @@ else()
   include(FindPkgConfig)
   include(${CMAKE_CURRENT_SOURCE_DIR}/build/cmake_modules/ReadFileList.cmake)
 
-  file(READ ${CMAKE_CURRENT_SOURCE_DIR}/required_groonga_version GROONGA_REQUIRED_VERSION)
+  file(READ
+    ${CMAKE_CURRENT_SOURCE_DIR}/required_groonga_version
+    GROONGA_REQUIRED_VERSION)
   string(STRIP "${GROONGA_REQUIRED_VERSION}" GROONGA_REQUIRED_VERSION)
 
   pkg_check_modules(GROONGA REQUIRED "groonga >= ${GROONGA_REQUIRED_VERSION}")
