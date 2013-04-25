@@ -32,9 +32,9 @@ if(GROONGA_NORMALIZER_MYSQL_BUNDLED)
   set(GROONGA_PLUGINS_DIR "${GRN_PLUGINS_DIR}")
 else()
   include(FindPkgConfig)
-  include(${CMAKE_SOURCE_DIR}/build/cmake_modules/ReadFileList.cmake)
+  include(${CMAKE_CURRENT_SOURCE_DIR}/build/cmake_modules/ReadFileList.cmake)
 
-  file(READ ${CMAKE_SOURCE_DIR}/required_groonga_version GROONGA_REQUIRED_VERSION)
+  file(READ ${CMAKE_CURRENT_SOURCE_DIR}/required_groonga_version GROONGA_REQUIRED_VERSION)
   string(STRIP "${GROONGA_REQUIRED_VERSION}" GROONGA_REQUIRED_VERSION)
 
   pkg_check_modules(GROONGA REQUIRED "groonga >= ${GROONGA_REQUIRED_VERSION}")
