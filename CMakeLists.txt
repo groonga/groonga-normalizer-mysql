@@ -43,9 +43,6 @@ else()
   _pkgconfig_invoke(groonga GROONGA PLUGINS_DIR "" --variable=pluginsdir)
 endif()
 
-add_definitions(
-  -DHAVE_CONFIG_H)
-
 include_directories(
   ${CMAKE_BINARY_DIR}
   ${GROONGA_INCLUDE_DIRS})
