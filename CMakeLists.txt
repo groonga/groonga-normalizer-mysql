@@ -18,8 +18,19 @@
 cmake_minimum_required(VERSION 2.6)
 project(groonga-normalizer-mysql)
 
-file(READ "${CMAKE_SOURCE_DIR}/version" VERSION)
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/version" VERSION)
 
+if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
+  set(GROONGA_NORMALIZER_MYSQL_BUNDLED FALSE)
+else()
+  set(GROONGA_NORMALIZER_MYSQL_BUNDLED TRUE)
+endif()
+
+if(GROONGA_NORMALIZER_MYSQL_BUNDLED)
+  set(GROONGA_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include")
+  set(GROONGA_LIBRARY_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/lib")
+  set(GROONGA_PLUGINS_DIR "${GRN_PLUGINS_DIR}")
+else()
 include(FindPkgConfig)
 include(${CMAKE_SOURCE_DIR}/build/cmake_modules/ReadFileList.cmake)
 
@@ -28,6 +39,7 @@ string(STRIP "${GROONGA_REQUIRED_VERSION}" GROONGA_REQUIRED_VERSION)
 
 pkg_check_modules(GROONGA REQUIRED "groonga >= ${GROONGA_REQUIRED_VERSION}")
 _pkgconfig_invoke(groonga GROONGA PLUGINS_DIR "" --variable=pluginsdir)
+endif()
 
 add_definitions(
   -DHAVE_CONFIG_H
