@@ -44,17 +44,14 @@ else()
 endif()
 
 add_definitions(
-  -DHAVE_CONFIG_H
-  )
+  -DHAVE_CONFIG_H)
 
 include_directories(
   ${CMAKE_BINARY_DIR}
-  ${GROONGA_INCLUDE_DIRS}
-  )
+  ${GROONGA_INCLUDE_DIRS})
 
 link_directories(
-  ${GROONGA_LIBRARY_DIRS}
-  )
+  ${GROONGA_LIBRARY_DIRS})
 
 add_subdirectory(normalizers)
 
