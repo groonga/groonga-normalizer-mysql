@@ -159,9 +159,11 @@ normalize(grn_ctx *ctx, grn_obj *string, uint32_t **normalize_table)
         uint32_t normalized_code;
         unsigned int n_bytes;
         normalized_code = normalize_table[page][low_code];
-        n_bytes = unichar_to_utf8(normalized_code,
-                                  normalized + normalized_length_in_bytes);
-        normalized_length_in_bytes += n_bytes;
+        if (normalized_code != 0) {
+          n_bytes = unichar_to_utf8(normalized_code,
+                                    normalized + normalized_length_in_bytes);
+          normalized_length_in_bytes += n_bytes;
+        }
       } else {
         int i;
         for (i = 0; i < character_length; i++) {
