@@ -109,6 +109,34 @@ decompose_character(const char *rest, int character_length,
   }
 }
 
+static inline void
+normalize_character(const char *utf8, int character_length,
+                    uint32_t **normalize_table,
+                    char *normalized,
+                    unsigned int *normalized_length_in_bytes,
+                    unsigned int *normalized_n_characters)
+{
+  int page;
+  uint32_t low_code;
+  decompose_character(utf8, character_length, &page, &low_code);
+  if ((0x00 <= page && page <= 0xff) && normalize_table[page]) {
+    uint32_t normalized_code;
+    unsigned int n_bytes;
+    normalized_code = normalize_table[page][low_code];
+    if (normalized_code != 0) {
+      n_bytes = unichar_to_utf8(normalized_code,
+                                normalized + *normalized_length_in_bytes);
+      *normalized_length_in_bytes += n_bytes;
+    }
+  } else {
+    int i;
+    for (i = 0; i < character_length; i++) {
+      normalized[*normalized_length_in_bytes + i] = utf8[i];
+    }
+    *normalized_length_in_bytes += character_length;
+  }
+  (*normalized_n_characters)++;
+}
 
 static void
 normalize(grn_ctx *ctx, grn_obj *string, uint32_t **normalize_table)
@@ -152,25 +180,10 @@ normalize(grn_ctx *ctx, grn_obj *string, uint32_t **normalize_table)
         current_type[-1] |= GRN_CHAR_BLANK;
       }
     } else {
-      int page;
-      uint32_t low_code;
-      decompose_character(rest, character_length, &page, &low_code);
-      if ((0x00 <= page && page <= 0xff) && normalize_table[page]) {
-        uint32_t normalized_code;
-        unsigned int n_bytes;
-        normalized_code = normalize_table[page][low_code];
-        if (normalized_code != 0) {
-          n_bytes = unichar_to_utf8(normalized_code,
-                                    normalized + normalized_length_in_bytes);
-          normalized_length_in_bytes += n_bytes;
-        }
-      } else {
-        int i;
-        for (i = 0; i < character_length; i++) {
-          normalized[normalized_length_in_bytes + i] = rest[i];
-        }
-        normalized_length_in_bytes += character_length;
-      }
+      normalize_character(rest, character_length, normalize_table,
+                          normalized,
+                          &normalized_length_in_bytes,
+                          &normalized_n_characters);
       if (current_type) {
         char *current_normalized;
         current_normalized =
@@ -179,7 +192,6 @@ normalize(grn_ctx *ctx, grn_obj *string, uint32_t **normalize_table)
           grn_nfkc_char_type((unsigned char *)current_normalized);
         current_type++;
       }
-      normalized_n_characters++;
     }
 
     rest += character_length;
