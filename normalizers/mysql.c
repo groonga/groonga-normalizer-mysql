@@ -141,20 +141,20 @@ normalize(grn_ctx *ctx, grn_obj *string, uint32_t **normalize_table)
   rest_length = original_length_in_bytes;
   while (rest_length > 0) {
     int character_length;
-    int page;
-    uint32_t low_code;
 
     character_length = grn_plugin_charlen(ctx, rest, rest_length, encoding);
     if (character_length == 0) {
       break;
     }
 
-    decompose_character(rest, character_length, &page, &low_code);
     if (remove_blank_p && character_length == 1 && rest[0] == ' ') {
       if (current_type > types) {
         current_type[-1] |= GRN_CHAR_BLANK;
       }
     } else {
+      int page;
+      uint32_t low_code;
+      decompose_character(rest, character_length, &page, &low_code);
       if ((0x00 <= page && page <= 0xff) && normalize_table[page]) {
         uint32_t normalized_code;
         unsigned int n_bytes;
