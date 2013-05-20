@@ -1,4 +1,4 @@
 register normalizers/mysql
 
 normalize NormalizerMySQLUnicodeCIExceptKanaCIKanaWithVoicedSoundMark \
-  "beforeｹﾞafter"
+  "ｶﾞｷﾞｸﾞｹﾞｺﾞｻﾞｼﾞｽﾞｾﾞｿﾞﾀﾞﾁﾞﾂﾞﾃﾞﾄﾞ"

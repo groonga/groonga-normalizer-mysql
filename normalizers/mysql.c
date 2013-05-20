@@ -35,6 +35,15 @@
 #  define inline _inline
 #endif
 
+typedef grn_bool (*normalizer_func)(grn_ctx *ctx,
+                                    const char *utf8,
+                                    int *character_length,
+                                    int rest_length,
+                                    uint32_t **normalize_table,
+                                    char *normalized,
+                                    unsigned int *normalized_length_in_bytes,
+                                    unsigned int *normalized_n_characters);
+
 static inline unsigned int
 unichar_to_utf8(uint32_t unichar, char *output)
 {
@@ -76,6 +85,57 @@ unichar_to_utf8(uint32_t unichar, char *output)
   }
 
   return n_bytes;
+}
+
+static inline uint32_t
+utf8_to_unichar(const char *utf8, int byte_size)
+{
+  uint32_t unichar;
+  const unsigned char *bytes = (const unsigned char *)utf8;
+
+  switch (byte_size) {
+  case 1 :
+    unichar = bytes[0] & 0x7f;
+    break;
+  case 2 :
+    unichar = ((bytes[0] & 0x1f) << 6) + (bytes[1] & 0x3f);
+    break;
+  case 3 :
+    unichar =
+      ((bytes[0] & 0x0f) << 12) +
+      ((bytes[1] & 0x3f) << 6) +
+      ((bytes[2] & 0x3f));
+    break;
+  case 4 :
+    unichar =
+      ((bytes[0] & 0x07) << 18) +
+      ((bytes[1] & 0x3f) << 12) +
+      ((bytes[2] & 0x3f) << 6) +
+      ((bytes[3] & 0x3f));
+    break;
+  case 5 :
+    unichar =
+      ((bytes[0] & 0x03) << 24) +
+      ((bytes[1] & 0x3f) << 18) +
+      ((bytes[2] & 0x3f) << 12) +
+      ((bytes[3] & 0x3f) << 6) +
+      ((bytes[4] & 0x3f));
+    break;
+  case 6 :
+    unichar =
+      ((bytes[0] & 0x01) << 30) +
+      ((bytes[1] & 0x3f) << 24) +
+      ((bytes[2] & 0x3f) << 18) +
+      ((bytes[3] & 0x3f) << 12) +
+      ((bytes[4] & 0x3f) << 6) +
+      ((bytes[5] & 0x3f));
+    break;
+  default :
+    unichar = 0;
+    break;
+  }
+
+  return unichar;
 }
 
 static inline void
@@ -139,7 +199,8 @@ normalize_character(const char *utf8, int character_length,
 }
 
 static void
-normalize(grn_ctx *ctx, grn_obj *string, uint32_t **normalize_table)
+normalize(grn_ctx *ctx, grn_obj *string, uint32_t **normalize_table,
+          normalizer_func custom_normalizer)
 {
   const char *original, *rest;
   unsigned int original_length_in_bytes, rest_length;
@@ -180,10 +241,23 @@ normalize(grn_ctx *ctx, grn_obj *string, uint32_t **normalize_table)
         current_type[-1] |= GRN_CHAR_BLANK;
       }
     } else {
-      normalize_character(rest, character_length, normalize_table,
-                          normalized,
-                          &normalized_length_in_bytes,
-                          &normalized_n_characters);
+      grn_bool custom_normalized = GRN_FALSE;
+      if (custom_normalizer) {
+        custom_normalized = custom_normalizer(ctx,
+                                              rest,
+                                              &character_length,
+                                              rest_length - character_length,
+                                              normalize_table,
+                                              normalized,
+                                              &normalized_length_in_bytes,
+                                              &normalized_n_characters);
+      }
+      if (!custom_normalized) {
+        normalize_character(rest, character_length, normalize_table,
+                            normalized,
+                            &normalized_length_in_bytes,
+                            &normalized_n_characters);
+      }
       if (current_type) {
         char *current_normalized;
         current_normalized =
@@ -229,7 +303,7 @@ mysql_general_ci_next(GNUC_UNUSED grn_ctx *ctx,
                      grn_encoding_to_string(encoding));
     return NULL;
   }
-  normalize(ctx, string, general_ci_table);
+  normalize(ctx, string, general_ci_table, NULL);
   return NULL;
 }
 
@@ -251,8 +325,142 @@ mysql_unicode_ci_next(GNUC_UNUSED grn_ctx *ctx,
                      grn_encoding_to_string(encoding));
     return NULL;
   }
-  normalize(ctx, string, unicode_ci_table);
+  normalize(ctx, string, unicode_ci_table, NULL);
   return NULL;
+}
+
+#define HALFWIDTH_KATAKANA_LETTER_KA 0xff76
+#define HALFWIDTH_KATAKANA_LETTER_KI 0xff77
+#define HALFWIDTH_KATAKANA_LETTER_KU 0xff78
+#define HALFWIDTH_KATAKANA_LETTER_KE 0xff79
+#define HALFWIDTH_KATAKANA_LETTER_KO 0xff7a
+
+#define HALFWIDTH_KATAKANA_LETTER_SA 0xff7b
+#define HALFWIDTH_KATAKANA_LETTER_SI 0xff7c
+#define HALFWIDTH_KATAKANA_LETTER_SU 0xff7d
+#define HALFWIDTH_KATAKANA_LETTER_SE 0xff7e
+#define HALFWIDTH_KATAKANA_LETTER_SO 0xff7f
+
+#define HALFWIDTH_KATAKANA_LETTER_TA 0xff80
+#define HALFWIDTH_KATAKANA_LETTER_TI 0xff81
+#define HALFWIDTH_KATAKANA_LETTER_TU 0xff82
+#define HALFWIDTH_KATAKANA_LETTER_TE 0xff83
+#define HALFWIDTH_KATAKANA_LETTER_TO 0xff84
+
+#define HALFWIDTH_KATAKANA_LETTER_HA 0xff8a
+#define HALFWIDTH_KATAKANA_LETTER_HI 0xff8b
+#define HALFWIDTH_KATAKANA_LETTER_HU 0xff8c
+#define HALFWIDTH_KATAKANA_LETTER_HE 0xff8d
+#define HALFWIDTH_KATAKANA_LETTER_HO 0xff8e
+
+#define HALFWIDTH_KATAKANA_VOICED_SOUND_MARK      0xff9e
+#define HALFWIDTH_KATAKANA_SEMI_VOICED_SOUND_MARK 0xff9f
+
+#define HIRAGANA_LETTER_KA                0x304b
+#define HIRAGANA_VOICED_SOUND_MARK_OFFSET 1
+#define HIRAGANA_VOICED_SOUND_MARK_GAP    2
+
+#define HIRAGANA_LETTER_HA         0x306f
+#define HIRAGANA_HA_LINE_BA_OFFSET 1
+#define HIRAGANA_HA_LINE_PA_OFFSET 2
+#define HIRAGANA_HA_LINE_GAP       3
+
+static grn_bool
+normalize_halfwidth_katakana_with_voiced_sound_mark(
+  grn_ctx *ctx,
+  const char *utf8,
+  int *character_length,
+  int rest_length,
+  GNUC_UNUSED uint32_t **normalize_table,
+  char *normalized,
+  unsigned int *normalized_length_in_bytes,
+  unsigned int *normalized_n_characters)
+{
+  grn_bool custom_normalized = GRN_FALSE;
+  grn_bool is_voiced_sound_markable_halfwidth_katakana = GRN_FALSE;
+  grn_bool is_semi_voiced_sound_markable_halfwidth_katakana = GRN_FALSE;
+  grn_bool is_ha_line = GRN_FALSE;
+  uint32_t unichar;
+
+  if (*character_length != 3) {
+    return GRN_FALSE;
+  }
+  if (rest_length < 3) {
+    return GRN_FALSE;
+  }
+
+  unichar = utf8_to_unichar(utf8, *character_length);
+  if (HALFWIDTH_KATAKANA_LETTER_KA <= unichar &&
+      unichar <= HALFWIDTH_KATAKANA_LETTER_TO) {
+    is_voiced_sound_markable_halfwidth_katakana = GRN_TRUE;
+  } else if (HALFWIDTH_KATAKANA_LETTER_HA <= unichar &&
+             unichar <= HALFWIDTH_KATAKANA_LETTER_HO) {
+    is_voiced_sound_markable_halfwidth_katakana = GRN_TRUE;
+    is_semi_voiced_sound_markable_halfwidth_katakana = GRN_TRUE;
+    is_ha_line = GRN_TRUE;
+  }
+
+  if (!is_voiced_sound_markable_halfwidth_katakana &&
+      !is_semi_voiced_sound_markable_halfwidth_katakana) {
+    return GRN_FALSE;
+  }
+
+  {
+    int next_character_length;
+    uint32_t next_unichar;
+    next_character_length = grn_plugin_charlen(ctx,
+                                               utf8 + *character_length,
+                                               rest_length,
+                                               GRN_ENC_UTF8);
+    if (next_character_length != 3) {
+      return GRN_FALSE;
+    }
+    next_unichar = utf8_to_unichar(utf8 + *character_length,
+                                   next_character_length);
+    if (next_unichar == HALFWIDTH_KATAKANA_VOICED_SOUND_MARK) {
+      if (is_voiced_sound_markable_halfwidth_katakana) {
+        unsigned int n_bytes;
+        if (is_ha_line) {
+          n_bytes = unichar_to_utf8(HIRAGANA_LETTER_HA +
+                                    HIRAGANA_HA_LINE_BA_OFFSET +
+                                    ((unichar - HALFWIDTH_KATAKANA_LETTER_HA) *
+                                     HIRAGANA_HA_LINE_GAP),
+                                    normalized + *normalized_length_in_bytes);
+        } else {
+          int small_tu_offset = 0;
+          if (HALFWIDTH_KATAKANA_LETTER_TU <= unichar &&
+              unichar <= HALFWIDTH_KATAKANA_LETTER_TO) {
+            small_tu_offset = 1;
+          }
+          n_bytes = unichar_to_utf8(HIRAGANA_LETTER_KA +
+                                    HIRAGANA_VOICED_SOUND_MARK_OFFSET +
+                                    small_tu_offset +
+                                    ((unichar - HALFWIDTH_KATAKANA_LETTER_KA) *
+                                     HIRAGANA_VOICED_SOUND_MARK_GAP),
+                                    normalized + *normalized_length_in_bytes);
+        }
+        *character_length += next_character_length;
+        *normalized_length_in_bytes += n_bytes;
+        (*normalized_n_characters)++;
+        custom_normalized = GRN_TRUE;
+      }
+    } else if (next_unichar == HALFWIDTH_KATAKANA_SEMI_VOICED_SOUND_MARK) {
+      if (is_semi_voiced_sound_markable_halfwidth_katakana) {
+        unsigned int n_bytes;
+        n_bytes = unichar_to_utf8(HIRAGANA_LETTER_HA +
+                                  HIRAGANA_HA_LINE_PA_OFFSET +
+                                  ((unichar - HALFWIDTH_KATAKANA_LETTER_HA) *
+                                   HIRAGANA_HA_LINE_GAP),
+                                  normalized + *normalized_length_in_bytes);
+        *character_length += next_character_length;
+        *normalized_length_in_bytes += n_bytes;
+        (*normalized_n_characters)++;
+        custom_normalized = GRN_TRUE;
+      }
+    }
+  }
+
+  return custom_normalized;
 }
 
 static grn_obj *
@@ -276,7 +484,8 @@ mysql_unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_next(
     return NULL;
   }
   normalize(ctx, string,
-            unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_table);
+            unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_table,
+            normalize_halfwidth_katakana_with_voiced_sound_mark);
   return NULL;
 }
 
