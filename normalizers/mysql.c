@@ -21,6 +21,9 @@
 #include <groonga/normalizer.h>
 #include <groonga/nfkc.h>
 
+#include <string.h>
+#include <stdio.h>
+
 #include "mysql_general_ci_table.h"
 #include "mysql_unicode_ci_table.h"
 #include "mysql_unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_table.h"
@@ -34,6 +37,8 @@
 #ifdef _MSC_VER
 #  define inline _inline
 #endif
+
+#define SNIPPET_BUFFER_SIZE 256
 
 typedef grn_bool (*normalizer_func)(grn_ctx *ctx,
                                     const char *utf8,
@@ -199,7 +204,90 @@ normalize_character(const char *utf8, int character_length,
 }
 
 static void
-normalize(grn_ctx *ctx, grn_obj *string, uint32_t **normalize_table,
+sized_buffer_append(char *buffer,
+                    unsigned int buffer_length,
+                    unsigned int *buffer_rest_length,
+                    const char *string)
+{
+  size_t string_length;
+
+  string_length = strlen(string);
+  if (string_length >= *buffer_rest_length) {
+    return;
+  }
+
+  strncat(buffer, string, buffer_length);
+  *buffer_rest_length -= string_length;
+}
+
+static void
+sized_buffer_dump_string(char *buffer,
+                         unsigned int buffer_length,
+                         unsigned int *buffer_rest_length,
+                         const char *string, unsigned int string_length)
+{
+  const unsigned char *bytes;
+  unsigned int i;
+
+  bytes = (const unsigned char *)string;
+  for (i = 0; i < string_length; i++) {
+    unsigned char byte = bytes[i];
+#define FORMATTED_BYTE_BUFFER_SIZE 5 /* "0xFF\0" */
+    char formatted_byte[FORMATTED_BYTE_BUFFER_SIZE];
+    if (i > 0) {
+      sized_buffer_append(buffer, buffer_length, buffer_rest_length,
+                          " ");
+    }
+    if (byte == 0) {
+      strncpy(formatted_byte, "0x00", FORMATTED_BYTE_BUFFER_SIZE);
+    } else {
+      snprintf(formatted_byte, FORMATTED_BYTE_BUFFER_SIZE, "%#04x", byte);
+    }
+    sized_buffer_append(buffer, buffer_length, buffer_rest_length,
+                        formatted_byte);
+#undef FORMATTED_BYTE_BUFFER_SIZE
+  }
+}
+
+static const char *
+snippet(const char *string, unsigned int length, unsigned int target_byte,
+        char *buffer, unsigned int buffer_length)
+{
+  const char *elision_mark = "...";
+  unsigned int max_window_length = 12;
+  unsigned int window_length;
+  unsigned int buffer_rest_length = buffer_length - 1;
+
+  buffer[0] = '\0';
+
+  if (target_byte > 0) {
+    sized_buffer_append(buffer, buffer_length, &buffer_rest_length,
+                        elision_mark);
+  }
+
+  sized_buffer_append(buffer, buffer_length, &buffer_rest_length, "<");
+  if (target_byte + max_window_length > length) {
+    window_length = length - target_byte;
+  } else {
+    window_length = max_window_length;
+  }
+  sized_buffer_dump_string(buffer, buffer_length, &buffer_rest_length,
+                           string + target_byte, window_length);
+  sized_buffer_append(buffer, buffer_length, &buffer_rest_length,
+                      ">");
+
+  if (target_byte + window_length < length) {
+    sized_buffer_append(buffer, buffer_length, &buffer_rest_length,
+                        elision_mark);
+  }
+
+  return buffer;
+}
+
+static void
+normalize(grn_ctx *ctx, grn_obj *string,
+          const char *normalizer_type_label,
+          uint32_t **normalize_table,
           normalizer_func custom_normalizer)
 {
   const char *original, *rest;
@@ -273,7 +361,16 @@ normalize(grn_ctx *ctx, grn_obj *string, uint32_t **normalize_table,
   }
 
   if (rest_length > 0) {
-    /* TODO: report error */
+    char buffer[SNIPPET_BUFFER_SIZE];
+    GRN_PLUGIN_LOG(ctx, GRN_LOG_DEBUG,
+                   "[normalizer][%s] failed to normalize at %u byte: %s",
+                   normalizer_type_label,
+                   original_length_in_bytes - rest_length,
+                   snippet(original,
+                           original_length_in_bytes,
+                           original_length_in_bytes - rest_length,
+                           buffer,
+                           SNIPPET_BUFFER_SIZE));
   }
   grn_string_set_normalized(ctx,
                             string,
@@ -291,17 +388,19 @@ mysql_general_ci_next(GNUC_UNUSED grn_ctx *ctx,
 {
   grn_obj *string = args[0];
   grn_encoding encoding;
+  const char *normalizer_type_label = "mysql-general-ci";
 
   encoding = grn_string_get_encoding(ctx, string);
   if (encoding != GRN_ENC_UTF8) {
     GRN_PLUGIN_ERROR(ctx,
                      GRN_FUNCTION_NOT_IMPLEMENTED,
-                     "[normalizer][mysql-general-ci] "
+                     "[normalizer][%s] "
                      "UTF-8 encoding is only supported: %s",
+                     normalizer_type_label,
                      grn_encoding_to_string(encoding));
     return NULL;
   }
-  normalize(ctx, string, general_ci_table, NULL);
+  normalize(ctx, string, normalizer_type_label, general_ci_table, NULL);
   return NULL;
 }
 
@@ -313,17 +412,19 @@ mysql_unicode_ci_next(GNUC_UNUSED grn_ctx *ctx,
 {
   grn_obj *string = args[0];
   grn_encoding encoding;
+  const char *normalizer_type_label = "mysql-unicode-ci";
 
   encoding = grn_string_get_encoding(ctx, string);
   if (encoding != GRN_ENC_UTF8) {
     GRN_PLUGIN_ERROR(ctx,
                      GRN_FUNCTION_NOT_IMPLEMENTED,
-                     "[normalizer][mysql-unicode-ci] "
+                     "[normalizer][%s] "
                      "UTF-8 encoding is only supported: %s",
+                     normalizer_type_label,
                      grn_encoding_to_string(encoding));
     return NULL;
   }
-  normalize(ctx, string, unicode_ci_table, NULL);
+  normalize(ctx, string, normalizer_type_label, unicode_ci_table, NULL);
   return NULL;
 }
 
@@ -470,18 +571,21 @@ mysql_unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_next(
 {
   grn_obj *string = args[0];
   grn_encoding encoding;
+  const char *normalizer_type_label =
+    "mysql-unicode-ci-except-kana-ci-kana-with-voiced-sound-mark";
 
   encoding = grn_string_get_encoding(ctx, string);
   if (encoding != GRN_ENC_UTF8) {
     GRN_PLUGIN_ERROR(ctx,
                      GRN_FUNCTION_NOT_IMPLEMENTED,
-                     "[normalizer]"
-                     "[mysql-unicode-ci-except-kana-ci-kana-with-voiced-sound-mark] "
+                     "[normalizer][%s] "
                      "UTF-8 encoding is only supported: %s",
+                     normalizer_type_label,
                      grn_encoding_to_string(encoding));
     return NULL;
   }
   normalize(ctx, string,
+            normalizer_type_label,
             unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_table,
             normalize_halfwidth_katakana_with_voiced_sound_mark);
   return NULL;
