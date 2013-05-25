@@ -272,21 +272,15 @@ normalize(grn_ctx *ctx, grn_obj *string, uint32_t **normalize_table,
     rest_length -= character_length;
   }
 
-  if (rest_length == 0) {
-    grn_string_set_normalized(ctx,
-                              string,
-                              normalized,
-                              normalized_length_in_bytes,
-                              normalized_n_characters);
-    grn_string_set_types(ctx, string, types);
-  } else {
+  if (rest_length > 0) {
     /* TODO: report error */
-    grn_string_set_normalized(ctx,
-                              string,
-                              normalized,
-                              0,
-                              0);
   }
+  grn_string_set_normalized(ctx,
+                            string,
+                            normalized,
+                            normalized_length_in_bytes,
+                            normalized_n_characters);
+  grn_string_set_types(ctx, string, types);
 }
 
 static grn_obj *
