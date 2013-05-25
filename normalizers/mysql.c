@@ -281,7 +281,11 @@ normalize(grn_ctx *ctx, grn_obj *string, uint32_t **normalize_table,
     grn_string_set_types(ctx, string, types);
   } else {
     /* TODO: report error */
-    GRN_PLUGIN_FREE(ctx, normalized);
+    grn_string_set_normalized(ctx,
+                              string,
+                              normalized,
+                              0,
+                              0);
   }
 }
 
