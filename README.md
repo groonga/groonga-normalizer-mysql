@@ -97,6 +97,12 @@ Then install `groonga-normalizer-mysql` package:
 
     % sudo yum install -y groonga-normalizer-mysql
 
+### OS X - Homebrew
+
+Install `groonga-normalizer-mysql` package:
+
+    % brew install groonga-normalizer-mysql
+
 ### Windows
 
 You need to build from source. Here are build instructions.
