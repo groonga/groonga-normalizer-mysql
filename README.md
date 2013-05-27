@@ -7,10 +7,56 @@ groonga-normalizer-mysql
 ## Description
 
 Groonga-normalizer-mysql is a groonga plugin. It provides MySQL
-compatible normalizers to groonga. They are `NormalizerMySQLGeneralCI`
-and `NormalizerMySQLUnicodeCI`. `NormalizerMySQLGeneralCI` corresponds
-to `utf8mb4_general_ci`.  `NormalizerMySQLUnicodeCI` corresponds to
+compatible normalizers and a custom normalizer to groonga.
+
+MySQL compatible normalizers are `NormalizerMySQLGeneralCI` and
+`NormalizerMySQLUnicodeCI`. `NormalizerMySQLGeneralCI` corresponds to
+`utf8mb4_general_ci`.  `NormalizerMySQLUnicodeCI` corresponds to
 `utf8mb4_unicode_ci`.
+
+A custom normalizer is
+`NormalizerMySQLUnicodeCIExceptKanaCIKanaWithVoicedSoundMark`. It is
+self-descriptive name but long. It is a variant normalizer of
+`NormalizerMySQLUnicode`. It has different behaviors. The followings
+are the different behaviors.
+
+* `NormalizerMySQLUnicode` normalizes all small Hiragana such as `ぁ`,
+  `っ` to Hiragana such as `あ`, `つ`.
+  `NormalizerMySQLUnicodeCIExceptKanaCIKanaWithVoicedSoundMark`
+  doesn't normalize `ぁ` to `あ` nor `っ` to `つ`. `ぁ` and `あ` are
+  different characters. `っ` and `つ` are also different characters.
+  This behavior is described by `ExceptKanaCI` in the long name.  This
+  following behaviors ared described by
+  `ExceptKanaWithVoicedSoundMark` in the long name.
+* `NormalizerMySQLUnicode` normalizes all Hiragana with voiced sound
+  mark such as `が` to Hiragana without voiced sound mark such as `か`.
+  `NormalizerMySQLUnicodeCIExceptKanaCIKanaWithVoicedSoundMark` doesn't
+  normalize `が` to `か`. `が` and `か` are different characters.
+* `NormalizerMySQLUnicode` normalizes all Hiragana with semi-voiced sound
+  mark such as `ぱ` to Hiragana without semi-voiced sound mark such as `は`.
+  `NormalizerMySQLUnicodeCIExceptKanaCIKanaWithVoicedSoundMark` doesn't
+  normalize `ぱ` to `は`. `ぱ` and `は` are different characters.
+* `NormalizerMySQLUnicode` normalizes all Katakana with voiced sound
+  mark such as `ガ` to Katakana without voiced sound mark such as `カ`.
+  `NormalizerMySQLUnicodeCIExceptKanaCIKanaWithVoicedSoundMark` doesn't
+  normalize `ガ` to `カ`. `ガ` and `カ` are different characters.
+* `NormalizerMySQLUnicode` normalizes all Katakana with semi-voiced sound
+  mark such as `パ` to Hiragana without semi-voiced sound mark such as `ハ`.
+  `NormalizerMySQLUnicodeCIExceptKanaCIKanaWithVoicedSoundMark` doesn't
+  normalize `パ` to `ハ`. `パ` and `ハ` are different characters.
+* `NormalizerMySQLUnicode` normalizes all halfwidth Katakana with
+  voiced sound mark such as `ｶﾞ` to halfwidth Katakana without voiced
+  sound mark such as `ｶ`.
+  `NormalizerMySQLUnicodeCIExceptKanaCIKanaWithVoicedSoundMark`
+  normalizes all halfwidth Katakana with voided sound mark such as `ｶﾞ`
+  to fullwidth Katakana with voiced sound mark such as `ガ`.
+
+`NormalizerMySQLUnicodeCIExceptKanaCIKanaWithVoicedSoundMark` is MySQL
+incompatible normalizer but it is useful for Japanese text. For
+example, `ふらつく` and `ブラック` has different
+means. `NormalizerMySQLUnicodeCI` identifies `ふらつく` with `ブラック
+` but `NormalizerMySQLUnicodeCIExceptKanaCIKanaWithVoicedSoundMark
+doesn't identify them.
 
 ## Install
 
