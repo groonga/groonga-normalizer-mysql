@@ -75,13 +75,13 @@ Run CMake. Here is a command line to install groonga to `C:\groonga` folder:
 
     groonga-X.Y.Z> cmake . -G "Visual Studio 10 Win64" -DCMAKE_INSTALL_PREFIX=C:\groonga
 
-Build by Visual C++ 2010 Express:
+Build:
 
-    groonga-X.Y.Z> msbuild groonga.sln /p:Configuration=Release
+    groonga-X.Y.Z> cmake --build . --config Release
 
-Install by Visual C++ 2010 Express:
+Install:
 
-    groonga-X.Y.Z> msbuild groonga.sln /p:Configuration=Release /t:Install
+    groonga-X.Y.Z> cmake --build . --config Release --target Install
 
 #### Build groonga-normalizer-mysql
 
@@ -100,13 +100,13 @@ Run CMake. Here is a command line to install groonga to `C:\groonga` folder:
 
     groonga-normalizer-mysql-X.Y.Z> cmake . -G "Visual Studio 10 Win64" -DCMAKE_INSTALL_PREFIX=C:\groonga
 
-Build by Visual C++ 2010 Express:
+Build:
 
-    groonga-normalizer-mysql-X.Y.Z> msbuild groonga-normalizer-mysql.sln /p:Configuration=Release
+    groonga-normalizer-mysql-X.Y.Z> cmake --build . --config Release
 
-Install by Visual C++ 2010 Express:
+Install:
 
-    groonga-normalizer-mysql-X.Y.Z> msbuild groonga-normalizer-mysql.sln /p:Configuration=Release /t:Install
+    groonga-normalizer-mysql-X.Y.Z> cmake --build . --config Release --target Install
 
 ## Usage
 
