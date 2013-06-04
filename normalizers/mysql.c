@@ -359,6 +359,9 @@ normalize(grn_ctx *ctx, grn_obj *string,
     rest += character_length;
     rest_length -= character_length;
   }
+  if (current_type) {
+    current_type[0] = GRN_CHAR_NULL;
+  }
 
   if (rest_length > 0) {
     char buffer[SNIPPET_BUFFER_SIZE];
