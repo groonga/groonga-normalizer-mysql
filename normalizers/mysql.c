@@ -36,6 +36,7 @@
 
 #ifdef _MSC_VER
 #  define inline _inline
+#  define snprintf _snprintf
 #endif
 
 #define SNIPPET_BUFFER_SIZE 256
