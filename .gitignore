@@ -22,6 +22,7 @@ cmake_install.cmake
 /m4/
 /missing
 /stamp-*
+/test-driver
 /tmp
 /groonga-normalizer-mysql.pc
 /test/grntest
