@@ -3,9 +3,9 @@ Section: libs
 Priority: optional
 Maintainer: Kouhei Sutou <kou@clear-code.com>
 Build-Depends:
-  debhelper (>= 7.0.50),
+  debhelper (>= 9),
   autotools-dev
-Standards-Version: 3.9.1
+Standards-Version: 3.9.3
 Homepage: http://groonga.org/
 
 Package: groonga-normalizer-mysql
