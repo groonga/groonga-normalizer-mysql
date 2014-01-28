@@ -18,7 +18,7 @@
 
 set -e
 
-# export GROONGA_MASTER=yes
+export GROONGA_MASTER=yes
 curl https://raw.github.com/groonga/groonga/master/data/travis/setup.sh | sh
 
 if ! pkg-config --exists groonga; then
