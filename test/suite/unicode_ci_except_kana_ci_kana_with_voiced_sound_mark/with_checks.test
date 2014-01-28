@@ -1,0 +1,4 @@
+register normalizers/mysql
+
+normalize NormalizerMySQLUnicodeCIExceptKanaCIKanaWithVoicedSoundMark \
+  "ｱ㌕ＡZ" WITH_CHECKS

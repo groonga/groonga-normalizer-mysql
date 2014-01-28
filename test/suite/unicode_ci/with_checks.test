@@ -1,0 +1,3 @@
+register normalizers/mysql
+
+normalize NormalizerMySQLUnicodeCI "ｱ㌕ＡZ" WITH_CHECKS

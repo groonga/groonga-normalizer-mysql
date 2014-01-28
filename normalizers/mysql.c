@@ -1,6 +1,6 @@
 /* -*- c-basic-offset: 2 -*- */
 /*
-  Copyright(C) 2013  Kouhei Sutou <kou@clear-code.com>
+  Copyright(C) 2013-2014  Kouhei Sutou <kou@clear-code.com>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -47,6 +47,7 @@ typedef grn_bool (*normalizer_func)(grn_ctx *ctx,
                                     int rest_length,
                                     uint32_t **normalize_table,
                                     char *normalized,
+                                    unsigned int *normalized_characer_length,
                                     unsigned int *normalized_length_in_bytes,
                                     unsigned int *normalized_n_characters);
 
@@ -179,6 +180,7 @@ static inline void
 normalize_character(const char *utf8, int character_length,
                     uint32_t **normalize_table,
                     char *normalized,
+                    unsigned int *normalized_character_length,
                     unsigned int *normalized_length_in_bytes,
                     unsigned int *normalized_n_characters)
 {
@@ -192,6 +194,7 @@ normalize_character(const char *utf8, int character_length,
     if (normalized_code != 0) {
       n_bytes = unichar_to_utf8(normalized_code,
                                 normalized + *normalized_length_in_bytes);
+      *normalized_character_length = n_bytes;
       *normalized_length_in_bytes += n_bytes;
     }
   } else {
@@ -199,6 +202,7 @@ normalize_character(const char *utf8, int character_length,
     for (i = 0; i < character_length; i++) {
       normalized[*normalized_length_in_bytes + i] = utf8[i];
     }
+    *normalized_character_length = character_length;
     *normalized_length_in_bytes += character_length;
   }
   (*normalized_n_characters)++;
@@ -298,6 +302,8 @@ normalize(grn_ctx *ctx, grn_obj *string,
   unsigned int normalized_n_characters = 0;
   unsigned char *types = NULL;
   unsigned char *current_type = NULL;
+  short *checks = NULL;
+  short *current_check = NULL;
   grn_encoding encoding;
   int flags;
   grn_bool remove_blank_p;
@@ -315,6 +321,12 @@ normalize(grn_ctx *ctx, grn_obj *string,
     types = GRN_PLUGIN_MALLOC(ctx, max_normalized_n_characters);
     current_type = types;
   }
+  if (flags & GRN_STRING_WITH_CHECKS) {
+    unsigned int max_normalized_length_in_bytes = original_length_in_bytes + 1;
+    checks = GRN_PLUGIN_MALLOC(ctx, max_normalized_length_in_bytes);
+    current_check = checks;
+    current_check[0] = 0;
+  }
   rest = original;
   rest_length = original_length_in_bytes;
   while (rest_length > 0) {
@@ -329,8 +341,12 @@ normalize(grn_ctx *ctx, grn_obj *string,
       if (current_type > types) {
         current_type[-1] |= GRN_CHAR_BLANK;
       }
+      if (current_check) {
+        current_check[0]++;
+      }
     } else {
       grn_bool custom_normalized = GRN_FALSE;
+      unsigned int normalized_character_length;
       if (custom_normalizer) {
         custom_normalized = custom_normalizer(ctx,
                                               rest,
@@ -338,12 +354,14 @@ normalize(grn_ctx *ctx, grn_obj *string,
                                               rest_length - character_length,
                                               normalize_table,
                                               normalized,
+                                              &normalized_character_length,
                                               &normalized_length_in_bytes,
                                               &normalized_n_characters);
       }
       if (!custom_normalized) {
         normalize_character(rest, character_length, normalize_table,
                             normalized,
+                            &normalized_character_length,
                             &normalized_length_in_bytes,
                             &normalized_n_characters);
       }
@@ -354,6 +372,16 @@ normalize(grn_ctx *ctx, grn_obj *string,
         current_type[0] =
           grn_nfkc_char_type((unsigned char *)current_normalized);
         current_type++;
+      }
+      if (current_check) {
+        unsigned int i;
+        current_check[0] += character_length;
+        current_check++;
+        for (i = 1; i < normalized_character_length; i++) {
+          current_check[0] = 0;
+          current_check++;
+        }
+        current_check[0] = 0;
       }
     }
 
@@ -382,6 +410,7 @@ normalize(grn_ctx *ctx, grn_obj *string,
                             normalized_length_in_bytes,
                             normalized_n_characters);
   grn_string_set_types(ctx, string, types);
+  grn_string_set_checks(ctx, string, checks);
 }
 
 static grn_obj *
@@ -476,6 +505,7 @@ normalize_halfwidth_katakana_with_voiced_sound_mark(
   int rest_length,
   GNUC_UNUSED uint32_t **normalize_table,
   char *normalized,
+  unsigned int *normalized_character_length,
   unsigned int *normalized_length_in_bytes,
   unsigned int *normalized_n_characters)
 {
@@ -543,6 +573,7 @@ normalize_halfwidth_katakana_with_voiced_sound_mark(
                                     normalized + *normalized_length_in_bytes);
         }
         *character_length += next_character_length;
+        *normalized_character_length = n_bytes;
         *normalized_length_in_bytes += n_bytes;
         (*normalized_n_characters)++;
         custom_normalized = GRN_TRUE;
@@ -556,6 +587,7 @@ normalize_halfwidth_katakana_with_voiced_sound_mark(
                                    HIRAGANA_HA_LINE_GAP),
                                   normalized + *normalized_length_in_bytes);
         *character_length += next_character_length;
+        *normalized_character_length = n_bytes;
         *normalized_length_in_bytes += n_bytes;
         (*normalized_n_characters)++;
         custom_normalized = GRN_TRUE;

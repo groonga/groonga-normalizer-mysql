@@ -1,0 +1,4 @@
+register normalizers/mysql
+[[0,0.0,0.0],true]
+normalize NormalizerMySQLUnicodeCI "ｱ㌕ＡZ" WITH_CHECKS
+[[0,0.0,0.0],{"normalized":"あ㌕AZ","types":[],"checks":[3,0,0,3,0,0,3,1]}]

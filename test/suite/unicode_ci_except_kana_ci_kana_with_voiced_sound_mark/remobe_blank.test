@@ -1,0 +1,4 @@
+register normalizers/mysql
+
+normalize NormalizerMySQLUnicodeCIExceptKanaCIKanaWithVoicedSoundMark \
+  " a  b   c" REMOVE_BLANK|WITH_CHECKS
