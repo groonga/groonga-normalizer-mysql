@@ -39,15 +39,12 @@ PKG_CHECK_MODULES([GROONGA], [groonga >= ${GROONGA_REQUIRED_VERSION}])
 
 _PKG_CONFIG(GROONGA_PLUGINS_DIR, [variable=pluginsdir],    [groonga])
 _PKG_CONFIG(GROONGA,             [variable=groonga],       [groonga])
-_PKG_CONFIG(GROONGA_HTTPD,       [variable=groonga_httpd], [groonga])
 
 GROONGA_PLUGINS_DIR="${pkg_cv_GROONGA_PLUGINS_DIR}"
 GROONGA="${pkg_cv_GROONGA}"
-GROONGA_HTTPD="${pkg_cv_GROONGA_HTTPD}"
 
 AC_SUBST(GROONGA_PLUGINS_DIR)
 AC_SUBST(GROONGA)
-AC_SUBST(GROONGA_HTTPD)
 
 normalizers_pluginsdir="\${GROONGA_PLUGINS_DIR}/normalizers"
 AC_SUBST(normalizers_pluginsdir)
