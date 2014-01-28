@@ -18,6 +18,9 @@ normalize NormalizerMySQLUnicodeCI "a1!あア亜💕 " WITH_TYPES
       "kanji",
       "others",
       "others"
+    ],
+    "checks": [
+
     ]
   }
 ]

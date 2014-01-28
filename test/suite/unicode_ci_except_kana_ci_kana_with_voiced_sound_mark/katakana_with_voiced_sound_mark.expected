@@ -11,6 +11,9 @@ normalize NormalizerMySQLUnicodeCIExceptKanaCIKanaWithVoicedSoundMark   "ガギ�
     "normalized": "がぎぐげござじずぜぞだぢづでどばびぶべぼ",
     "types": [
 
+    ],
+    "checks": [
+
     ]
   }
 ]

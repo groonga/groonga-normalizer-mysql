@@ -11,6 +11,9 @@ normalize NormalizerMySQLUnicodeCIExceptKanaCIKanaWithVoicedSoundMark   "がぎ�
     "normalized": "がぎぐげござじずぜぞだぢづでどばびぶべぼ",
     "types": [
 
+    ],
+    "checks": [
+
     ]
   }
 ]

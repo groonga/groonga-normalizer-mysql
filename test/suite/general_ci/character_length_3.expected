@@ -1,4 +1,4 @@
 register normalizers/mysql
 [[0,0.0,0.0],true]
 normalize NormalizerMySQLGeneralCI "ｂｌａｃｋ"
-[[0,0.0,0.0],{"normalized":"ＢＬＡＣＫ","types":[]}]
+[[0,0.0,0.0],{"normalized":"ＢＬＡＣＫ","types":[],"checks":[]}]
