@@ -322,8 +322,8 @@ normalize(grn_ctx *ctx, grn_obj *string,
     current_type = types;
   }
   if (flags & GRN_STRING_WITH_CHECKS) {
-    unsigned int max_normalized_length_in_bytes = original_length_in_bytes + 1;
-    checks = GRN_PLUGIN_MALLOC(ctx, max_normalized_length_in_bytes);
+    unsigned int max_checks_size = sizeof(short) * original_length_in_bytes + 1;
+    checks = GRN_PLUGIN_MALLOC(ctx, max_checks_size);
     current_check = checks;
     current_check[0] = 0;
   }
