@@ -313,7 +313,8 @@ normalize(grn_ctx *ctx, grn_obj *string,
   remove_blank_p = flags & GRN_STRING_REMOVE_BLANK;
   grn_string_get_original(ctx, string, &original, &original_length_in_bytes);
   {
-    unsigned int max_normalized_length_in_bytes = original_length_in_bytes;
+    unsigned int max_normalized_length_in_bytes =
+      original_length_in_bytes + 1;
     normalized = GRN_PLUGIN_MALLOC(ctx, max_normalized_length_in_bytes);
   }
   if (flags & GRN_STRING_WITH_TYPES) {
@@ -391,6 +392,7 @@ normalize(grn_ctx *ctx, grn_obj *string,
   if (current_type) {
     current_type[0] = GRN_CHAR_NULL;
   }
+  normalized[normalized_length_in_bytes] = '\0';
 
   if (rest_length > 0) {
     char buffer[SNIPPET_BUFFER_SIZE];
