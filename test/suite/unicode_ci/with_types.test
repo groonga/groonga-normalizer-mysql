@@ -1,3 +1,4 @@
 register normalizers/mysql
 
-normalize NormalizerMySQLUnicodeCI "a1!あア亜💕 " WITH_TYPES
+normalize NormalizerMySQLUnicodeCI "a1!！あアｱ亜💕 " WITH_TYPES
+
