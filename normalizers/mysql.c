@@ -369,7 +369,7 @@ normalize(grn_ctx *ctx, grn_obj *string,
       if (current_type) {
         char *current_normalized;
         current_normalized =
-          normalized + normalized_length_in_bytes - character_length;
+          normalized + normalized_length_in_bytes - normalized_character_length;
         current_type[0] =
           grn_nfkc_char_type((unsigned char *)current_normalized);
         current_type++;
