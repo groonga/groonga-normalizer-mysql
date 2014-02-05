@@ -13,7 +13,7 @@ normalize NormalizerMySQLUnicodeCI "a1!！あアｱ亜💕 " WITH_TYPES
       "alpha",
       "digit",
       "symbol",
-      "digit",
+      "symbol",
       "hiragana",
       "hiragana",
       "hiragana",
