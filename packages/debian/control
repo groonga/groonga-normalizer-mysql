@@ -5,6 +5,7 @@ Maintainer: Kouhei Sutou <kou@clear-code.com>
 Build-Depends:
   debhelper (>= 9),
   autotools-dev,
+  pkg-config,
   libgroonga-dev (>= 3.0.0)
 Standards-Version: 3.9.3
 Homepage: http://groonga.org/
