@@ -4,7 +4,8 @@ Priority: optional
 Maintainer: Kouhei Sutou <kou@clear-code.com>
 Build-Depends:
   debhelper (>= 9),
-  autotools-dev
+  autotools-dev,
+  libgroonga-dev (>= 3.0.0)
 Standards-Version: 3.9.3
 Homepage: http://groonga.org/
 
@@ -14,7 +15,7 @@ Architecture: any
 Depends:
   ${misc:Depends},
   ${shlibs:Depends},
-  libgroonga-dev (>= 3.0.0)
+  libgroonga
 Description: MySQL derived normalizer for groonga.
  Groonga is an open-source fulltext search engine and column store.
  It lets you write high-performance applications that requires fulltext search.
