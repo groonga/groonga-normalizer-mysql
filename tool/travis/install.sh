@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2014  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -19,7 +19,8 @@
 set -e
 
 # export GROONGA_MASTER=yes
-curl https://raw.github.com/groonga/groonga/master/data/travis/setup.sh | sh
+curl --silent --location \
+    https://raw.github.com/groonga/groonga/master/data/travis/setup.sh | sh
 
 if ! pkg-config --exists groonga; then
     sudo apt-get install -qq -y libgroonga-dev
