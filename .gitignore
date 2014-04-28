@@ -10,6 +10,7 @@ CMakeCache.txt
 Makefile
 Makefile.in
 cmake_install.cmake
+/*.tar.gz
 /aclocal.m4
 /autom4te.cache/
 /config.*
@@ -28,7 +29,10 @@ cmake_install.cmake
 /groonga-normalizer-mysql.pc
 /test/grntest
 /test/groonga-command
+/test/tmp
+/packages/*.tar.gz
 /packages/apt/tmp/*
+/packages/ubuntu/tmp/
 /packages/yum/tmp/*
 /packages/rpm/*/*.spec
 /.gdb_history
