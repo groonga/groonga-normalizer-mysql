@@ -36,5 +36,6 @@ cmake_install.cmake
 /packages/yum/env.sh
 /packages/yum/tmp/*
 /packages/yum/repositories/
+/packages/yum/.vagrant/
 /packages/rpm/*/*.spec
 /.gdb_history
