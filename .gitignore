@@ -37,5 +37,6 @@ cmake_install.cmake
 /packages/yum/tmp/*
 /packages/yum/repositories/
 /packages/yum/.vagrant/
+/packages/yum/RPM-GPG-KEY-groonga-normalizer-mysql
 /packages/rpm/*/*.spec
 /.gdb_history
