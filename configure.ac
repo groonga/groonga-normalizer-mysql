@@ -157,6 +157,7 @@ AC_CONFIG_FILES([
   packages/rpm/fedora/Makefile
   packages/rpm/fedora/groonga-normalizer-mysql.spec
   packages/yum/Makefile
+  packages/yum/env.sh
   packages/source/Makefile
   test/Makefile
   doc/Makefile
