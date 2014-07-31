@@ -1,0 +1,3 @@
+register normalizers/mysql
+
+normalize NormalizerMySQLUnicodeCI "aﾞあﾞz" WITH_CHECKS|WITH_TYPES

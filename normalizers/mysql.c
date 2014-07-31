@@ -191,11 +191,14 @@ normalize_character(const char *utf8, int character_length,
     uint32_t normalized_code;
     unsigned int n_bytes;
     normalized_code = normalize_table[page][low_code];
-    if (normalized_code != 0) {
+    if (normalized_code == 0x00000) {
+      *normalized_character_length = 0;
+    } else {
       n_bytes = unichar_to_utf8(normalized_code,
                                 normalized + *normalized_length_in_bytes);
       *normalized_character_length = n_bytes;
       *normalized_length_in_bytes += n_bytes;
+      (*normalized_n_characters)++;
     }
   } else {
     int i;
@@ -204,8 +207,8 @@ normalize_character(const char *utf8, int character_length,
     }
     *normalized_character_length = character_length;
     *normalized_length_in_bytes += character_length;
+    (*normalized_n_characters)++;
   }
-  (*normalized_n_characters)++;
 }
 
 static void
@@ -366,7 +369,7 @@ normalize(grn_ctx *ctx, grn_obj *string,
                             &normalized_length_in_bytes,
                             &normalized_n_characters);
       }
-      if (current_type) {
+      if (current_type && normalized_character_length > 0) {
         char *current_normalized;
         current_normalized =
           normalized + normalized_length_in_bytes - normalized_character_length;
@@ -375,14 +378,16 @@ normalize(grn_ctx *ctx, grn_obj *string,
         current_type++;
       }
       if (current_check) {
-        unsigned int i;
         current_check[0] += character_length;
-        current_check++;
-        for (i = 1; i < normalized_character_length; i++) {
-          current_check[0] = 0;
+        if (normalized_character_length > 0) {
+          unsigned int i;
           current_check++;
+          for (i = 1; i < normalized_character_length; i++) {
+            current_check[0] = 0;
+            current_check++;
+          }
+          current_check[0] = 0;
         }
-        current_check[0] = 0;
       }
     }
 
