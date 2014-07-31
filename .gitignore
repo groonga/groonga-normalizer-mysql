@@ -29,6 +29,7 @@ cmake_install.cmake
 /groonga-normalizer-mysql.pc
 /test/grntest
 /test/groonga-command
+/test/groonga-command-parser
 /test/tmp
 /packages/*.tar.gz
 /packages/apt/tmp/*
