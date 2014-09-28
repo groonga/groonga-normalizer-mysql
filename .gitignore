@@ -32,7 +32,10 @@ cmake_install.cmake
 /test/groonga-command-parser
 /test/tmp
 /packages/*.tar.gz
-/packages/apt/tmp/*
+/packages/apt/tmp/
+/packages/apt/env.sh
+/packages/apt/repositories/
+/packages/apt/.vagrant/
 /packages/ubuntu/tmp/
 /packages/yum/env.sh
 /packages/yum/tmp/*
