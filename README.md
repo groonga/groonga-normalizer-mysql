@@ -6,7 +6,7 @@ groonga-normalizer-mysql
 
 ## Description
 
-Groonga-normalizer-mysql is a groonga plugin. It provides MySQL
+groonga-normalizer-mysql is a groonga plugin. It provides MySQL
 compatible normalizers and a custom normalizer to groonga.
 
 MySQL compatible normalizers are `NormalizerMySQLGeneralCI` and
