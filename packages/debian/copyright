@@ -2,12 +2,13 @@ Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Contact: Kouhei Sutou <kou at clear-code.com>
 Source: http://packages.groonga.org/source/groonga-normalizer-mysql/
 
-This package was debianized by Kouhei Sutou <kou@clear-code.com> on
-Tue, 29 Jan 2013 14:52:04 +0000.
-
-It was downloaded from <http://groonga.org/>
-
+Files: *
 Copyright: 2013 Brazil, Inc
+License: LGPL-2
+
+Files: debian/*
+Copyright: 2013 Kouhei Sutou <kou@clear-code.com>
+    HAYASHI Kentaro <hayashi@clear-code.com>
 License: LGPL-2
 
 License: LGPL-2
