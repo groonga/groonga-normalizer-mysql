@@ -8,7 +8,7 @@ Build-Depends:
   pkg-config,
   libgroonga-dev (>= 3.0.0)
 Standards-Version: 3.9.3
-Homepage: http://groonga.org/
+Homepage: https://github.com/groonga/groonga-normalizer-mysql
 
 Package: groonga-normalizer-mysql
 Section: libs
