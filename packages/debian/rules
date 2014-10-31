@@ -13,3 +13,4 @@ export DH_OPTIONS
 override_dh_auto_test:
 
 override_dh_install:
+	find $(CURDIR) -name '*.la' -delete
