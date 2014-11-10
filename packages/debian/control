@@ -18,7 +18,14 @@ Depends:
   libgroonga0
 Description: MySQL derived normalizer for Groonga
  Groonga is an open-source fulltext search engine and column store.
- It lets you write high-performance applications that requires fulltext search.
+ It lets you write high-performance applications that requires fulltext
+ search.
  .
- This package provides a normalizer which normalizes text as same as MySQL does.
-
+ This package provides a normalizer which normalizes text as same as
+ MySQL does.
+ .
+ Groonga has its own normalizers by default, but that behavior is a bit
+ defferent from MySQL does, so as a result, it affects search results.
+ These normalizers are useful if you regards it important for keeping
+ normalizer compatibility with MySQL in Mroonga which uses Groonga as
+ storage engine.
