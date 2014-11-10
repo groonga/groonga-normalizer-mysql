@@ -8,17 +8,17 @@ License: LGPL-2
 
 Files: debian/*
 Copyright: 2013 Kouhei Sutou <kou@clear-code.com>
-    HAYASHI Kentaro <hayashi@clear-code.com>
+           2013 HAYASHI Kentaro <hayashi@clear-code.com>
 License: LGPL-2
 
 Files: normalizers/mysql_general_ci_table.h
 Copyright: 2013 Kouhei Sutou <kou@clear-code.com>
-    2000, 2012, Oracle and/or its affiliates
+           2000, 2012, Oracle and/or its affiliates
 License: LGPL-2
 
 Files: normalizers/mysql_unicode_ci_*.h
 Copyright: 2013 Kouhei Sutou <kou@clear-code.com>
-    2004, 2011, Oracle and/or its affiliates
+           2004, 2011, Oracle and/or its affiliates
 License: LGPL-2
 
 License: LGPL-2
