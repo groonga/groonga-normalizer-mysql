@@ -13,7 +13,7 @@ License: LGPL-2
 
 Files: test/run-test.sh
 Copyright: 2013 Kouhei Sutou <kou@clear-code.com>
-License: GPL-2+
+License: LGPL-2+
 
 Files: normalizers/mysql_general_ci_table.h
 Copyright: 2013 Kouhei Sutou <kou@clear-code.com>
