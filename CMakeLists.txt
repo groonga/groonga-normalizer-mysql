@@ -58,6 +58,8 @@ configure_file(
   "${CMAKE_CURRENT_BINARY_DIR}/groonga-normalizer-mysql.pc"
   @ONLY)
 
-install(
-  FILES "${CMAKE_CURRENT_BINARY_DIR}/groonga-normalizer-mysql.pc"
-  DESTINATION "lib/pkgconfig/")
+if(NOT GROONGA_NORMALIZER_MYSQL_FOUND)
+  install(
+    FILES "${CMAKE_CURRENT_BINARY_DIR}/groonga-normalizer-mysql.pc"
+    DESTINATION "lib/pkgconfig/")
+endif()

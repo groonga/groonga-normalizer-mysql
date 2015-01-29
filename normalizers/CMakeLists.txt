@@ -22,4 +22,6 @@ set_target_properties(mysql_normalizer PROPERTIES
   PREFIX ""
   OUTPUT_NAME "mysql")
 target_link_libraries(mysql_normalizer ${GROONGA_LIBRARIES})
-install(TARGETS mysql_normalizer DESTINATION "${NORMALIZERS_DIR}")
+if(NOT MRN_GROONGA_BUNDLED)
+  install(TARGETS mysql_normalizer DESTINATION "${NORMALIZERS_DIR}")
+endif()
