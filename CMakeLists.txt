@@ -53,12 +53,11 @@ link_directories(
 
 add_subdirectory(normalizers)
 
-configure_file(
-  groonga-normalizer-mysql.pc.in
-  "${CMAKE_CURRENT_BINARY_DIR}/groonga-normalizer-mysql.pc"
-  @ONLY)
-
-if(NOT GROONGA_NORMALIZER_MYSQL_FOUND)
+if(NOT GROONGA_NORMALIZER_MYSQL_BUNDLED)
+  configure_file(
+    groonga-normalizer-mysql.pc.in
+    "${CMAKE_CURRENT_BINARY_DIR}/groonga-normalizer-mysql.pc"
+    @ONLY)
   install(
     FILES "${CMAKE_CURRENT_BINARY_DIR}/groonga-normalizer-mysql.pc"
     DESTINATION "lib/pkgconfig/")
