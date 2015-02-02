@@ -2,6 +2,7 @@
 .libs/
 CMakeFiles/
 *~
+*.a
 *.o
 *.so
 *.lo

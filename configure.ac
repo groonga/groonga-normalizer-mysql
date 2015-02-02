@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2015  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -48,6 +48,18 @@ AC_SUBST(GROONGA)
 
 normalizers_pluginsdir="\${GROONGA_PLUGINS_DIR}/normalizers"
 AC_SUBST(normalizers_pluginsdir)
+
+AC_ARG_ENABLE([embed],
+  AS_HELP_STRING([--enable-embed],
+    [Build as a static library to embed into an application (default: no)]),
+  [GROONGA_NORMALIZER_MYSQL_EMBED="$enableval"],
+  [GROONGA_NORMALIZER_MYSQL_EMBED="no"])
+
+if test "x$GROONGA_NORMALIZER_MYSQL_EMBED" = "xno"; then
+  AC_DEFINE_UNQUOTED(GROONGA_NORMALIZER_MYSQL_EMBED,
+                     [1],
+                     [Define to 1 if groonga-normalizer-mysql is built for embedding.])
+fi
 
 # check Ruby for test
 ac_cv_ruby_available="no"
