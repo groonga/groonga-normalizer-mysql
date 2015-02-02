@@ -18,9 +18,15 @@
 cmake_minimum_required(VERSION 2.6)
 project(groonga-normalizer-mysql)
 
+if(DEFINED GROONGA_NORMALIZER_MYSQL_EMBED)
+  set(GROONGA_NORMALIZER_MYSQL_EMBED_DEFAULT
+    ${GROONGA_NORMALIZER_MYSQL_EMBED})
+else()
+  set(GROONGA_NORMALIZER_MYSQL_EMBED_DEFAULT OFF)
+endif()
 option(GROONGA_NORMALIZER_MYSQL_EMBED
   "Build as a static library to embed into an application"
-  OFF)
+  ${GROONGA_NORMALIZER_MYSQL_EMBED_DEFAULT})
 
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/version" VERSION)
 
