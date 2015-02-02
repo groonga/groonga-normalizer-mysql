@@ -22,7 +22,7 @@
 #  include <config.h>
 #endif
 
-#ifdef GRN_NORMALIZER_MYSQL_EMBED
+#ifdef GROONGA_NORMALIZER_MYSQL_EMBED
 #  define GRN_PLUGIN_FUNCTION_TAG normalizers_mysql
 #endif
 
