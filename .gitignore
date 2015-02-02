@@ -7,10 +7,10 @@ CMakeFiles/
 *.so
 *.lo
 *.la
+*.cmake
 CMakeCache.txt
 Makefile
 Makefile.in
-cmake_install.cmake
 /*.tar.gz
 /aclocal.m4
 /autom4te.cache/
