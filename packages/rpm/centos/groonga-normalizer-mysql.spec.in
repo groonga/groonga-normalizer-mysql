@@ -53,7 +53,7 @@ rm $RPM_BUILD_ROOT%{_libdir}/groonga/plugins/*/*.la
 %{_libdir}/pkgconfig/groonga-normalizer-mysql.pc
 
 %changelog
-* Mon Feb 09 2015  <hayashi@clear-code.com> - 1.0.7-1
+* Mon Feb 09 2015 HAYASHI Kentaro <hayashi@clear-code.com> - 1.0.7-1
 - new upstream release.
 
 * Sun Feb 09 2014 HAYASHI Kentaro <hayashi@clear-code.com> - 1.0.6-1
