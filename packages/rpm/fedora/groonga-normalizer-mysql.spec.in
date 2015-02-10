@@ -41,7 +41,7 @@ make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p"
 rm $RPM_BUILD_ROOT%{_libdir}/groonga/plugins/*/*.la
 
 %files
-%doc README AUTHORS COPYING
+%doc README.md lgpl-2.0.txt news.md
 %dir %{_libdir}/groonga
 %dir %{_libdir}/groonga/plugins
 %dir %{_libdir}/groonga/plugins/normalizers
