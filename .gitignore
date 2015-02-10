@@ -46,3 +46,4 @@ Makefile.in
 /packages/rpm/*/*.spec
 /packages/source/files/
 /.gdb_history
+/misc
