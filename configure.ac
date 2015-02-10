@@ -55,7 +55,7 @@ AC_ARG_ENABLE([embed],
   [GROONGA_NORMALIZER_MYSQL_EMBED="$enableval"],
   [GROONGA_NORMALIZER_MYSQL_EMBED="no"])
 
-if test "x$GROONGA_NORMALIZER_MYSQL_EMBED" = "xno"; then
+if test "x$GROONGA_NORMALIZER_MYSQL_EMBED" = "xyes"; then
   AC_DEFINE_UNQUOTED(GROONGA_NORMALIZER_MYSQL_EMBED,
                      [1],
                      [Define to 1 if groonga-normalizer-mysql is built for embedding.])
