@@ -44,4 +44,5 @@ Makefile.in
 /packages/yum/.vagrant/
 /packages/yum/RPM-GPG-KEY-groonga-normalizer-mysql
 /packages/rpm/*/*.spec
+/packages/source/files/
 /.gdb_history
