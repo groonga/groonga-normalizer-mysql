@@ -17,4 +17,4 @@
 docdir = $(datadir)/doc/$(PACKAGE)
 dist_doc_DATA =					\
 	lgpl-2.0.txt				\
-	news.txt
+	news.md
