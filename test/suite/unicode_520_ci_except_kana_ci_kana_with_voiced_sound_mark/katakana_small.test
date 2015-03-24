@@ -1,0 +1,4 @@
+register normalizers/mysql
+
+normalize NormalizerMySQLUnicode520CIExceptKanaCIKanaWithVoicedSoundMark \
+  "ァィゥェォッャュョヮ"

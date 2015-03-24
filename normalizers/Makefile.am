@@ -43,7 +43,8 @@ UPDATE_TABLES_TARGETS =								\
 	update-general-ci-table							\
 	update-unicode-ci-table							\
 	update-unicode-ci-except-kana-ci-kana-with-voiced-sound-mark-table	\
-	update-unicode-520-ci-table
+	update-unicode-520-ci-table						\
+	update-unicode-520-ci-except-kana-ci-kana-with-voiced-sound-mark-table
 
 update-tables: $(UPDATE_TABLES_TARGETS)
 
@@ -75,3 +76,15 @@ update-unicode-520-ci-table: ensure-mysql-source-dir
 	  --version=520					\
 	  $(MYSQL_SOURCE_DIR)/strings/ctype-uca.c >	\
 	  $(srcdir)/mysql_unicode_520_ci_table.h
+
+update-unicode-520-ci-except-kana-ci-kana-with-voiced-sound-mark-table: ensure-mysql-source-dir
+	$(RUBY)							\
+	  $(top_srcdir)/tool/generate_uca_table.rb		\
+	  --version=520						\
+	  --split-small-kana					\
+	  --split-kana-with-voiced-sound-mark			\
+	  --split-kana-with-semi-voiced-sound-mark		\
+	  --suffix _except_kana_ci_kana_with_voiced_sound_mark	\
+	  $(MYSQL_SOURCE_DIR)/strings/ctype-uca.c >		\
+	  $(srcdir)/mysql_unicode_520_ci_except_kana_ci_kana_with_voiced_sound_mark_table.h
+

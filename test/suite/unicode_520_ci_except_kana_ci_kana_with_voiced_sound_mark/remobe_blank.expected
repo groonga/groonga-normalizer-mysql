@@ -1,0 +1,4 @@
+register normalizers/mysql
+[[0,0.0,0.0],true]
+normalize NormalizerMySQLUnicode520CIExceptKanaCIKanaWithVoicedSoundMark   " a  b   c" REMOVE_BLANK|WITH_CHECKS
+[[0,0.0,0.0],{"normalized":"ABC","types":[],"checks":[2,3,4]}]

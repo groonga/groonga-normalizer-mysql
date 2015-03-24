@@ -34,8 +34,9 @@
 
 #include "mysql_general_ci_table.h"
 #include "mysql_unicode_ci_table.h"
-#include "mysql_unicode_520_ci_table.h"
 #include "mysql_unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_table.h"
+#include "mysql_unicode_520_ci_table.h"
+#include "mysql_unicode_520_ci_except_kana_ci_kana_with_voiced_sound_mark_table.h"
 
 #ifdef __GNUC__
 #  define GNUC_UNUSED __attribute__((__unused__))
@@ -695,6 +696,36 @@ mysql_unicode_520_ci_next(GNUC_UNUSED grn_ctx *ctx,
   return NULL;
 }
 
+static grn_obj *
+mysql_unicode_520_ci_except_kana_ci_kana_with_voiced_sound_mark_next(
+  GNUC_UNUSED grn_ctx *ctx,
+  GNUC_UNUSED int nargs,
+  grn_obj **args,
+  GNUC_UNUSED grn_user_data *user_data)
+{
+  grn_obj *string = args[0];
+  grn_encoding encoding;
+  const char *normalizer_type_label =
+    "mysql-unicode-520-ci-except-kana-ci-kana-with-voiced-sound-mark";
+
+  encoding = grn_string_get_encoding(ctx, string);
+  if (encoding != GRN_ENC_UTF8) {
+    GRN_PLUGIN_ERROR(ctx,
+                     GRN_FUNCTION_NOT_IMPLEMENTED,
+                     "[normalizer][%s] "
+                     "UTF-8 encoding is only supported: %s",
+                     normalizer_type_label,
+                     grn_encoding_to_string(encoding));
+    return NULL;
+  }
+  normalize(ctx, string,
+            normalizer_type_label,
+            unicode_520_ci_except_kana_ci_kana_with_voiced_sound_mark_table,
+            sizeof(unicode_520_ci_except_kana_ci_kana_with_voiced_sound_mark_table) / sizeof(uint32_t *),
+            normalize_halfwidth_katakana_with_voiced_sound_mark);
+  return NULL;
+}
+
 grn_rc
 GRN_PLUGIN_INIT(grn_ctx *ctx)
 {
@@ -719,6 +750,15 @@ GRN_PLUGIN_REGISTER(grn_ctx *ctx)
                           NULL);
   grn_normalizer_register(ctx, "NormalizerMySQLUnicode520CI", -1,
                           NULL, mysql_unicode_520_ci_next, NULL);
+  grn_normalizer_register(ctx,
+                          "NormalizerMySQLUnicode520CI"
+                          "Except"
+                          "KanaCI"
+                          "KanaWithVoicedSoundMark",
+                          -1,
+                          NULL,
+                          mysql_unicode_520_ci_except_kana_ci_kana_with_voiced_sound_mark_next,
+                          NULL);
   return GRN_SUCCESS;
 }
 

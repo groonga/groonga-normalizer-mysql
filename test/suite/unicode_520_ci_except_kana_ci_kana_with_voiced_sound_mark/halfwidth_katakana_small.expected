@@ -1,0 +1,19 @@
+register normalizers/mysql
+[[0,0.0,0.0],true]
+normalize NormalizerMySQLUnicode520CIExceptKanaCIKanaWithVoicedSoundMark   "ｧｨｩｪｫｯｬｭｮ"
+[
+  [
+    0,
+    0.0,
+    0.0
+  ],
+  {
+    "normalized": "ぁぃぅぇぉっゃゅょ",
+    "types": [
+
+    ],
+    "checks": [
+
+    ]
+  }
+]
