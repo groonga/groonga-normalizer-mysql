@@ -1,0 +1,28 @@
+register normalizers/mysql
+[[0,0.0,0.0],true]
+normalize NormalizerMySQLUnicode520CI "a1!！あアｱ亜💕 " WITH_TYPES
+[
+  [
+    0,
+    0.0,
+    0.0
+  ],
+  {
+    "normalized": "A1!!あああ亜💕 ",
+    "types": [
+      "alpha",
+      "digit",
+      "symbol",
+      "symbol",
+      "hiragana",
+      "hiragana",
+      "hiragana",
+      "kanji",
+      "others",
+      "others"
+    ],
+    "checks": [
+
+    ]
+  }
+]

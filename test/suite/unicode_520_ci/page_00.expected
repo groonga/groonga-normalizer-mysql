@@ -1,0 +1,4 @@
+register normalizers/mysql
+[[0,0.0,0.0],true]
+normalize NormalizerMySQLUnicode520CI "aBc"
+[[0,0.0,0.0],{"normalized":"ABC","types":[],"checks":[]}]
