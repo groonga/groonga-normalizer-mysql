@@ -25,6 +25,14 @@ if(GROONGA_NORMALIZER_MYSQL_EMBED)
     mysql_normalizer
     PROPERTIES
     POSITION_INDEPENDENT_CODE ON)
+  if(NOT DEFINED CMAKE_C_COMPILE_OPTIONS_PIC)
+    # For old CMake
+    if(CMAKE_COMPILER_IS_GNUCXX)
+      set_source_files_properties(${MYSQL_SOURCES}
+	PROPERTIES
+	COMPILE_FLAGS "-fPIC")
+    endif()
+  endif()
 else()
   add_library(mysql_normalizer MODULE ${MYSQL_SOURCES})
   set_target_properties(mysql_normalizer PROPERTIES
