@@ -7,6 +7,10 @@
   * Fixed a bug that full-width space isn't treated as blank character.
     [groonga-dev,03215] [Reported by Shota Mitsui]
 
+### Thanks
+
+  * Shota Mitsui
+
 ## 1.0.9: 2015-03-29
 
 ### Improves
