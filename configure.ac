@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2016  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -74,7 +74,12 @@ if test "x$RUBY" = "xno"; then
 else
   if test "x$RUBY" = "xauto"; then
     AC_PATH_PROGS(RUBY,
-                  [ruby2.1 ruby21 ruby2.0 ruby20 ruby1.9 ruby19 ruby1.9.1 ruby],
+                  [ dnl
+                    ruby2.3 ruby23 dnl
+                    ruby2.2 ruby22 dnl
+                    ruby2.1 ruby21 dnl
+                    ruby dnl
+                  ],
                   ruby-not-found)
     if test "$RUBY" != "ruby-not-found"; then
       ruby_version="`$RUBY --version`"
