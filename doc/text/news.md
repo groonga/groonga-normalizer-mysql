@@ -1,5 +1,16 @@
 # News
 
+## 1.1.1: 2016-04-29
+
+### Improves
+
+  * Supported Ubuntu 15.10 and Ubuntu 16.04
+  * Dropped Debian 7.0
+
+### Fixes
+
+  * Fixed to install license information when cmake is used.
+
 ## 1.1.0: 2015-05-29
 
 ### Fixes
