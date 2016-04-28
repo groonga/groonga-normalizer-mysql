@@ -2,7 +2,7 @@
 
 ## 1.1.1: 2016-04-29
 
-### Improves
+### Improvements
 
   * Supported Ubuntu 15.10 and Ubuntu 16.04
   * Dropped Debian 7.0
@@ -24,7 +24,7 @@
 
 ## 1.0.9: 2015-03-29
 
-### Improves
+### Improvements
 
   * Added `NormalizerMySQLUnicode520CI`
   * Added `NormalizerMySQLUnicode520CIExceptKanaCIKanaWithVoicedSoundMark`
