@@ -9,7 +9,7 @@ compiler:
 install:
   - tool/travis/install.sh
 before_script:
-  - rvm use 2.3.1
+  - rvm use 2.4
   - tool/travis/before_script.sh
 script:
   - test/run-test.sh
