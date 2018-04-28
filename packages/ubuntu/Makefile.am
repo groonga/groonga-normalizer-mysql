@@ -1,4 +1,4 @@
-CODE_NAMES = trusty,xenial,artful
+CODE_NAMES = trusty,xenial,artful,bionic
 SOURCE = ../$(PACKAGE)-$(VERSION).tar.gz
 
 all:
