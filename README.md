@@ -14,6 +14,9 @@ Here are MySQL compatible normalizers:
 * `NormalizerMySQLGeneralCI` for `utf8mb4_general_ci`
 * `NormalizerMySQLUnicodeCI` for `utf8mb4_unicode_ci`
 * `NormalizerMySQLUnicode520CI` for `utf8mb4_unicode_520_ci`
+* `NormalizerMySQLUnicode900` for `utf8mb4_900_ai_ci`,
+  `utf8mb4_900_as_ci`, `utf8mb4_900_as_cs`, `utf8mb4_ja_900_as_cs` and
+  `utf8mb4_ja_900_as_cs_ks`.
 
 Here are custom normalizers:
 
@@ -89,25 +92,14 @@ and install `groonga-normalizer-mysql` package:
 
 Install `groonga-repository` package:
 
-    % sudo rpm -ivh http://packages.groonga.org/centos/groonga-release-1.1.0-1.noarch.rpm
+    % sudo rpm -ivh https://packages.groonga.org/centos/groonga-release-latest.noarch.rpm
     % sudo yum makecache
 
 Then install `groonga-normalizer-mysql` package:
 
     % sudo yum install -y groonga-normalizer-mysql
 
-### Fedora
-
-Install `groonga-repository` package:
-
-    % sudo rpm -ivh http://packages.groonga.org/fedora/groonga-release-1.1.0-1.noarch.rpm
-    % sudo yum makecache
-
-Then install `groonga-normalizer-mysql` package:
-
-    % sudo yum install -y groonga-normalizer-mysql
-
-### OS X - Homebrew
+### macOS - Homebrew
 
 Install `groonga-normalizer-mysql` package:
 
@@ -121,7 +113,7 @@ You need to build from source. Here are build instructions.
 
 Install the following build tools:
 
-* [Microsoft Visual Studio 2010 Express](http://www.microsoft.com/japan/msdn/vstudio/express/): 2012 isn't tested yet.
+* [Microsoft Visual C++](https://visualstudio.microsoft.com/vs/features/cplusplus/)
 * [CMake](http://www.cmake.org/)
 
 #### Build Groonga
@@ -135,7 +127,7 @@ Extract the source and move to the source folder:
 
 Run CMake. Here is a command line to install Groonga to `C:\groonga` folder:
 
-    groonga-X.Y.Z> cmake . -G "Visual Studio 12 Win64" -DCMAKE_INSTALL_PREFIX=C:\groonga
+    groonga-X.Y.Z> cmake . -G "Visual Studio 14 Win64" -DCMAKE_INSTALL_PREFIX=C:\groonga
 
 Build:
 
@@ -156,11 +148,11 @@ Extract the source and move to the source folder:
 
 IMPORTANT!!!: Set `PKG_CONFIG_PATH` environment variable:
 
-    groonga-normalizer-mysql-X.Y.Z> set PKG_CONFIG_PATH=C:\groongalocal\lib\pkgconfig
+    groonga-normalizer-mysql-X.Y.Z> set PKG_CONFIG_PATH=C:\groonga\local\lib\pkgconfig
 
 Run CMake. Here is a command line to install Groonga to `C:\groonga` folder:
 
-    groonga-normalizer-mysql-X.Y.Z> cmake . -G "Visual Studio 12 Win64" -DCMAKE_INSTALL_PREFIX=C:\groonga
+    groonga-normalizer-mysql-X.Y.Z> cmake . -G "Visual Studio 14 Win64" -DCMAKE_INSTALL_PREFIX=C:\groonga
 
 Build:
 
@@ -183,7 +175,7 @@ Then, you can use `NormalizerMySQLGeneralCI` and
 
 ## Dependencies
 
-* Groonga >= 3.0.3
+* Groonga >= 8.0.4
 
 ## Mailing list
 
@@ -205,7 +197,7 @@ Then, you can use `NormalizerMySQLGeneralCI` and
 LGPLv2 only. See doc/text/lgpl-2.0.txt for details.
 
 This program uses normalization table defined in MySQL source code. So
-this program is derived work of
-`MYSQL_SOURCE/strings/ctype-utf8.c`. This program is the same license
-as `MYSQL_SOURCE/strings/ctype-utf8.c` and it is licensed under LGPLv2
-only.
+this program is derived work of `MYSQL_SOURCE/strings/ctype-utf8.c`,
+`MYSQL_SOURCE/strings/uca900_data.h`,
+`MYSQL_SOURCE/strings/uca900_ja_data.h`. This program is the same
+license as them and they are licensed under LGPLv2 only.
