@@ -1,0 +1,6 @@
+register normalizers/mysql
+
+normalize \
+  'NormalizerMySQLUnicode900("locale", "ja", \
+                             "weight_level", 3)' \
+  "ﾊ"

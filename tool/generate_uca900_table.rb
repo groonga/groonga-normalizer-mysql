@@ -32,14 +32,24 @@ option_parser.on("--weight-level=N", Integer,
                  "(#{@weight_level})") do |level|
   @weight_level = level
 end
+option_parser.on("--tailoring-locale=LOCALE",
+                 "Use LOCALE tailoring",
+                 "(#{@tailoring_locale})") do |locale|
+  @tailoring_locale = locale
+end
+option_parser.on("--tailoring-path=PATH",
+                 "Parse PATH to extract tailoring expression",
+                 "(#{@tailoring_path})") do |path|
+  @tailoring_path = path
+end
 option_parser.on("--suffix=SUFFIX", "Add SUFFIX to names") do |suffix|
   @suffix = suffix
 end
 
 begin
   option_parser.parse!(ARGV)
-rescue OptionParser::Error
-  puts($!)
+rescue OptionParser::ParseError
+  $stderr.puts($!)
   exit(false)
 end
 
@@ -51,6 +61,11 @@ end
 uca_h_path = ARGV[0]
 
 parser = UCA900Parser.new
+if @tailoring_path
+  File.open(@tailoring_path) do |tailoring_file|
+    parser.parse_tailoring(tailoring_file, @tailoring_locale)
+  end
+end
 File.open(uca_h_path) do |uca_h|
   parser.parse(uca_h)
 end

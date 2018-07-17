@@ -40,6 +40,8 @@
 #include "mysql_unicode_900_ai_ci_table.h"
 #include "mysql_unicode_900_as_ci_table.h"
 #include "mysql_unicode_900_as_cs_table.h"
+#include "mysql_unicode_900_ja_as_cs_table.h"
+#include "mysql_unicode_900_ja_as_cs_ks_table.h"
 
 #ifdef __GNUC__
 #  define GNUC_UNUSED __attribute__((__unused__))
@@ -738,14 +740,21 @@ mysql_unicode_520_ci_except_kana_ci_kana_with_voiced_sound_mark_next(
   return NULL;
 }
 
+typedef enum {
+  MYSQL_UNICODE_900_LOCALE_NONE,
+  MYSQL_UNICODE_900_LOCALE_JA,
+} mysql_unicode_900_locale;
+
 typedef struct {
   uint8_t weight_level;
+  mysql_unicode_900_locale locale;
 } mysql_unicode_900_options;
 
 static void
 mysql_unicode_900_options_init(mysql_unicode_900_options *options)
 {
   options->weight_level = 1;
+  options->locale = MYSQL_UNICODE_900_LOCALE_NONE;
 }
 
 static void *
@@ -754,14 +763,16 @@ mysql_unicode_900_open_options(grn_ctx *ctx,
                                grn_obj *raw_options,
                                GNUC_UNUSED void *user_data)
 {
+  const char *normalizer_type_label = "mysql-unicode-900";
   mysql_unicode_900_options *options;
 
   options = GRN_PLUGIN_MALLOC(ctx, sizeof(*options));
   if (!options) {
     GRN_PLUGIN_ERROR(ctx,
                      GRN_NO_MEMORY_AVAILABLE,
-                     "[normalizer][mysql-unicode-900] "
-                     "failed to allocate memory for options");
+                     "[normalizer][%s] "
+                     "failed to allocate memory for options",
+                     normalizer_type_label);
     return NULL;
   }
 
@@ -769,15 +780,59 @@ mysql_unicode_900_open_options(grn_ctx *ctx,
 
   GRN_OPTION_VALUES_EACH_BEGIN(ctx, raw_options, i, name, name_length) {
     /* TODO: Use grn_raw_string. */
-#define NAME_EQUAL(option_name)                                         \
-    (name_length == strlen(option_name) &&                              \
-     strncmp(name, option_name, strlen(option_name)) == 0)
-    if (NAME_EQUAL("weight_level")) {
+#define STRING_EQUAL(raw_string, raw_string_length, c_string)   \
+    (raw_string_length == strlen(c_string) &&                   \
+     strncmp(raw_string, c_string, raw_string_length) == 0)
+    if (STRING_EQUAL(name, name_length, "weight_level")) {
       options->weight_level =
         grn_vector_get_element_uint8(ctx,
                                      raw_options,
                                      i,
                                      options->weight_level);
+    } else if (STRING_EQUAL(name, name_length, "locale")) {
+      const char *locale;
+      unsigned int locale_length;
+      grn_id domain;
+      locale_length =
+        grn_vector_get_element(ctx, raw_options, i, &locale, NULL, &domain);
+      if (!grn_type_id_is_text_family(ctx, domain)) {
+        GRN_PLUGIN_FREE(ctx, options);
+        options = NULL;
+        {
+          grn_obj value;
+          grn_obj inspected;
+          GRN_OBJ_INIT(&value, GRN_BULK, 0, domain);
+          grn_bulk_write(ctx, &value, locale, locale_length);
+          GRN_TEXT_INIT(&inspected, 0);
+          grn_inspect(ctx, &value, &inspected);
+          GRN_OBJ_FIN(ctx, &value);
+          GRN_PLUGIN_ERROR(ctx,
+                           GRN_INVALID_ARGUMENT,
+                           "[normalizer][%s] "
+                           "locale must be text: <%.*s>",
+                           normalizer_type_label,
+                           (int)GRN_TEXT_LEN(&inspected),
+                           GRN_TEXT_VALUE(&inspected));
+          GRN_OBJ_FIN(ctx, &inspected);
+        }
+        break;
+      }
+      if (STRING_EQUAL(locale, locale_length, "none")) {
+        options->locale = MYSQL_UNICODE_900_LOCALE_NONE;
+      } else if (STRING_EQUAL(locale, locale_length, "ja")) {
+        options->locale = MYSQL_UNICODE_900_LOCALE_JA;
+      } else {
+        GRN_PLUGIN_FREE(ctx, options);
+        options = NULL;
+        GRN_PLUGIN_ERROR(ctx,
+                         GRN_INVALID_ARGUMENT,
+                         "[normalizer][%s] "
+                         "locale must be <none> or <ja>: <%.*s>",
+                         normalizer_type_label,
+                         (int)locale_length,
+                         locale);
+        break;
+      }
     }
 #undef NAME_EQUAL
   } GRN_OPTION_VALUES_EACH_END();
@@ -841,19 +896,47 @@ mysql_unicode_900_next(grn_ctx *ctx,
     normalize(ctx, string,
               normalizer_type_label,
               unicode_900_as_ci_table,
-              sizeof(unicode_900_ai_ci_table) / sizeof(uint32_t *),
+              sizeof(unicode_900_as_ci_table) / sizeof(uint32_t *),
               NULL);
   } else if (options->weight_level == 3) {
-    normalize(ctx, string,
-              normalizer_type_label,
-              unicode_900_as_cs_table,
-              sizeof(unicode_900_ai_ci_table) / sizeof(uint32_t *),
-              NULL);
+    switch (options->locale) {
+    case MYSQL_UNICODE_900_LOCALE_JA :
+      normalize(ctx, string,
+                normalizer_type_label,
+                unicode_900_ja_as_cs_table,
+                sizeof(unicode_900_ja_as_cs_table) / sizeof(uint32_t *),
+                NULL);
+      break;
+    default :
+      normalize(ctx, string,
+                normalizer_type_label,
+                unicode_900_as_cs_table,
+                sizeof(unicode_900_as_cs_table) / sizeof(uint32_t *),
+                NULL);
+      break;
+    }
+  } else if (options->weight_level == 4) {
+    switch (options->locale) {
+    case MYSQL_UNICODE_900_LOCALE_JA :
+      normalize(ctx, string,
+                normalizer_type_label,
+                unicode_900_ja_as_cs_ks_table,
+                sizeof(unicode_900_ja_as_cs_ks_table) / sizeof(uint32_t *),
+                NULL);
+      break;
+    default :
+      GRN_PLUGIN_ERROR(ctx,
+                       GRN_FUNCTION_NOT_IMPLEMENTED,
+                       "[normalizer][%s] "
+                       "locale must be ja for weight level 4",
+                       normalizer_type_label);
+      break;
+    }
   } else {
     GRN_PLUGIN_ERROR(ctx,
                      GRN_FUNCTION_NOT_IMPLEMENTED,
                      "[normalizer][%s] "
-                     "weight level must be 1, 2 or 3: %u",
+                     "weight level must be 1, 2, 3 or 4: %u",
                      normalizer_type_label,
                      options->weight_level);
     return NULL;

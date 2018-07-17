@@ -47,7 +47,9 @@ UPDATE_TABLES_TARGETS =								\
 	update-unicode-520-ci-except-kana-ci-kana-with-voiced-sound-mark-table	\
 	update-unicode-900-ai-ci-table						\
 	update-unicode-520-as-ci-table						\
-	update-unicode-520-as-cs-table
+	update-unicode-900-as-cs-table						\
+	update-unicode-900-ja-as-cs-table					\
+	update-unicode-900-ja-as-cs-ks-table
 
 update-tables: $(UPDATE_TABLES_TARGETS)
 
@@ -115,3 +117,22 @@ update-unicode-900-as-cs-table: ensure-mysql-source-dir
 	  $(MYSQL_SOURCE_DIR)/strings/uca900_data.h >	\
 	  $(srcdir)/mysql_unicode_900_as_cs_table.h
 
+update-unicode-900-ja-as-cs-table: ensure-mysql-source-dir
+	$(RUBY)								\
+	  $(top_srcdir)/tool/generate_uca900_table.rb			\
+	  --tailoring-locale ja						\
+	  --tailoring-path $(MYSQL_SOURCE_DIR)/strings/uca900_ja_data.h	\
+	  --weight-level 3						\
+	  --suffix _ja_as_cs						\
+	  $(MYSQL_SOURCE_DIR)/strings/uca900_data.h >			\
+	  $(srcdir)/mysql_unicode_900_ja_as_cs_table.h
+
+update-unicode-900-ja-as-cs-ks-table: ensure-mysql-source-dir
+	$(RUBY)								\
+	  $(top_srcdir)/tool/generate_uca900_table.rb			\
+	  --tailoring-locale ja						\
+	  --tailoring-path $(MYSQL_SOURCE_DIR)/strings/uca900_ja_data.h	\
+	  --weight-level 4						\
+	  --suffix _ja_as_cs_ks						\
+	  $(MYSQL_SOURCE_DIR)/strings/uca900_data.h >			\
+	  $(srcdir)/mysql_unicode_900_ja_as_cs_ks_table.h

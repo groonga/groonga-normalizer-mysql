@@ -1,0 +1,4 @@
+register normalizers/mysql
+[[0,0.0,0.0],true]
+normalize   'NormalizerMySQLUnicode900("locale", "ja",                              "weight_level", 3)'   "ょ"
+[[0,0.0,0.0],{"normalized":"ょ","types":[],"checks":[]}]

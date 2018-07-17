@@ -15,6 +15,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "English"
+require "strscan"
 
 module Unicode
   module_function
@@ -171,6 +172,10 @@ class UCAParser
       rest_characters = characters.reject do |character|
         character == representative_character
       end
+      # p ["U+%04x" % representative_character.code_point,
+      #    representative_character.utf8,
+      #    representative_character.weights,
+      #    rest_characters.collect {|x| [x.utf8, x.weights]}]
       rest_characters.each do |character|
         code_point = character.code_point
         page = code_point >> 8
@@ -306,13 +311,167 @@ class CTypeUCAParser < UCAParser
   end
 end
 
+class ICUCollationCustomizationRuleParser
+  class Rule < Struct.new(:type,
+                          :base_string,
+                          :target_string,
+                          :nth_weight,
+                          :before_nth_weight,
+                          :post_string)
+  end
+
+  def initialize(rule_text)
+    @scanner = StringScanner.new(rule_text)
+  end
+
+  def parse(&block)
+    until @scanner.eos?
+      @scanner.skip(/\s+/)
+      if @scanner.scan(/&/)
+        parse_reset(&block)
+      else
+        raise "Must be reset: #{@scanner.inspect}"
+      end
+    end
+  end
+
+  private
+  def parse_reset(&block)
+    before_nth_weight = parse_before_nth_weight
+    base_string = parse_string
+    unless base_string
+      raise "Must be string: #{@scanner.inspect}"
+    end
+
+    if base_string
+      until @scanner.eos?
+        @scanner.skip(/\s+/)
+        type = nil
+        nth_weight = nil
+        if @scanner.scan(/(<{1,4})/)
+          type = :greater
+          nth_weight = @scanner[1].size
+        elsif @scanner.scan(/=/)
+          type = :equal
+        elsif @scanner.scan(/\//)
+          type = :expansion
+        end
+        break unless type
+        @scanner.skip(/\s+/)
+        target_string = parse_string
+        unless target_string
+          raise "Must be target string: #{@scanner.inspect}"
+        end
+        post_string = parse_prefix
+        yield(Rule.new(type,
+                       base_string,
+                       target_string,
+                       nth_weight,
+                       before_nth_weight,
+                       post_string))
+        base_string = target_string
+      end
+    end
+  end
+
+  def parse_before_nth_weight
+    if @scanner.scan(/\[before ([123])\]/)
+      Integer(@scanner[1], 10)
+    else
+      nil
+    end
+  end
+
+  def parse_string
+    characters = []
+    loop do
+      character = parse_character
+      break if character.nil?
+      characters << character
+    end
+    if characters.empty?
+      nil
+    else
+      characters.join("")
+    end
+  end
+
+  def parse_character
+    parse_escaped_character ||
+      @scanner.scan(/[\da-zA-Z]/)
+  end
+
+  def parse_escaped_character
+    if @scanner.scan(/\\u([\da-fA-F]+)/)
+      Unicode.to_utf8(Integer(@scanner[1], 16))
+    else
+      nil
+    end
+  end
+
+  def parse_prefix
+    if @scanner.scan(/\|/)
+      parse_string
+    else
+      nil
+    end
+  end
+end
+
 class UCA900Parser < UCAParser
+  def initialize
+    super
+    @tailoring = {}
+  end
+
+  # Parse ICU Collation Customization syntax tailoring
+  def parse_tailoring(input, locale)
+    in_cldr_30 = false
+    rule_text = nil
+    input.each_line do |line|
+      case line
+      when /#{Regexp.escape(locale)}_cldr_30\[\]/
+        in_cldr_30 = true
+        rule_text = ""
+      when /"(.+)"(;)?/
+        raw_c_string = $1
+        semicolon = $2
+        next unless in_cldr_30
+
+        rule_text << raw_c_string.gsub(/\\\\/, "\\")
+
+        if semicolon == ";"
+          parse_icu_collation_cutomization_rule(rule_text)
+          break
+        end
+      end
+    end
+  end
+
   def parse(input)
     parse_data(input)
     normalize_pages
   end
 
   private
+  def parse_icu_collation_cutomization_rule(rule_text)
+    parser = ICUCollationCustomizationRuleParser.new(rule_text)
+    parser.parse do |rule|
+      next if rule.before_nth_weight
+      next if rule.post_string
+      case rule.type
+      when :greater, :equal
+        if @tailoring.key?(rule.base_string)
+          raise "Duplicated tailoring: #{rule.base_string}"
+        end
+        @tailoring[rule.base_string] = {
+          target: rule.target_string,
+          nth_weight: rule.nth_weight,
+        }
+      end
+    end
+  end
+
   def parse_data(input)
     current_page = nil
     in_n_collation_elements = false
@@ -361,11 +520,36 @@ class UCA900Parser < UCAParser
   end
 
   def normalize_pages
+    all_characters = {}
     @pages.each do |page, weight_sets|
       @pages[page] = weight_sets.collect.with_index do |weights, i|
         code_point = (page << 8) + i
-        Character.new(weights, code_point)
+        character = Character.new(weights, code_point)
+        all_characters[character.utf8] = character
+        character
       end
+    end
+    all_characters.each do |utf8, character|
+      rule = @tailoring[utf8]
+      next if rule.nil?
+      target_character = all_characters[rule[:target]]
+      # p [utf8, rule, character.weights, target_character.weights]
+      nth_weight = rule[:nth_weight]
+      if nth_weight
+        character.weights.each_with_index do |weight, i|
+          weight.each_with_index do |w, j|
+            break if j >= nth_weight
+            target_character.weights[i][j] = w
+          end
+          if nth_weight > weight.size
+            weight << 0
+            target_character.weights[i] << 1
+          end
+        end
+      else
+        target_character.weights = character.weights
+      end
+      # p [utf8, rule, character.weights, target_character.weights]
     end
   end
 end
