@@ -119,7 +119,35 @@ class UCAParser
     @pages = {}
   end
 
+  def normalization_table(options={})
+    table = {}
+    group_characters(options).each do |characters|
+      characters.extend(CharacterArray)
+      next if characters.size == 1
+      representative_character =
+        characters.find_representative_character(options)
+      representative_code_point = representative_character.code_point
+      rest_characters = characters.reject do |character|
+        character == representative_character
+      end
+      rest_characters.each do |character|
+        code_point = character.code_point
+        page = code_point >> 8
+        low_code = code_point & 0xff
+        table[page] ||= [nil] * 256
+        table[page][low_code] = representative_code_point
+      end
+    end
+    table.sort_by do |page, code_points|
+      page
+    end
+  end
+
+  private
   def weight_based_characters(level)
+    sorted_pages = @pages.sort_by do |page, characters|
+      page
+    end
     weight_based_characters = {}
     sorted_pages.each do |page, characters|
       characters.each do |character|
@@ -134,10 +162,68 @@ class UCAParser
     weight_based_characters
   end
 
-  def sorted_pages
-    @pages.sort_by do |page, characters|
-      page
+  def group_characters(options={})
+    grouped_characters = []
+    weight_based_characters.each do |weight, characters|
+      grouped_characters.concat(split_characters(characters, options))
     end
+    grouped_characters
+  end
+
+  SMALL_KANAS = [
+    "ぁ", "ぃ", "ぅ", "ぇ", "ぉ",
+    "っ",
+    "ゃ", "ゅ", "ょ",
+    "ゎ",
+    "ァ", "ィ", "ゥ", "ェ", "ォ",
+    "ッ",
+    "ャ", "ュ", "ョ",
+    "ヮ",
+    "ｧ", "ｨ", "ｩ", "ｪ", "ｫ",
+    "ｯ",
+    "ｬ", "ｭ", "ｮ",
+  ]
+  def small_kana?(character)
+    SMALL_KANAS.include?(character[:utf8])
+  end
+
+  KANA_WITH_VOICED_SOUND_MARKS = [
+    "が", "ぎ", "ぐ", "げ", "ご",
+    "ざ", "じ", "ず", "ぜ", "ぞ",
+    "だ", "ぢ", "づ", "で", "ど",
+    "ば", "び", "ぶ", "べ", "ぼ",
+    "ガ", "ギ", "グ", "ゲ", "ゴ",
+    "ザ", "ジ", "ズ", "ゼ", "ゾ",
+    "ダ", "ヂ", "ヅ", "デ", "ド",
+    "バ", "ビ", "ブ", "ベ", "ボ",
+  ]
+  def kana_with_voiced_sound_mark?(character)
+    KANA_WITH_VOICED_SOUND_MARKS.include?(character[:utf8])
+  end
+
+  KANA_WITH_SEMI_VOICED_SOUND_MARKS = [
+    "ぱ", "ぴ", "ぷ", "ぺ", "ぽ",
+    "パ", "ピ", "プ", "ペ", "ポ",
+  ]
+  def kana_with_semi_voiced_sound_mark?(character)
+    KANA_WITH_SEMI_VOICED_SOUND_MARKS.include?(character[:utf8])
+  end
+
+  def split_characters(characters, options)
+    grouped_characters = characters.group_by do |character|
+      if options[:split_small_kana] and small_kana?(character)
+        :small_kana
+      elsif options[:split_kana_with_voiced_sound_mark] and
+          kana_with_voiced_sound_mark?(character)
+        :kana_with_voiced_sound_mark
+      elsif options[:split_kana_with_semi_voiced_sound_mark] and
+          kana_with_semi_voiced_sound_mark?(character)
+        :kana_with_semi_voiced_sound_mark
+      else
+        :other
+      end
+    end
+    grouped_characters.values
   end
 end
 

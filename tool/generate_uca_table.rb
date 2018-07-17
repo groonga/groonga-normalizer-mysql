@@ -76,90 +76,7 @@ File.open(ctype_uca_c_path) do |ctype_uca_c|
   parser.parse(ctype_uca_c)
 end
 
-SMALL_KANAS = [
-  "ぁ", "ぃ", "ぅ", "ぇ", "ぉ",
-  "っ",
-  "ゃ", "ゅ", "ょ",
-  "ゎ",
-  "ァ", "ィ", "ゥ", "ェ", "ォ",
-  "ッ",
-  "ャ", "ュ", "ョ",
-  "ヮ",
-  "ｧ", "ｨ", "ｩ", "ｪ", "ｫ",
-  "ｯ",
-  "ｬ", "ｭ", "ｮ",
-]
-def small_kana?(character)
-  SMALL_KANAS.include?(character[:utf8])
-end
-
-KANA_WITH_VOICED_SOUND_MARKS = [
-  "が", "ぎ", "ぐ", "げ", "ご",
-  "ざ", "じ", "ず", "ぜ", "ぞ",
-  "だ", "ぢ", "づ", "で", "ど",
-  "ば", "び", "ぶ", "べ", "ぼ",
-  "ガ", "ギ", "グ", "ゲ", "ゴ",
-  "ザ", "ジ", "ズ", "ゼ", "ゾ",
-  "ダ", "ヂ", "ヅ", "デ", "ド",
-  "バ", "ビ", "ブ", "ベ", "ボ",
-]
-def kana_with_voiced_sound_mark?(character)
-  KANA_WITH_VOICED_SOUND_MARKS.include?(character[:utf8])
-end
-
-KANA_WITH_SEMI_VOICED_SOUND_MARKS = [
-  "ぱ", "ぴ", "ぷ", "ぺ", "ぽ",
-  "パ", "ピ", "プ", "ペ", "ポ",
-]
-def kana_with_semi_voiced_sound_mark?(character)
-  KANA_WITH_SEMI_VOICED_SOUND_MARKS.include?(character[:utf8])
-end
-
-def split_characters(characters)
-  grouped_characters = characters.group_by do |character|
-    if @split_small_kana_p and small_kana?(character)
-      :small_kana
-    elsif @split_kana_with_voiced_sound_mark_p and
-        kana_with_voiced_sound_mark?(character)
-      :kana_with_voiced_sound_mark
-    elsif @split_kana_with_semi_voiced_sound_mark_p and
-        kana_with_semi_voiced_sound_mark?(character)
-      :kana_with_semi_voiced_sound_mark
-    else
-      :other
-    end
-  end
-  grouped_characters.values
-end
-
-grouped_characters = []
-parser.weight_based_characters.each do |weight, characters|
-  grouped_characters.concat(split_characters(characters))
-end
-
-target_pages = {}
-grouped_characters.each do |characters|
-  characters.extend(CharacterArray)
-  next if characters.size == 1
-  representative_character =
-    characters.find_representative_character(split_small_kana: @split_small_kana_p)
-  representative_code_point = representative_character.code_point
-  rest_characters = characters.reject do |character|
-    character == representative_character
-  end
-  rest_characters.each do |character|
-    code_point = character.code_point
-    page = code_point >> 8
-    low_code = code_point & 0xff
-    target_pages[page] ||= [nil] * 256
-    target_pages[page][low_code] = representative_code_point
-  end
-end
-
-sorted_target_pages = target_pages.sort_by do |page, code_points|
-  page
-end
-
+normalization_table = parser.normalization_table
 
 normalized_ctype_uca_c_path =
   ctype_uca_c_path.sub(/\A.*\/([^\/]+\/strings\/ctype-uca\.c)\z/, "\\1")
@@ -226,7 +143,7 @@ def page_name(page)
   "#{variable_name_prefix}_page_%02x" % page
 end
 
-sorted_target_pages.each do |page, characters|
+normalization_table.each do |page, characters|
   puts(<<-PAGE_HEADER)
 
 static uint32_t #{page_name(page)}[] = {
@@ -250,7 +167,7 @@ static uint32_t *#{variable_name_prefix}_table[] = {
 PAGES_HEADER
 
 pages = []
-sorted_target_pages.each do |page, characters|
+normalization_table.each do |page, characters|
   pages[page] = page_name(page)
 end
 lines = pages.each_slice(2).collect do |pages_group|
