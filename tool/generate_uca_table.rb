@@ -164,12 +164,6 @@ end
 normalized_ctype_uca_c_path =
   ctype_uca_c_path.sub(/\A.*\/([^\/]+\/strings\/ctype-uca\.c)\z/, "\\1")
 
-header_guard_id = "MYSQL_UCA"
-if @version
-  header_guard_id << "_#{@version}"
-end
-header_guard_id << "#{@suffix.upcase}_H"
-
 puts(<<-HEADER)
 /*
   Copyright(C) 2013-2015  Kouhei Sutou <kou@clear-code.com>
@@ -214,8 +208,7 @@ puts(<<-HEADER)
     Written by Alexander Barkov <bar@mysql.com>
 */
 
-#ifndef #{header_guard_id}
-#define #{header_guard_id}
+#pragma once
 
 #include <stdint.h>
 HEADER
@@ -271,8 +264,3 @@ puts(lines.join(",\n"))
 puts(<<-PAGES_FOOTER)
 };
 PAGES_FOOTER
-
-puts(<<-FOOTER)
-
-#endif
-FOOTER

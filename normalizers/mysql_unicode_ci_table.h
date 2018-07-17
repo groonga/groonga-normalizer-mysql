@@ -41,8 +41,7 @@
     Written by Alexander Barkov <bar@mysql.com>
 */
 
-#ifndef MYSQL_UCA_H
-#define MYSQL_UCA_H
+#pragma once
 
 #include <stdint.h>
 
@@ -1681,5 +1680,3 @@ static uint32_t *unicode_ci_table[] = {
    unicode_ci_page_fc,  unicode_ci_page_fd,
    unicode_ci_page_fe,  unicode_ci_page_ff
 };
-
-#endif
