@@ -1,5 +1,18 @@
 # News
 
+## 1.1.2: 2018-07-17
+
+### Improvements
+
+  * Added a new normalizer `NormalizerMySQLUnicode900` for
+    `utf8mb4_900_ai_ci`, `utf8mb4_900_as_ci`, `utf8mb4_900_as_cs`,
+    `utf8mb4_ja_900_as_cs` and `utf8mb4_ja_900_as_cs_ks`.
+  * Added support for Debian GNU/Linux stretch.
+  * Added support for Ubuntu 18.04.
+  * Dropped support for Ubuntu 15.10.
+  * Dropped support for Debian GNU/Linux jessie.
+  * Dropped support for CentOS 5.
+
 ## 1.1.1: 2016-04-29
 
 ### Improvements
