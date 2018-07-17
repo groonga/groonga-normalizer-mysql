@@ -1551,7 +1551,7 @@ static uint32_t unicode_ci_page_ff[] = {
   0x0fff8, 0x00000, 0x00000, 0x00000, 0x0fffc, 0x0fffd, 0x0fffe, 0x0ffff
 };
 
-static uint32_t *unicode_ci_table[256] = {
+static uint32_t *unicode_ci_table[] = {
    unicode_ci_page_00,  unicode_ci_page_01,
    unicode_ci_page_02,  unicode_ci_page_03,
    unicode_ci_page_04,  unicode_ci_page_05,

@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
-# -*- coding: utf-8 -*-
 #
-# Copyright (C) 2013-2015  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2018  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -138,43 +137,18 @@ parser.weight_based_characters.each do |weight, characters|
   grouped_characters.concat(split_characters(characters))
 end
 
-GREEK_CAPITAL_UNICODE_RANGE = Unicode.from_utf8("Α")..Unicode.from_utf8("Ω")
-def find_greek_capital_character(characters)
-  characters.find do |character|
-    GREEK_CAPITAL_UNICODE_RANGE.cover?(character[:code_point])
-  end
-end
-
-def find_representative_character(characters)
-  representative_character = nil
-  case characters.first[:utf8]
-  when "⺄", "⺇", "⺈", "⺊", "⺌", "⺗"
-    representative_character = characters.last
-  when "⺜", "⺝", "⺧", "⺫", "⺬", "⺮", "⺶", "⺻", "⺼", "⺽"
-    representative_character = characters[1]
-  when "⻆", "⻊", "⻏", "⻑", "⻕", "⻗", "⻝", "⻡", "⻣", "⻤"
-    representative_character = characters.last
-  when "⻱", "⼀", "⼆", "⼈"
-    representative_character = characters[1]
-  when "ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "っ", "ゃ", "ゅ", "ょ", "ゎ"
-    representative_character = characters[1] unless @split_small_kana_p
-  else
-    representative_character ||= find_greek_capital_character(characters)
-  end
-  representative_character ||= characters.first
-  representative_character
-end
-
 target_pages = {}
 grouped_characters.each do |characters|
+  characters.extend(CharacterArray)
   next if characters.size == 1
-  representative_character = find_representative_character(characters)
-  representative_code_point = representative_character[:code_point]
+  representative_character =
+    characters.find_representative_character(split_small_kana: @split_small_kana_p)
+  representative_code_point = representative_character.code_point
   rest_characters = characters.reject do |character|
     character == representative_character
   end
   rest_characters.each do |character|
-    code_point = character[:code_point]
+    code_point = character.code_point
     page = code_point >> 8
     low_code = code_point & 0xff
     target_pages[page] ||= [nil] * 256
@@ -279,16 +253,16 @@ end
 
 puts(<<-PAGES_HEADER)
 
-static uint32_t *#{variable_name_prefix}_table[#{parser.n_pages}] = {
+static uint32_t *#{variable_name_prefix}_table[] = {
 PAGES_HEADER
 
-pages = ["NULL"] * parser.n_pages
+pages = []
 sorted_target_pages.each do |page, characters|
   pages[page] = page_name(page)
 end
 lines = pages.each_slice(2).collect do |pages_group|
   formatted_pages = pages_group.collect do |page|
-    "%19s" % page
+    "%19s" % (page || "NULL")
   end
   "  " + formatted_pages.join(", ")
 end

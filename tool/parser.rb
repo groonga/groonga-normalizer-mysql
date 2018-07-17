@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2018  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -24,6 +24,42 @@ module Unicode
 
   def from_utf8(utf8)
     utf8.unpack("U")[0]
+  end
+end
+
+class Character < Struct.new(:weights,
+                             :code_point)
+  def utf8
+    Unicode.to_utf8(code_point)
+  end
+end
+
+module CharacterArray
+  def find_representative_character(options={})
+    representative_character = nil
+    case first.utf8
+    when "⺄", "⺇", "⺈", "⺊", "⺌", "⺗"
+      representative_character = last
+    when "⺜", "⺝", "⺧", "⺫", "⺬", "⺮", "⺶", "⺻", "⺼", "⺽"
+      representative_character = self[1]
+    when "⻆", "⻊", "⻏", "⻑", "⻕", "⻗", "⻝", "⻡", "⻣", "⻤"
+      representative_character = last
+    when "⻱", "⼀", "⼆", "⼈"
+      representative_character = self[1]
+    when "ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "っ", "ゃ", "ゅ", "ょ", "ゎ"
+      representative_character = self[1] unless options[:split_small_kana]
+    else
+      representative_character ||= find_greek_capital_character
+    end
+    representative_character ||= first
+    representative_character
+  end
+
+  GREEK_CAPITAL_UNICODE_RANGE = Unicode.from_utf8("Α")..Unicode.from_utf8("Ω")
+  def find_greek_capital_character
+    find do |character|
+      GREEK_CAPITAL_UNICODE_RANGE.cover?(character.code_point)
+    end
   end
 end
 
@@ -78,26 +114,21 @@ class CTypeUTF8Parser
   end
 end
 
-class CTypeUCAParser
-  attr_reader :pages
-  def initialize(version=nil)
-    @version = version
+class UCAParser
+  def initialize
     @pages = {}
-    @lengths = []
   end
 
-  def parse(input)
-    parse_ctype_uca(input)
-    normalize_pages
-  end
-
-  def weight_based_characters
+  def weight_based_characters(level)
     weight_based_characters = {}
     sorted_pages.each do |page, characters|
       characters.each do |character|
-        weight = character[:weight]
-        weight_based_characters[weight] ||= []
-        weight_based_characters[weight] << character
+        weights = character.weights
+        target_weights = weights.collect do |weight|
+          weight[0, level]
+        end
+        weight_based_characters[target_weights] ||= []
+        weight_based_characters[target_weights] << character
       end
     end
     weight_based_characters
@@ -108,9 +139,22 @@ class CTypeUCAParser
       page
     end
   end
+end
 
-  def n_pages
-    @lengths.size
+class CTypeUCAParser < UCAParser
+  def initialize(version=nil)
+    super()
+    @version = version
+    @lengths = []
+  end
+
+  def parse(input)
+    parse_ctype_uca(input)
+    normalize_pages
+  end
+
+  def weight_based_characters
+    super(1)
   end
 
   private
@@ -162,21 +206,16 @@ class CTypeUCAParser
 
   def normalize_pages
     @pages.each do |page, flatten_weights|
-      weights = flatten_weights.each_slice(@lengths[page])
-      @pages[page] = weights.with_index.collect do |weight, i|
-        if weight.all?(&:zero?)
-          weight = [0]
-        else
-          while weight.last.zero?
-            weight.pop
-          end
+      weights_set = flatten_weights.each_slice(@lengths[page])
+      @pages[page] = weights_set.with_index.collect do |weights, i|
+        weights = weights.collect do |level1_weight|
+          [level1_weight]
+        end
+        while weights.last == [0]
+          weights.pop
         end
         code_point = (page << 8) + i
-        {
-          :weight     => weight,
-          :code_point => code_point,
-          :utf8       => Unicode.to_utf8(code_point),
-        }
+        Character.new(weights, code_point)
       end
     end
   end
