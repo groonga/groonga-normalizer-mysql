@@ -23,9 +23,11 @@ require "parser"
 
 @version = nil
 @suffix = ""
-@split_small_kana_p = false
-@split_kana_with_voiced_sound_mark_p = false
-@split_kana_with_semi_voiced_sound_mark_p = false
+@options = {
+  split_small_kana: false,
+  split_kana_with_voiced_sound_mark: false,
+  split_kana_with_semi_voiced_sound_mark: false,
+}
 
 option_parser = OptionParser.new
 option_parser.banner += " MYSQL_SOURCE/strings/ctype-uca.c"
@@ -41,26 +43,26 @@ end
 option_parser.on("--[no-]split-small-kana",
                  "Split small hiragana (katakana) and " +
                    "large hiragana (katakana)",
-                 "(#{@split_small_kana_p})") do |boolean|
-  @split_small_kana_p = boolean
+                 "(#{@options[:split_small_kana]})") do |boolean|
+  @options[:split_small_kana] = boolean
 end
 
 option_parser.on("--[no-]split-kana-with-voiced-sound-mark",
                  "Split hiragana (katakana) with voiced sound mark",
-                 "(#{@split_kana_with_voiced_sound_mark})") do |boolean|
-  @split_kana_with_voiced_sound_mark_p = boolean
+                 "(#{@options[:split_kana_with_voiced_sound_mark]})") do |boolean|
+  @options[:split_kana_with_voiced_sound_mark] = boolean
 end
 
 option_parser.on("--[no-]split-kana-with-semi-voiced-sound-mark",
                  "Split hiragana (katakana) with semi-voiced sound mark",
-                 "(#{@split_kana_with_semi_voiced_sound_mark})") do |boolean|
-  @split_kana_with_semi_voiced_sound_mark_p = boolean
+                 "(#{@options[:split_kana_with_semi_voiced_sound_mark]})") do |boolean|
+  @options[:split_kana_with_semi_voiced_sound_mark] = boolean
 end
 
 begin
   option_parser.parse!(ARGV)
-rescue OptionParser::Error
-  puts($!)
+rescue OptionParser::ParseError
+  $stderr.puts($!)
   exit(false)
 end
 
@@ -76,7 +78,7 @@ File.open(ctype_uca_c_path) do |ctype_uca_c|
   parser.parse(ctype_uca_c)
 end
 
-normalization_table = parser.normalization_table
+normalization_table = parser.normalization_table(@options)
 
 normalized_ctype_uca_c_path =
   ctype_uca_c_path.sub(/\A.*\/([^\/]+\/strings\/ctype-uca\.c)\z/, "\\1")

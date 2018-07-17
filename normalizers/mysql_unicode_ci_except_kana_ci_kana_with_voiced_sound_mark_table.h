@@ -41,8 +41,7 @@
     Written by Alexander Barkov <bar@mysql.com>
 */
 
-#ifndef MYSQL_UCA_EXCEPT_KANA_CI_KANA_WITH_VOICED_SOUND_MARK_H
-#define MYSQL_UCA_EXCEPT_KANA_CI_KANA_WITH_VOICED_SOUND_MARK_H
+#pragma once
 
 #include <stdint.h>
 
@@ -1551,7 +1550,7 @@ static uint32_t unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_page_ff[] 
   0x0fff8, 0x00000, 0x00000, 0x00000, 0x0fffc, 0x0fffd, 0x0fffe, 0x0ffff
 };
 
-static uint32_t *unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_table[256] = {
+static uint32_t *unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_table[] = {
   unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_page_00, unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_page_01,
   unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_page_02, unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_page_03,
   unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_page_04, unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_page_05,
@@ -1681,5 +1680,3 @@ static uint32_t *unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_table[256
   unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_page_fc, unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_page_fd,
   unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_page_fe, unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_page_ff
 };
-
-#endif

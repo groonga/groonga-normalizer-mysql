@@ -32,6 +32,45 @@ class Character < Struct.new(:weights,
   def utf8
     Unicode.to_utf8(code_point)
   end
+
+  SMALL_KANAS = [
+    "ぁ", "ぃ", "ぅ", "ぇ", "ぉ",
+    "っ",
+    "ゃ", "ゅ", "ょ",
+    "ゎ",
+    "ァ", "ィ", "ゥ", "ェ", "ォ",
+    "ッ",
+    "ャ", "ュ", "ョ",
+    "ヮ",
+    "ｧ", "ｨ", "ｩ", "ｪ", "ｫ",
+    "ｯ",
+    "ｬ", "ｭ", "ｮ",
+  ]
+  def small_kana?
+    SMALL_KANAS.include?(utf8)
+  end
+
+  KANA_WITH_VOICED_SOUND_MARKS = [
+    "が", "ぎ", "ぐ", "げ", "ご",
+    "ざ", "じ", "ず", "ぜ", "ぞ",
+    "だ", "ぢ", "づ", "で", "ど",
+    "ば", "び", "ぶ", "べ", "ぼ",
+    "ガ", "ギ", "グ", "ゲ", "ゴ",
+    "ザ", "ジ", "ズ", "ゼ", "ゾ",
+    "ダ", "ヂ", "ヅ", "デ", "ド",
+    "バ", "ビ", "ブ", "ベ", "ボ",
+  ]
+  def kana_with_voiced_sound_mark?
+    KANA_WITH_VOICED_SOUND_MARKS.include?(utf8)
+  end
+
+  KANA_WITH_SEMI_VOICED_SOUND_MARKS = [
+    "ぱ", "ぴ", "ぷ", "ぺ", "ぽ",
+    "パ", "ピ", "プ", "ペ", "ポ",
+  ]
+  def kana_with_semi_voiced_sound_mark?
+    KANA_WITH_SEMI_VOICED_SOUND_MARKS.include?(utf8)
+  end
 end
 
 module CharacterArray
@@ -47,7 +86,9 @@ module CharacterArray
     when "⻱", "⼀", "⼆", "⼈"
       representative_character = self[1]
     when "ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "っ", "ゃ", "ゅ", "ょ", "ゎ"
-      representative_character = self[1] unless options[:split_small_kana]
+      if options[:split_small_kana] == false
+        representative_character = self[1]
+      end
     else
       representative_character ||= find_greek_capital_character
     end
@@ -174,54 +215,15 @@ class UCAParser
     grouped_characters
   end
 
-  SMALL_KANAS = [
-    "ぁ", "ぃ", "ぅ", "ぇ", "ぉ",
-    "っ",
-    "ゃ", "ゅ", "ょ",
-    "ゎ",
-    "ァ", "ィ", "ゥ", "ェ", "ォ",
-    "ッ",
-    "ャ", "ュ", "ョ",
-    "ヮ",
-    "ｧ", "ｨ", "ｩ", "ｪ", "ｫ",
-    "ｯ",
-    "ｬ", "ｭ", "ｮ",
-  ]
-  def small_kana?(character)
-    SMALL_KANAS.include?(character[:utf8])
-  end
-
-  KANA_WITH_VOICED_SOUND_MARKS = [
-    "が", "ぎ", "ぐ", "げ", "ご",
-    "ざ", "じ", "ず", "ぜ", "ぞ",
-    "だ", "ぢ", "づ", "で", "ど",
-    "ば", "び", "ぶ", "べ", "ぼ",
-    "ガ", "ギ", "グ", "ゲ", "ゴ",
-    "ザ", "ジ", "ズ", "ゼ", "ゾ",
-    "ダ", "ヂ", "ヅ", "デ", "ド",
-    "バ", "ビ", "ブ", "ベ", "ボ",
-  ]
-  def kana_with_voiced_sound_mark?(character)
-    KANA_WITH_VOICED_SOUND_MARKS.include?(character[:utf8])
-  end
-
-  KANA_WITH_SEMI_VOICED_SOUND_MARKS = [
-    "ぱ", "ぴ", "ぷ", "ぺ", "ぽ",
-    "パ", "ピ", "プ", "ペ", "ポ",
-  ]
-  def kana_with_semi_voiced_sound_mark?(character)
-    KANA_WITH_SEMI_VOICED_SOUND_MARKS.include?(character[:utf8])
-  end
-
   def split_characters(characters, options)
     grouped_characters = characters.group_by do |character|
-      if options[:split_small_kana] and small_kana?(character)
+      if options[:split_small_kana] and character.small_kana?
         :small_kana
       elsif options[:split_kana_with_voiced_sound_mark] and
-          kana_with_voiced_sound_mark?(character)
+          character.kana_with_voiced_sound_mark?
         :kana_with_voiced_sound_mark
       elsif options[:split_kana_with_semi_voiced_sound_mark] and
-          kana_with_semi_voiced_sound_mark?(character)
+          character.kana_with_semi_voiced_sound_mark?
         :kana_with_semi_voiced_sound_mark
       else
         :other
