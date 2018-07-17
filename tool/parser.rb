@@ -446,10 +446,12 @@ class UCA900Parser < UCAParser
         end
       end
     end
+    parse_data(input,
+               / #{Regexp.escape(locale)}_[a-z]+_page([\da-fA-F]{2})\[\]=/)
   end
 
   def parse(input)
-    parse_data(input)
+    parse_data(input, / uca900_p([\da-fA-F]{3})\[\]=/)
     normalize_pages
   end
 
@@ -472,7 +474,7 @@ class UCA900Parser < UCAParser
     end
   end
 
-  def parse_data(input)
+  def parse_data(input, start_pattern)
     current_page = nil
     in_n_collation_elements = false
     nth_character = nil
@@ -485,8 +487,11 @@ class UCA900Parser < UCAParser
         nth_character = nil
         nth_weight = nil
         nth_collation_element = nil
-      when / uca900_p([\da-fA-F]{3})\[\]=/
+      when start_pattern
         current_page = Integer($1, 16)
+        if @pages[current_page]
+          raise "Duplicated page: #{current_page}: <#{line}>"
+        end
         @pages[current_page] = []
       when /\A  \/\* Primary weight (\d) for each character. \*\//
         nth_character = 0
