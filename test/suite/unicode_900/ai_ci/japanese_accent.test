@@ -1,0 +1,5 @@
+register normalizers/mysql
+
+normalize \
+  'NormalizerMySQLUnicode900("weight_level", 1)' \
+  "ぱばパバ"

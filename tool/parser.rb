@@ -155,6 +155,9 @@ class UCAParser
         target_weights = weights.collect do |weight|
           weight[0, level]
         end
+        while target_weights.last and target_weights.last.all?(&:zero?)
+          target_weights.pop
+        end
         weight_based_characters[target_weights] ||= []
         weight_based_characters[target_weights] << character
       end
@@ -164,7 +167,8 @@ class UCAParser
 
   def group_characters(options={})
     grouped_characters = []
-    weight_based_characters.each do |weight, characters|
+    level = options[:level] || 1
+    weight_based_characters(level).each do |weight, characters|
       grouped_characters.concat(split_characters(characters, options))
     end
     grouped_characters
@@ -239,10 +243,6 @@ class CTypeUCAParser < UCAParser
     normalize_pages
   end
 
-  def weight_based_characters
-    super(1)
-  end
-
   private
   def page_data_pattern
     if @version == "520"
@@ -297,9 +297,70 @@ class CTypeUCAParser < UCAParser
         weights = weights.collect do |level1_weight|
           [level1_weight]
         end
-        while weights.last == [0]
-          weights.pop
+        code_point = (page << 8) + i
+        Character.new(weights, code_point)
+      end
+    end
+  end
+end
+
+class UCA900Parser < UCAParser
+  def parse(input)
+    parse_data(input)
+    normalize_pages
+  end
+
+  private
+  def parse_data(input)
+    current_page = nil
+    in_n_collation_elements = false
+    nth_character = nil
+    nth_weight = nil
+    nth_collation_element = nil
+    input.each_line do |line|
+      case line.chomp
+      when ""
+        in_n_collation_elements = false
+        nth_character = nil
+        nth_weight = nil
+        nth_collation_element = nil
+      when / uca900_p([\da-fA-F]{3})\[\]=/
+        current_page = Integer($1, 16)
+        @pages[current_page] = []
+      when /\A  \/\* Primary weight (\d) for each character. \*\//
+        nth_character = 0
+        nth_weight = 0
+        nth_collation_element = Integer($1, 10) - 1
+      when /\A  \/\* Secondary weight (\d) for each character. \*\//
+        nth_character = 0
+        nth_weight = 1
+        nth_collation_element = Integer($1, 10) - 1
+      when /\A  \/\* Tertiary weight (\d) for each character. \*\//
+        nth_character = 0
+        nth_weight = 2
+        nth_collation_element = Integer($1, 10) - 1
+      when /\A  0x([\da-zA-F]+),/
+        nth_weight_value = Integer($1, 16)
+        next if current_page.nil?
+        next if nth_character.nil?
+        next if nth_weight.nil?
+        next if nth_collation_element.nil?
+        if [nth_weight, nth_collation_element] == [0, 0]
+          @pages[current_page][nth_character] = []
         end
+        weight_sets = @pages[current_page][nth_character]
+        weight_sets[nth_collation_element] ||= []
+        weight_sets[nth_collation_element][nth_weight] = nth_weight_value
+        nth_character += 1
+      when /^\};$/
+        current_page = nil
+      end
+    end
+  end
+
+  def normalize_pages
+    @pages.each do |page, weight_sets|
+      @pages[page] = weight_sets.collect.with_index do |weights, i|
         code_point = (page << 8) + i
         Character.new(weights, code_point)
       end

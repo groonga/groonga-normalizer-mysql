@@ -1,6 +1,6 @@
 /* -*- c-basic-offset: 2 -*- */
 /*
-  Copyright(C) 2013-2015  Kouhei Sutou <kou@clear-code.com>
+  Copyright(C) 2013-2018  Kouhei Sutou <kou@clear-code.com>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -37,6 +37,9 @@
 #include "mysql_unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_table.h"
 #include "mysql_unicode_520_ci_table.h"
 #include "mysql_unicode_520_ci_except_kana_ci_kana_with_voiced_sound_mark_table.h"
+#include "mysql_unicode_900_ai_ci_table.h"
+#include "mysql_unicode_900_as_ci_table.h"
+#include "mysql_unicode_900_as_cs_table.h"
 
 #ifdef __GNUC__
 #  define GNUC_UNUSED __attribute__((__unused__))
@@ -735,6 +738,130 @@ mysql_unicode_520_ci_except_kana_ci_kana_with_voiced_sound_mark_next(
   return NULL;
 }
 
+typedef struct {
+  uint8_t weight_level;
+} mysql_unicode_900_options;
+
+static void
+mysql_unicode_900_options_init(mysql_unicode_900_options *options)
+{
+  options->weight_level = 1;
+}
+
+static void *
+mysql_unicode_900_open_options(grn_ctx *ctx,
+                               GNUC_UNUSED grn_obj *string,
+                               grn_obj *raw_options,
+                               GNUC_UNUSED void *user_data)
+{
+  mysql_unicode_900_options *options;
+
+  options = GRN_PLUGIN_MALLOC(ctx, sizeof(*options));
+  if (!options) {
+    GRN_PLUGIN_ERROR(ctx,
+                     GRN_NO_MEMORY_AVAILABLE,
+                     "[normalizer][mysql-unicode-900] "
+                     "failed to allocate memory for options");
+    return NULL;
+  }
+
+  mysql_unicode_900_options_init(options);
+
+  GRN_OPTION_VALUES_EACH_BEGIN(ctx, raw_options, i, name, name_length) {
+    /* TODO: Use grn_raw_string. */
+#define NAME_EQUAL(option_name)                                         \
+    (name_length == strlen(option_name) &&                              \
+     strncmp(name, option_name, strlen(option_name)) == 0)
+    if (NAME_EQUAL("weight_level")) {
+      options->weight_level =
+        grn_vector_get_element_uint8(ctx,
+                                     raw_options,
+                                     i,
+                                     options->weight_level);
+    }
+#undef NAME_EQUAL
+  } GRN_OPTION_VALUES_EACH_END();
+
+  return options;
+}
+
+static void
+mysql_unicode_900_close_options(grn_ctx *ctx, void *data)
+{
+  mysql_unicode_900_options *options = data;
+  GRN_PLUGIN_FREE(ctx, options);
+}
+
+static grn_obj *
+mysql_unicode_900_next(grn_ctx *ctx,
+                       GNUC_UNUSED int n_args,
+                       grn_obj **args,
+                       GNUC_UNUSED grn_user_data *user_data)
+{
+  const char *normalizer_type_label = "mysql-unicode-900";
+  grn_obj *string = args[0];
+  grn_encoding encoding;
+  grn_obj *table;
+  mysql_unicode_900_options *options;
+  mysql_unicode_900_options options_raw;
+
+  encoding = grn_string_get_encoding(ctx, string);
+  if (encoding != GRN_ENC_UTF8) {
+    GRN_PLUGIN_ERROR(ctx,
+                     GRN_FUNCTION_NOT_IMPLEMENTED,
+                     "[normalizer][%s] "
+                     "UTF-8 encoding is only supported: %s",
+                     normalizer_type_label,
+                     grn_encoding_to_string(encoding));
+    return NULL;
+  }
+
+  table = grn_string_get_table(ctx, string);
+  if (table) {
+    options = grn_table_cache_normalizer_options(ctx,
+                                                 table,
+                                                 string,
+                                                 mysql_unicode_900_open_options,
+                                                 mysql_unicode_900_close_options,
+                                                 NULL);
+    if (ctx->rc != GRN_SUCCESS) {
+      return NULL;
+    }
+  } else {
+    mysql_unicode_900_options_init(&options_raw);
+    options = &options_raw;
+  }
+  if (options->weight_level == 1) {
+    normalize(ctx, string,
+              normalizer_type_label,
+              unicode_900_ai_ci_table,
+              sizeof(unicode_900_ai_ci_table) / sizeof(uint32_t *),
+              NULL);
+  } else if (options->weight_level == 2) {
+    normalize(ctx, string,
+              normalizer_type_label,
+              unicode_900_as_ci_table,
+              sizeof(unicode_900_ai_ci_table) / sizeof(uint32_t *),
+              NULL);
+  } else if (options->weight_level == 3) {
+    normalize(ctx, string,
+              normalizer_type_label,
+              unicode_900_as_cs_table,
+              sizeof(unicode_900_ai_ci_table) / sizeof(uint32_t *),
+              NULL);
+  } else {
+    GRN_PLUGIN_ERROR(ctx,
+                     GRN_FUNCTION_NOT_IMPLEMENTED,
+                     "[normalizer][%s] "
+                     "weight level must be 1, 2 or 3: %u",
+                     normalizer_type_label,
+                     options->weight_level);
+    return NULL;
+  }
+
+  return NULL;
+}
+
 grn_rc
 GRN_PLUGIN_INIT(grn_ctx *ctx)
 {
@@ -767,6 +894,12 @@ GRN_PLUGIN_REGISTER(grn_ctx *ctx)
                           -1,
                           NULL,
                           mysql_unicode_520_ci_except_kana_ci_kana_with_voiced_sound_mark_next,
+                          NULL);
+  grn_normalizer_register(ctx,
+                          "NormalizerMySQLUnicode900",
+                          -1,
+                          NULL,
+                          mysql_unicode_900_next,
                           NULL);
   return GRN_SUCCESS;
 }
