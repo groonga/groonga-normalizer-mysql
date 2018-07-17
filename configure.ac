@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2016  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2018  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -184,6 +184,8 @@ AC_SUBST(CUTTER_SOURCE_PATH)
 
 GPG_UID=m4_include(gpg_uid)
 AC_SUBST(GPG_UID)
+GPG_UID_RSA4096=m4_include(gpg_uid_rsa4096)
+AC_SUBST(GPG_UID_RSA4096)
 
 AC_CONFIG_FILES([
   Makefile
