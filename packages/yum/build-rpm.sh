@@ -28,7 +28,8 @@ case "${architecture}" in
     ;;
 esac
 
-run rpm -ivh http://packages.groonga.org/centos/groonga-release-1.1.0-1.noarch.rpm
+run yum install -y epel-release
+run rpm -ivh http://packages.groonga.org/centos/groonga-release-latest.noarch.rpm
 run yum makecache
 
 run yum groupinstall -y "Development Tools"
