@@ -1,12 +1,19 @@
 # News
 
+## 1.1.3: 2018-07-18
+
+### Fixes
+
+  * Fixed kana voiced sound mark related conversions for
+    `utf8mb4_ja_0900_as_cs`.
+
 ## 1.1.2: 2018-07-17
 
 ### Improvements
 
   * Added a new normalizer `NormalizerMySQLUnicode900` for
-    `utf8mb4_900_ai_ci`, `utf8mb4_900_as_ci`, `utf8mb4_900_as_cs`,
-    `utf8mb4_ja_900_as_cs` and `utf8mb4_ja_900_as_cs_ks`.
+    `utf8mb4_0900_ai_ci`, `utf8mb4_0900_as_ci`, `utf8mb4_0900_as_cs`,
+    `utf8mb4_ja_0900_as_cs` and `utf8mb4_ja_0900_as_cs_ks`.
   * Added support for Debian GNU/Linux stretch.
   * Added support for Ubuntu 18.04.
   * Dropped support for Ubuntu 15.10.
