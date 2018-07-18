@@ -27,6 +27,7 @@ require "parser"
   split_small_kana: false,
   split_kana_with_voiced_sound_mark: false,
   split_kana_with_semi_voiced_sound_mark: false,
+  debug: false,
 }
 
 option_parser = OptionParser.new
@@ -59,6 +60,11 @@ option_parser.on("--[no-]split-kana-with-semi-voiced-sound-mark",
   @options[:split_kana_with_semi_voiced_sound_mark] = boolean
 end
 
+option_parser.on("--[no-]debug",
+                 "Enable debug output") do |boolean|
+  @options[:debug] = boolean
+end
+
 begin
   option_parser.parse!(ARGV)
 rescue OptionParser::ParseError
@@ -73,12 +79,12 @@ end
 
 ctype_uca_c_path = ARGV[0]
 
-parser = CTypeUCAParser.new(@version)
+parser = CTypeUCAParser.new(@version, @options)
 File.open(ctype_uca_c_path) do |ctype_uca_c|
   parser.parse(ctype_uca_c)
 end
 
-normalization_table = parser.normalization_table(@options)
+normalization_table = parser.normalization_table
 
 normalized_ctype_uca_c_path =
   ctype_uca_c_path.sub(/\A.*\/([^\/]+\/strings\/ctype-uca\.c)\z/, "\\1")

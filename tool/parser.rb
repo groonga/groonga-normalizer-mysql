@@ -157,25 +157,35 @@ class CTypeUTF8Parser
 end
 
 class UCAParser
-  def initialize
+  def initialize(options)
+    @options = options
     @pages = {}
   end
 
-  def normalization_table(options={})
+  def normalization_table
     table = {}
-    group_characters(options).each do |characters|
+    group_characters.each do |characters|
       characters.extend(CharacterArray)
-      next if characters.size == 1
+      if characters.size == 1
+        if @options[:debug]
+          p ["U+%04x" % characters.first.code_point,
+             characters.first.utf8,
+             characters.first.weights]
+        end
+        next
+      end
       representative_character =
-        characters.find_representative_character(options)
+        characters.find_representative_character(@options)
       representative_code_point = representative_character.code_point
       rest_characters = characters.reject do |character|
         character == representative_character
       end
-      # p ["U+%04x" % representative_character.code_point,
-      #    representative_character.utf8,
-      #    representative_character.weights,
-      #    rest_characters.collect {|x| [x.utf8, x.weights]}]
+      if @options[:debug]
+        p ["U+%04x" % representative_character.code_point,
+           representative_character.utf8,
+           representative_character.weights,
+           rest_characters.collect {|x| [x.utf8, x.weights]}]
+      end
       rest_characters.each do |character|
         code_point = character.code_point
         page = code_point >> 8
@@ -211,23 +221,23 @@ class UCAParser
     weight_based_characters
   end
 
-  def group_characters(options={})
+  def group_characters
     grouped_characters = []
-    level = options[:level] || 1
+    level = @options[:weight_level] || 1
     weight_based_characters(level).each do |weight, characters|
-      grouped_characters.concat(split_characters(characters, options))
+      grouped_characters.concat(split_characters(characters))
     end
     grouped_characters
   end
 
-  def split_characters(characters, options)
+  def split_characters(characters)
     grouped_characters = characters.group_by do |character|
-      if options[:split_small_kana] and character.small_kana?
+      if @options[:split_small_kana] and character.small_kana?
         :small_kana
-      elsif options[:split_kana_with_voiced_sound_mark] and
+      elsif @options[:split_kana_with_voiced_sound_mark] and
           character.kana_with_voiced_sound_mark?
         :kana_with_voiced_sound_mark
-      elsif options[:split_kana_with_semi_voiced_sound_mark] and
+      elsif @options[:split_kana_with_semi_voiced_sound_mark] and
           character.kana_with_semi_voiced_sound_mark?
         :kana_with_semi_voiced_sound_mark
       else
@@ -239,8 +249,8 @@ class UCAParser
 end
 
 class CTypeUCAParser < UCAParser
-  def initialize(version=nil)
-    super()
+  def initialize(version=nil, options)
+    super(options)
     @version = version
     @lengths = []
   end
@@ -419,8 +429,8 @@ class ICUCollationCustomizationRuleParser
 end
 
 class UCA900Parser < UCAParser
-  def initialize
-    super
+  def initialize(options={})
+    super(options)
     @tailoring = {}
   end
 
@@ -538,7 +548,9 @@ class UCA900Parser < UCAParser
       rule = @tailoring[utf8]
       next if rule.nil?
       target_character = all_characters[rule[:target]]
-      # p [utf8, rule, character.weights, target_character.weights]
+      if @options[:debug]
+        p [utf8, rule, character.weights, target_character.weights]
+      end
       nth_weight = rule[:nth_weight]
       if nth_weight
         character.weights.each_with_index do |weight, i|
@@ -554,7 +566,9 @@ class UCA900Parser < UCAParser
       else
         target_character.weights = character.weights
       end
-      # p [utf8, rule, character.weights, target_character.weights]
+      if @options[:debug]
+        p [utf8, rule, character.weights, target_character.weights]
+      end
     end
   end
 end

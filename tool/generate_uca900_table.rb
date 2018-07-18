@@ -21,7 +21,10 @@ require "optparse"
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 require "parser"
 
-@weight_level = 1
+@options = {
+  weight_level: 1,
+  debug: false,
+}
 @suffix = nil
 
 option_parser = OptionParser.new
@@ -29,8 +32,8 @@ option_parser.banner += " MYSQL_SOURCE/strings/uca900_data.h"
 
 option_parser.on("--weight-level=N", Integer,
                  "Use N level weights",
-                 "(#{@weight_level})") do |level|
-  @weight_level = level
+                 "(#{@options[:weight_level]})") do |level|
+  @options[:weight_level] = level
 end
 option_parser.on("--tailoring-locale=LOCALE",
                  "Use LOCALE tailoring",
@@ -44,6 +47,10 @@ option_parser.on("--tailoring-path=PATH",
 end
 option_parser.on("--suffix=SUFFIX", "Add SUFFIX to names") do |suffix|
   @suffix = suffix
+end
+option_parser.on("--[no-]debug",
+                 "Enable debug output") do |boolean|
+  @options[:debug] = boolean
 end
 
 begin
@@ -60,7 +67,7 @@ end
 
 uca_h_path = ARGV[0]
 
-parser = UCA900Parser.new
+parser = UCA900Parser.new(@options)
 if @tailoring_path
   File.open(@tailoring_path) do |tailoring_file|
     parser.parse_tailoring(tailoring_file, @tailoring_locale)
@@ -70,7 +77,7 @@ File.open(uca_h_path) do |uca_h|
   parser.parse(uca_h)
 end
 
-normalization_table = parser.normalization_table(level: @weight_level)
+normalization_table = parser.normalization_table
 
 normalized_uca_h_path =
   uca_h_path.sub(/\A.*\/([^\/]+\/strings\/uca900_data\.h)\z/, "\\1")
