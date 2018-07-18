@@ -46,7 +46,9 @@ echo-ruby:
 	@echo $(RUBY)
 
 tag:
-	cd $(top_srcdir) && git tag v$(VERSION) -a -m 'groonga-normalizer-mysql $(VERSION)!!!'
+	cd $(top_srcdir) && \
+	  git tag v$(VERSION) -a -m 'groonga-normalizer-mysql $(VERSION)!!!' && \
+	  git push --tags
 
 update-version:
 	@if test -z "$(NEW_VERSION)"; then	\
