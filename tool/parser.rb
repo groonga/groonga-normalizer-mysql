@@ -200,6 +200,17 @@ class UCAParser
   end
 
   private
+  def remove_last_all_zero_weights(weights)
+    normalized_weights = []
+    remove = true
+    weights.reverse_each do |weight|
+      next if remove and weight.all?(&:zero?)
+      remove = false
+      normalized_weights.unshift(weight)
+    end
+    normalized_weights
+  end
+
   def weight_based_characters(level)
     sorted_pages = @pages.sort_by do |page, characters|
       page
@@ -211,9 +222,7 @@ class UCAParser
         target_weights = weights.collect do |weight|
           weight[0, level]
         end
-        while target_weights.last and target_weights.last.all?(&:zero?)
-          target_weights.pop
-        end
+        target_weights = remove_last_all_zero_weights(target_weights)
         weight_based_characters[target_weights] ||= []
         weight_based_characters[target_weights] << character
       end
@@ -363,8 +372,6 @@ class ICUCollationCustomizationRuleParser
           nth_weight = @scanner[1].size
         elsif @scanner.scan(/=/)
           type = :equal
-        elsif @scanner.scan(/\//)
-          type = :expansion
         end
         break unless type
         @scanner.skip(/\s+/)
@@ -373,6 +380,13 @@ class ICUCollationCustomizationRuleParser
           raise "Must be target string: #{@scanner.inspect}"
         end
         post_string = parse_prefix
+        if @scanner.scan(/\//)
+          if post_string
+            post_string += parse_string
+          else
+            base_string += parse_string
+          end
+        end
         yield(Rule.new(type,
                        base_string,
                        target_string,
@@ -431,27 +445,27 @@ end
 class UCA900Parser < UCAParser
   def initialize(options={})
     super(options)
-    @tailoring = {}
+    @rules = {}
   end
 
   # Parse ICU Collation Customization syntax tailoring
   def parse_tailoring(input, locale)
     in_cldr_30 = false
-    rule_text = nil
+    tailoring = nil
     input.each_line do |line|
       case line
       when /#{Regexp.escape(locale)}_cldr_30\[\]/
         in_cldr_30 = true
-        rule_text = ""
+        tailoring = ""
       when /"(.+)"(;)?/
         raw_c_string = $1
         semicolon = $2
         next unless in_cldr_30
 
-        rule_text << raw_c_string.gsub(/\\\\/, "\\")
+        tailoring << raw_c_string.gsub(/\\\\/, "\\")
 
         if semicolon == ";"
-          parse_icu_collation_cutomization_rule(rule_text)
+          parse_icu_collation_cutomization_ruleset(tailoring)
           break
         end
       end
@@ -466,17 +480,17 @@ class UCA900Parser < UCAParser
   end
 
   private
-  def parse_icu_collation_cutomization_rule(rule_text)
-    parser = ICUCollationCustomizationRuleParser.new(rule_text)
+  def parse_icu_collation_cutomization_ruleset(tailoring)
+    parser = ICUCollationCustomizationRuleParser.new(tailoring)
     parser.parse do |rule|
-      next if rule.before_nth_weight
       next if rule.post_string
+      next if rule.before_nth_weight
       case rule.type
       when :greater, :equal
-        if @tailoring.key?(rule.base_string)
+        if @rules.key?(rule.base_string)
           raise "Duplicated tailoring: #{rule.base_string}"
         end
-        @tailoring[rule.base_string] = {
+        @rules[rule.base_string] = {
           target: rule.target_string,
           nth_weight: rule.nth_weight,
         }
@@ -536,38 +550,51 @@ class UCA900Parser < UCAParser
 
   def normalize_pages
     all_characters = {}
+    primary_weights = {}
     @pages.each do |page, weight_sets|
       @pages[page] = weight_sets.collect.with_index do |weights, i|
+        weights = remove_last_all_zero_weights(weights)
         code_point = (page << 8) + i
         character = Character.new(weights, code_point)
         all_characters[character.utf8] = character
+        primary_weights[weights[0]] ||= []
+        primary_weights[weights[0]] << character
         character
       end
     end
-    all_characters.each do |utf8, character|
-      rule = @tailoring[utf8]
-      next if rule.nil?
-      target_character = all_characters[rule[:target]]
-      if @options[:debug]
-        p [utf8, rule, character.weights, target_character.weights]
+    @rules.each do |utf8, rule|
+      next if utf8.size != 1
+      base_character = all_characters[utf8]
+      if base_character.weights.size != 1
+        raise "2 or more weights for base character isn't supported: <#{utf8}>"
       end
-      nth_weight = rule[:nth_weight]
-      if nth_weight
-        character.weights.each_with_index do |weight, i|
-          weight.each_with_index do |w, j|
-            break if j >= nth_weight
-            target_character.weights[i][j] = w
-          end
-          if nth_weight > weight.size
-            weight << 0
-            target_character.weights[i] << 1
-          end
+      target_base_character = all_characters[rule[:target]]
+      target_characters = primary_weights[target_base_character.weights[0]]
+      if @options[:debug]
+        p [utf8, rule, base_character.weights, target_characters.collect(&:utf8)]
+      end
+      target_characters.each do |target_character|
+        if @options[:debug]
+          p [utf8, rule, base_character.weights, target_character.weights]
         end
-      else
-        target_character.weights = character.weights
-      end
-      if @options[:debug]
-        p [utf8, rule, character.weights, target_character.weights]
+        nth_weight = rule[:nth_weight]
+        if nth_weight
+          base_character.weights.each_with_index do |weight, i|
+            weight.each_with_index do |w, j|
+              break if j >= nth_weight
+              target_character.weights[i][j] = w
+            end
+            if nth_weight > weight.size
+              weight << 0
+              target_character.weights[i] << 1
+            end
+          end
+        else
+          target_character.weights = base_character.weights
+        end
+        if @options[:debug]
+          p [utf8, rule, base_character.weights, target_character.weights]
+        end
       end
     end
   end
