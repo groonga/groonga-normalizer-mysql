@@ -14,9 +14,9 @@ Here are MySQL compatible normalizers:
 * `NormalizerMySQLGeneralCI` for `utf8mb4_general_ci`
 * `NormalizerMySQLUnicodeCI` for `utf8mb4_unicode_ci`
 * `NormalizerMySQLUnicode520CI` for `utf8mb4_unicode_520_ci`
-* `NormalizerMySQLUnicode900` for `utf8mb4_900_ai_ci`,
-  `utf8mb4_900_as_ci`, `utf8mb4_900_as_cs`, `utf8mb4_ja_900_as_cs` and
-  `utf8mb4_ja_900_as_cs_ks`.
+* `NormalizerMySQLUnicode900` for `utf8mb4_0900_ai_ci`,
+  `utf8mb4_0900_as_ci`, `utf8mb4_0900_as_cs`, `utf8mb4_ja_0900_as_cs` and
+  `utf8mb4_ja_0900_as_cs_ks`.
 
 Here are custom normalizers:
 
