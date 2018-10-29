@@ -759,7 +759,7 @@ mysql_unicode_900_options_init(mysql_unicode_900_options *options)
 
 static void *
 mysql_unicode_900_open_options(grn_ctx *ctx,
-                               GNUC_UNUSED grn_obj *string,
+                               GNUC_UNUSED grn_obj *normalizer,
                                grn_obj *raw_options,
                                GNUC_UNUSED void *user_data)
 {
