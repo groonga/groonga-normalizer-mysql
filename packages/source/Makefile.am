@@ -12,6 +12,11 @@ ensure-rsync-path:
 	  false;							\
 	fi
 
+ensure-latest-archive: $(FILES)
+	cd files &&							\
+	ln -sf $(PACKAGE)-$(VERSION).tar.gz $(PACKAGE)-latest.tar.gz;	\
+	ln -sf $(PACKAGE)-$(VERSION).zip $(PACKAGE)-latest.zip
+
 download: ensure-rsync-path
 	rsync							\
 	  -avz							\
@@ -20,7 +25,7 @@ download: ensure-rsync-path
 	  $(RSYNC_PATH)/source/groonga-normalizer-mysql/	\
 	  files
 
-upload: ensure-rsync-path $(FILES)
+upload: ensure-rsync-path ensure-latest-archive $(FILES)
 	rsync						\
 	  -avz						\
 	  --progress					\
