@@ -39,5 +39,10 @@ else()
     PREFIX ""
     OUTPUT_NAME "mysql")
   install(TARGETS mysql_normalizer DESTINATION "${NORMALIZERS_DIR}")
+  if(MSVC AND CMAKE_VERSION VERSION_GREATER "3.1")
+    install(FILES $<TARGET_PDB_FILE:mysql_normalizer>
+      DESTINATION "${NORMALIZERS_DIR}"
+      OPTIONAL)
+  endif()
 endif()
 target_link_libraries(mysql_normalizer ${GROONGA_LIBRARIES})
