@@ -1,5 +1,16 @@
 # News
 
+## 1.1.4: 2019-04-03
+
+### Improvements
+
+  * Added support for install pdb with MSVC and CMake build. [GitHub#7]
+
+### Fixes
+
+  * Fixed collation names related to
+    NormalizerMySQLUnicode900 (900 -> 0900) in README.md [GitHub#6]
+
 ## 1.1.3: 2018-07-18
 
 ### Fixes
