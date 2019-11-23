@@ -57,30 +57,11 @@ update-version:
 	fi
 	@echo -n $(NEW_VERSION) > $(srcdir)/version
 
-update-latest-release: misc
-	@if test -z "$(OLD_RELEASE)"; then	\
-	  echo "\$$(OLD_RELEASE) is missing";	\
-	  exit 1;				\
-	fi
-	@if test -z "$(OLD_RELEASE_DATE)"; then		\
-	  echo "\$$(OLD_RELEASE_DATE) is missing";	\
-	  exit 1;					\
-	fi
+update-latest-release:
 	@if test -z "$(NEW_RELEASE_DATE)"; then		\
 	  echo "\$$(NEW_RELEASE_DATE) is missing";	\
 	  exit 1;					\
 	fi
-	cd $(top_srcdir) &&					\
-	  misc/update-latest-release.rb				\
-	  $(PACKAGE) $(OLD_RELEASE) $(OLD_RELEASE_DATE)		\
-	  $(VERSION) $(NEW_RELEASE_DATE)			\
-	  packages/rpm/fedora/groonga-normalizer-mysql.spec.in	\
-	  packages/rpm/centos/groonga-normalizer-mysql.spec.in	\
-	  packages/debian/changelog
-
-misc:
-	@if test -z "$(CUTTER_SOURCE_PATH)"; then \
-	  echo "\$$(CUTTER_SOURCE_PATH) is missing"; \
-	  exit 1; \
-	fi
-	ln -s "$(CUTTER_SOURCE_PATH)/misc" misc
+	cd $(top_srcdir)/packages &&		\
+	  $(RUBY) -S rake version:udpate	\
+	    RELEASE_TIME=$(NEW_RELEASE_DATE)

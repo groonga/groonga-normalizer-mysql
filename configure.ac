@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2018  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2019  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -167,26 +167,6 @@ case "$GROONGA_SOURCE_PATH" in
 esac
 AC_SUBST(GROONGA_SOURCE_PATH)
 
-AC_ARG_WITH([cutter-source-path],
-            AS_HELP_STRING([--with-cutter-source-path=PATH],
-                           [Specify Cutter source path for
-			    groonga-normalizer-mysql's release manager.]),
-			   [CUTTER_SOURCE_PATH="$withval"])
-case "$CUTTER_SOURCE_PATH" in
-  ""|/*)
-    : # do nothing
-    ;;
-  *)
-    CUTTER_SOURCE_PATH="\$(top_builddir)/${CUTTER_SOURCE_PATH}"
-    ;;
-esac
-AC_SUBST(CUTTER_SOURCE_PATH)
-
-GPG_UID=m4_include(gpg_uid)
-AC_SUBST(GPG_UID)
-GPG_UID_RSA4096=m4_include(gpg_uid_rsa4096)
-AC_SUBST(GPG_UID_RSA4096)
-
 AC_CONFIG_FILES([
   Makefile
   groonga-normalizer-mysql.pc
@@ -194,16 +174,7 @@ AC_CONFIG_FILES([
   build/cmake_modules/Makefile
   normalizers/Makefile
   packages/Makefile
-  packages/apt/Makefile
-  packages/apt/env.sh
   packages/ubuntu/Makefile
-  packages/rpm/Makefile
-  packages/rpm/centos/Makefile
-  packages/rpm/centos/groonga-normalizer-mysql.spec
-  packages/rpm/fedora/Makefile
-  packages/rpm/fedora/groonga-normalizer-mysql.spec
-  packages/yum/Makefile
-  packages/yum/env.sh
   packages/source/Makefile
   test/Makefile
   doc/Makefile

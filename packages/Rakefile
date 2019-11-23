@@ -1,0 +1,84 @@
+require "json"
+require "pathname"
+
+apache_arrow_repository = ENV["APACHE_ARROW_REPOSITORY"]
+if apache_arrow_repository.nil?
+  raise "Specify APACHE_ARROW_REPOSITORY environment variable"
+end
+require "#{apache_arrow_repository}/dev/tasks/linux-packages/package-task"
+
+class GroongaNormalizerMySQLPackageTask < PackageTask
+  def initialize
+    super("groonga-normalizer-mysql", detect_version, detect_release_time)
+  end
+
+  private
+  def top_directory
+    packages_directory.parent
+  end
+
+  def packages_directory
+    Pathname(__dir__)
+  end
+
+  def detect_version
+    ENV["VERSION"] || (top_directory + "version").read.chomp
+  end
+
+  def detect_release_time
+    release_time_env = ENV["RELEASE_TIME"]
+    if release_time_env
+      Time.parse(release_time_env).utc
+    else
+      Time.now.utc
+    end
+  end
+
+  def detect_required_groonga_version
+    (top_directory + "required_groonga_version").read.chomp
+  end
+
+  def original_archive_path
+    top_directory + @archive_name
+  end
+
+  def define_archive_task
+    [@archive_name, deb_archive_name, rpm_archive_name].each do |archive_name|
+      file archive_name => original_archive_path.to_s do
+        sh("tar", "xf", original_archive_path.to_s)
+        archive_base_name = File.basename(archive_name, ".tar.gz")
+        sh("tar", "czf", archive_name, archive_base_name)
+        rm_r(archive_base_name)
+      end
+    end
+  end
+
+  def apt_targets_default
+    [
+      "debian-stretch",
+      "debian-stretch-i386",
+      "debian-buster",
+      "debian-buster-i386",
+    ]
+  end
+
+  def yum_targets_default
+    [
+      "centos-6",
+      "centos-7",
+      "centos-8",
+    ]
+  end
+
+  def yum_expand_variable(key)
+    case key
+    when "REQUIRED_GROONGA_VERSION"
+      detect_required_groonga_version
+    else
+      super
+    end
+  end
+end
+
+task = GroongaNormalizerMySQLPackageTask.new
+task.define
