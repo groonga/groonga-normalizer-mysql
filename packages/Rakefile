@@ -12,6 +12,11 @@ class GroongaNormalizerMySQLPackageTask < PackageTask
     super("groonga-normalizer-mysql", detect_version, detect_release_time)
   end
 
+  def define
+    super
+    define_release_tasks
+  end
+
   private
   def top_directory
     packages_directory.parent
@@ -49,6 +54,25 @@ class GroongaNormalizerMySQLPackageTask < PackageTask
         archive_base_name = File.basename(archive_name, ".tar.gz")
         sh("tar", "czf", archive_name, archive_base_name)
         rm_r(archive_base_name)
+      end
+    end
+  end
+
+  def define_release_tasks
+    [
+      [:apt, apt_dir],
+      [:yum, yum_dir],
+    ].each do |target_namespace, base_dir|
+      namespace target_namespace do
+        task :release do
+          repositories_dir = "#{base_dir}/repositories"
+          rm_rf(repositories_dir)
+          Rake::Task["apt:build"].invoke
+          sh("rsync",
+             "-av",
+             "#{repositories_dir}/",
+             "packages@packages.groonga.org:public/")
+        end
       end
     end
   end
