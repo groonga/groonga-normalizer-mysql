@@ -67,7 +67,7 @@ class GroongaNormalizerMySQLPackageTask < PackageTask
         task :release do
           repositories_dir = "#{base_dir}/repositories"
           rm_rf(repositories_dir)
-          Rake::Task["apt:build"].invoke
+          Rake::Task["#{target_namespace}:build"].invoke
           sh("rsync",
              "-av",
              "#{repositories_dir}/",
