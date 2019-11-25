@@ -73,7 +73,7 @@ jobs:
       - name: Clone dependencies
         run: |
           cd ..
-          git clone --depth 1 https://github.com/apache/arrow.git
+          git clone --depth 1 --recursive https://github.com/groonga/groonga.git
       - name: Generate configure
         run: |
           ./autogen.sh
@@ -89,7 +89,7 @@ jobs:
           rake version:update
           rake ${{ matrix.rake_arguments }}
         env:
-          APACHE_ARROW_REPOSITORY: ../../arrow
+          GROONGA_REPOSITORY: ../../groonga
       - uses: actions/upload-artifact@master
         with:
           name: packages-${{ matrix.id }}
