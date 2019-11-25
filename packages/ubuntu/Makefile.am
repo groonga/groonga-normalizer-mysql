@@ -1,4 +1,5 @@
-CODE_NAMES = trusty,xenial,bionic
+UBUNTU_CODE_NAMES = xenial,bionic,disco,eoan
+UBUNTU_VERSIONS = 16.04,18.04,19.04,19.10
 SOURCE = ../$(PACKAGE)-$(VERSION).tar.gz
 
 all:
@@ -18,7 +19,8 @@ upload: source ensure-configuration
 	  --package '$(PACKAGE)'				\
 	  --version '$(VERSION)'				\
 	  --source-archive '$(SOURCE)'				\
-	  --code-names '$(CODE_NAMES)'				\
+	  --ubuntu-code-names '$(UBUNTU_CODE_NAMES)'		\
+	  --ubuntu-versions '$(UBUNTU_VERSIONS)'		\
 	  --debian-directory '$(srcdir)/../debian/'		\
 	  --pgp-sign-key '$(LAUNCHPAD_UPLOADER_PGP_KEY)'
 
