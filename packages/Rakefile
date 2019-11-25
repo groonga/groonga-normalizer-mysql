@@ -25,15 +25,6 @@ class GroongaNormalizerMySQLPackageTask < PackagesGroongaOrgPackageTask
     ENV["VERSION"] || (top_directory + "version").read.chomp
   end
 
-  def detect_release_time
-    release_time_env = ENV["RELEASE_TIME"]
-    if release_time_env
-      Time.parse(release_time_env).utc
-    else
-      Time.now.utc
-    end
-  end
-
   def detect_required_groonga_version
     (top_directory + "required_groonga_version").read.chomp
   end
