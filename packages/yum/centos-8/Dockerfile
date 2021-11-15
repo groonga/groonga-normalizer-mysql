@@ -6,9 +6,11 @@ ARG DEBUG
 RUN \
   quiet=$([ "${DEBUG}" = "yes" ] || echo "--quiet") && \
   dnf install -y ${quiet} \
-    https://packages.groonga.org/centos/groonga-release-latest.noarch.rpm \
-    epel-release && \
+    epel-release \
+    'dnf-command(config-manager)' \
+    https://packages.groonga.org/centos/groonga-release-latest.noarch.rpm && \
+  dnf config-manager --set-enabled PowerTools && \
   dnf groupinstall -y ${quiet} "Development Tools" && \
-  dnf install --enablerepo=PowerTools -y ${quiet} \
+  dnf install -y ${quiet} \
     groonga-devel && \
   dnf clean ${quiet} all
