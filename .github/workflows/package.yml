@@ -18,22 +18,12 @@ jobs:
       fail-fast: false
       matrix:
         label:
-          - Debian GNU/Linux stretch amd64
-          - Debian GNU/Linux stretch i386
           - Debian GNU/Linux buster amd64
           - Debian GNU/Linux buster i386
           - CentOS 7
           - CentOS 8
           - AlmaLinux 8
         include:
-          - label: Debian GNU/Linux stretch amd64
-            id: debian-stretch-amd64
-            rake_arguments: apt:build APT_TARGETS=debian-stretch
-            repositories_path: packages/apt/repositories/
-          - label: Debian GNU/Linux stretch i386
-            id: debian-stretch-i386
-            rake_arguments: apt:build APT_TARGETS=debian-stretch-i386
-            repositories_path: packages/apt/repositories/
           - label: Debian GNU/Linux buster amd64
             id: debian-buster-amd64
             rake_arguments: apt:build APT_TARGETS=debian-buster
