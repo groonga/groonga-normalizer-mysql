@@ -24,6 +24,7 @@ jobs:
           - Debian GNU/Linux buster i386
           - CentOS 7
           - CentOS 8
+          - AlmaLinux 8
         include:
           - label: Debian GNU/Linux stretch amd64
             id: debian-stretch-amd64
@@ -48,6 +49,10 @@ jobs:
           - label: CentOS 8
             id: centos-8
             rake_arguments: yum:build YUM_TARGETS=centos-8
+            repositories_path: packages/yum/repositories/
+          - label: AlmaLinux 8
+            id: almalinux-8
+            rake_arguments: yum:build YUM_TARGETS=almalinux-8
             repositories_path: packages/yum/repositories/
     runs-on: ubuntu-latest
     steps:
