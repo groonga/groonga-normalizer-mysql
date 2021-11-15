@@ -22,7 +22,6 @@ jobs:
           - Debian GNU/Linux stretch i386
           - Debian GNU/Linux buster amd64
           - Debian GNU/Linux buster i386
-          - CentOS 6
           - CentOS 7
           - CentOS 8
         include:
@@ -42,10 +41,6 @@ jobs:
             id: debian-buster-i386
             rake_arguments: apt:build APT_TARGETS=debian-buster-i386
             repositories_path: packages/apt/repositories/
-          - label: CentOS 6
-            id: centos-6
-            rake_arguments: yum:build YUM_TARGETS=centos-6
-            repositories_path: packages/yum/repositories/
           - label: CentOS 7
             id: centos-7
             rake_arguments: yum:build YUM_TARGETS=centos-7
