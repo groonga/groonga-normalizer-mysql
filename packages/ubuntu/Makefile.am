@@ -1,5 +1,5 @@
-UBUNTU_CODE_NAMES = xenial,bionic,disco,eoan
-UBUNTU_VERSIONS = 16.04,18.04,19.04,19.10
+UBUNTU_CODE_NAMES = bionic,focal,hirsute,impish
+UBUNTU_VERSIONS = 18.04,20.04,21.04,21.10
 SOURCE = ../$(PACKAGE)-$(VERSION).tar.gz
 
 all:
