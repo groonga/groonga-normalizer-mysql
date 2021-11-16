@@ -1,5 +1,21 @@
 # News
 
+## 1.1.5: 2021-11-16
+
+### Improvements
+
+  * Added support for AlmaLinux 8.
+  * Added support for Debian GNU/Linux 11 (bullseye)
+  * Added support for Debian GNU/Linux 10 (buster) on ARM64.
+  * Added support for Ubuntu 20.04 (focal)
+  * Added support for Ubuntu 21.04 (hirsute)
+  * Added support for Ubuntu 21.10 (impish)
+  * Dropped support for CentOS 6.
+  * Dropped support for Debian GNU/Linux 9 (stretch)
+  * Dropped support for Ubuntu 16.04 (xenial)
+  * Dropped support for Ubuntu 19.04 (disco)
+  * Dropped support for Ubuntu 19.10 (eoan)
+
 ## 1.1.4: 2019-04-03
 
 ### Improvements
