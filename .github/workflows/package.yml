@@ -19,6 +19,7 @@ jobs:
       matrix:
         label:
           - Debian GNU/Linux buster amd64
+          - Debian GNU/Linux buster arm64
           - Debian GNU/Linux buster i386
           - Debian GNU/Linux bullseye amd64
           - Debian GNU/Linux bullseye arm64
@@ -28,6 +29,10 @@ jobs:
         include:
           - label: Debian GNU/Linux buster amd64
             id: debian-buster-amd64
+            rake_arguments: apt:build APT_TARGETS=debian-buster
+            repositories_path: packages/apt/repositories/
+          - label: Debian GNU/Linux buster arm64
+            id: debian-buster-arm64
             rake_arguments: apt:build APT_TARGETS=debian-buster
             repositories_path: packages/apt/repositories/
           - label: Debian GNU/Linux buster i386
