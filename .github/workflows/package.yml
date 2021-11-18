@@ -29,34 +29,42 @@ jobs:
         include:
           - label: Debian GNU/Linux buster amd64
             id: debian-buster-amd64
+            task-namespace: apt
             rake_arguments: apt:build APT_TARGETS=debian-buster
             repositories_path: packages/apt/repositories/
           - label: Debian GNU/Linux buster arm64
             id: debian-buster-arm64
+            task-namespace: apt
             rake_arguments: apt:build APT_TARGETS=debian-buster
             repositories_path: packages/apt/repositories/
           - label: Debian GNU/Linux buster i386
             id: debian-buster-i386
+            task-namespace: apt
             rake_arguments: apt:build APT_TARGETS=debian-buster-i386
             repositories_path: packages/apt/repositories/
           - label: Debian GNU/Linux bullseye amd64
             id: debian-bullseye-amd64
+            task-namespace: apt
             rake_arguments: apt:build APT_TARGETS=debian-bullseye
             repositories_path: packages/apt/repositories/
           - label: Debian GNU/Linux bullseye arm64
             id: debian-bullseye-arm64
+            task-namespace: apt
             rake_arguments: apt:build APT_TARGETS=debian-bullseye
             repositories_path: packages/apt/repositories/
           - label: CentOS 7
             id: centos-7
+            task-namespace: yum
             rake_arguments: yum:build YUM_TARGETS=centos-7
             repositories_path: packages/yum/repositories/
           - label: CentOS 8
             id: centos-8
+            task-namespace: yum
             rake_arguments: yum:build YUM_TARGETS=centos-8
             repositories_path: packages/yum/repositories/
           - label: AlmaLinux 8
             id: almalinux-8
+            task-namespace: yum
             rake_arguments: yum:build YUM_TARGETS=almalinux-8
             repositories_path: packages/yum/repositories/
     runs-on: ubuntu-latest
