@@ -29,34 +29,42 @@ jobs:
         include:
           - label: Debian GNU/Linux buster amd64
             id: debian-buster-amd64
+            task-namespace: apt
             rake_arguments: apt:build APT_TARGETS=debian-buster
             repositories_path: packages/apt/repositories/
           - label: Debian GNU/Linux buster arm64
             id: debian-buster-arm64
+            task-namespace: apt
             rake_arguments: apt:build APT_TARGETS=debian-buster
             repositories_path: packages/apt/repositories/
           - label: Debian GNU/Linux buster i386
             id: debian-buster-i386
+            task-namespace: apt
             rake_arguments: apt:build APT_TARGETS=debian-buster-i386
             repositories_path: packages/apt/repositories/
           - label: Debian GNU/Linux bullseye amd64
             id: debian-bullseye-amd64
+            task-namespace: apt
             rake_arguments: apt:build APT_TARGETS=debian-bullseye
             repositories_path: packages/apt/repositories/
           - label: Debian GNU/Linux bullseye arm64
             id: debian-bullseye-arm64
+            task-namespace: apt
             rake_arguments: apt:build APT_TARGETS=debian-bullseye
             repositories_path: packages/apt/repositories/
           - label: CentOS 7
             id: centos-7
+            task-namespace: yum
             rake_arguments: yum:build YUM_TARGETS=centos-7
             repositories_path: packages/yum/repositories/
           - label: CentOS 8
             id: centos-8
+            task-namespace: yum
             rake_arguments: yum:build YUM_TARGETS=centos-8
             repositories_path: packages/yum/repositories/
           - label: AlmaLinux 8
             id: almalinux-8
+            task-namespace: yum
             rake_arguments: yum:build YUM_TARGETS=almalinux-8
             repositories_path: packages/yum/repositories/
     runs-on: ubuntu-latest
@@ -99,3 +107,36 @@ jobs:
         with:
           name: packages-${{ matrix.id }}
           path: ${{ matrix.repositories_path }}
+
+      # Release
+      - name: Create assets
+        if: |
+          startsWith(github.ref, 'refs/tags/')
+        run: |
+          tar czf ${{ matrix.id }}.tar.gz packages/${{ matrix.task-namespace }}/repositories/
+      - name: Ensure creating release
+        if: |
+          startsWith(github.ref, 'refs/tags/')
+        id: create-release
+        uses: actions/github-script@0.4.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          result-encoding: string
+          script: |
+            const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor
+            const fs = require("fs");
+            const path = ".github/workflows/ensure-creating-release.js";
+            const script = fs.readFileSync(path).toString();
+            const func = new AsyncFunction("require", "github", "context", script);
+            return await func(require, github, context);
+      - name: Upload to release
+        uses: actions/upload-release-asset@v1.0.1
+        if: |
+          startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create-release.outputs.result }}
+          asset_path: ${{ matrix.id }}.tar.gz
+          asset_name: ${{ matrix.id }}.tar.gz
+          asset_content_type: application/gzip
