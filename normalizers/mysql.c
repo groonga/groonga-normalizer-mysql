@@ -408,7 +408,7 @@ normalize(grn_ctx *ctx, grn_obj *string,
         current_type[-1] |= GRN_CHAR_BLANK;
       }
       if (current_check) {
-        current_check[0]++;
+        current_check[0] += character_length;
       }
       normalized_length_in_bytes = previous_normalized_length_in_bytes;
       normalized_n_characters = previous_normalized_n_characters;
