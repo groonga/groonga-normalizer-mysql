@@ -1,12 +1,12 @@
 # News
 
-## 1.1.6: 2021-12-29
+## 1.1.8: 2021-12-29
 
 ### Fixes
 
   * Fixed a bug that out of space for highlight when we use NormalizerMySQLUnicodeCI
     in normalizer on Mroonga and we execute highlight_full() to a text include full-width spaces.
-    [GitHub #19][Patched by Takashi Hashida] 
+    [GitHub #19][Patched by Takashi Hashida]
 
 ## 1.1.5: 2021-11-16
 
