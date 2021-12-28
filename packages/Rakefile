@@ -119,6 +119,10 @@ class GroongaNormalizerMySQLPackageTask < PackagesGroongaOrgPackageTask
     end
     url
   end
+
+  def built_package_n_split_components
+    3
+  end
 end
 
 task = GroongaNormalizerMySQLPackageTask.new
