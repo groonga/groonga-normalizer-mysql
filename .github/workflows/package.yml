@@ -24,7 +24,6 @@ jobs:
           - Debian GNU/Linux bullseye amd64
           - Debian GNU/Linux bullseye arm64
           - CentOS 7
-          - CentOS 8
           - AlmaLinux 8
         include:
           - label: Debian GNU/Linux buster amd64
@@ -56,11 +55,6 @@ jobs:
             id: centos-7
             task-namespace: yum
             rake_arguments: yum:build YUM_TARGETS=centos-7
-            repositories_path: packages/yum/repositories/
-          - label: CentOS 8
-            id: centos-8
-            task-namespace: yum
-            rake_arguments: yum:build YUM_TARGETS=centos-8
             repositories_path: packages/yum/repositories/
           - label: AlmaLinux 8
             id: almalinux-8
