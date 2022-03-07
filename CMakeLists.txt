@@ -40,8 +40,15 @@ else()
 endif()
 
 if(GROONGA_NORMALIZER_MYSQL_BUNDLED)
-  set(GROONGA_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include")
-  set(GROONGA_LIBRARY_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/lib")
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../groonga/include")
+    set(GROONGA_INCLUDE_DIRS
+      "${CMAKE_CURRENT_SOURCE_DIR}/../groonga/include"
+      "${CMAKE_CURRENT_BINARY_DIR}/../groonga/include")
+    set(GROONGA_LIBRARY_DIRS "${CMAKE_CURRENT_BUILD_DIR}/../groonga/lib")
+  else()
+    set(GROONGA_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include")
+    set(GROONGA_LIBRARY_DIRS "${CMAKE_CURRENT_BUILD_DIR}/lib")
+  endif()
   set(GROONGA_LIBRARIES "libgroonga")
   set(GROONGA_PLUGINS_DIR "${GRN_RELATIVE_PLUGINS_DIR}")
 else()
