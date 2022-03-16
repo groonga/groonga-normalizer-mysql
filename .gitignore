@@ -37,7 +37,9 @@ Makefile.in
 /packages/apt/repositories/
 /packages/ubuntu/tmp/
 /packages/yum/build.sh
+/packages/yum/env.sh
 /packages/yum/repositories/
+/packages/yum/tmp/
 /packages/source/files/
 /.gdb_history
 /misc
