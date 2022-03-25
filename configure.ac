@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2019  Sutou Kouhei <kou@clear-code.com>
+# Copyright (C) 2013-2022  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -99,6 +99,11 @@ else
   if test "x$RUBY" = "xauto"; then
     AC_PATH_PROGS(RUBY,
                   [ dnl
+                    ruby3.0 ruby30 dnl
+                    ruby2.7 ruby27 dnl
+                    ruby2.6 ruby26 dnl
+                    ruby2.5 ruby25 dnl
+                    ruby2.4 ruby24 dnl
                     ruby2.3 ruby23 dnl
                     ruby2.2 ruby22 dnl
                     ruby2.1 ruby21 dnl
@@ -106,12 +111,7 @@ else
                   ],
                   ruby-not-found)
     if test "$RUBY" != "ruby-not-found"; then
-      ruby_version="`$RUBY --version`"
-      if echo "$ruby_version" | grep -q -- 'ruby \(1\.9\|2\.\)'; then
-        ac_cv_ruby_available="yes"
-      else
-        AC_MSG_WARN([$RUBY isn't Ruby 1.9 or later ($ruby_version)])
-      fi
+      ac_cv_ruby_available="yes"
     fi
   else
     ruby_not_found_warning_message="$RUBY is not found. Disable test."
