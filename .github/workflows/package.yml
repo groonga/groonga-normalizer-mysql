@@ -23,6 +23,7 @@ jobs:
           - CentOS 7
           - Amazon Linux 2
           - AlmaLinux 8
+          - AlmaLinux 9
         include:
           - label: Debian GNU/Linux bullseye amd64
             id: debian-bullseye-amd64
@@ -48,6 +49,11 @@ jobs:
             id: almalinux-8
             task-namespace: yum
             rake_arguments: yum:build YUM_TARGETS=almalinux-8
+            repositories_path: packages/yum/repositories/
+          - label: AlmaLinux 9
+            id: almalinux-9
+            task-namespace: yum
+            rake_arguments: yum:build YUM_TARGETS=almalinux-9
             repositories_path: packages/yum/repositories/
     runs-on: ubuntu-latest
     steps:
