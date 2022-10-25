@@ -48,9 +48,6 @@ class GroongaNormalizerMySQLPackageTask < PackagesGroongaOrgPackageTask
     [
       "debian-bullseye",
       "debian-bullseye-arm64",
-      "debian-buster",
-      "debian-buster-arm64",
-      "debian-buster-i386",
     ]
   end
 
