@@ -1,5 +1,5 @@
-UBUNTU_CODE_NAMES = bionic,focal,hirsute,impish
-UBUNTU_VERSIONS = 18.04,20.04,21.04,21.10
+UBUNTU_CODE_NAMES = bionic,focal,hirsute,jammy
+UBUNTU_VERSIONS = 18.04,20.04,21.04,22.04
 SOURCE = ../$(PACKAGE)-$(VERSION).tar.gz
 
 all:
