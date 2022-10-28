@@ -1,5 +1,14 @@
 # News
 
+## 1.1.9: 2022-10-29
+
+### Improvements
+
+  * Added support for AlmaLinux 9.
+  * Added support for Amazon Linux 2.
+  * Dropped support for CentOS 8.
+  * Dropped support for Debian GNU/Linux 10 (buster).
+
 ## 1.1.8: 2021-12-29
 
 ### Fixes
