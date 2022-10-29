@@ -6,8 +6,10 @@
 
   * Added support for AlmaLinux 9.
   * Added support for Amazon Linux 2.
+  * Added support for Ubuntu 22.04 (jammy).
   * Dropped support for CentOS 8.
   * Dropped support for Debian GNU/Linux 10 (buster).
+  * Dropped support for Ubuntu 21.10 (impish).
 
 ## 1.1.8: 2021-12-29
 
