@@ -57,7 +57,7 @@ if(GROONGA_NORMALIZER_MYSQL_BUNDLED)
   set(GROONGA_LIBRARIES "libgroonga")
   set(GROONGA_PLUGINS_DIR "${GRN_RELATIVE_PLUGINS_DIR}")
 else()
-  include(FindPkgConfig)
+  find_package(PkgConfig REQUIRED)
   include(${CMAKE_CURRENT_SOURCE_DIR}/build/cmake_modules/ReadFileList.cmake)
 
   file(READ
