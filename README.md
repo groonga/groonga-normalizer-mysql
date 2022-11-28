@@ -99,6 +99,16 @@ Then install `groonga-normalizer-mysql` package:
 
     % sudo yum install -y groonga-normalizer-mysql
 
+### AlmaLinux 8
+
+Install `groonga-repository` package:
+
+    % sudo dnf install -y https://packages.groonga.org/almalinux/8/groonga-release-latest.noarch.rpm
+
+Then install `groonga-normalizer-mysql` package:
+
+    % sudo dnf install -y --enablerepo=epel groonga-normalizer-mysql
+
 ### macOS - Homebrew
 
 Install `groonga-normalizer-mysql` package:
