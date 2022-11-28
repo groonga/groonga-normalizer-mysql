@@ -1,5 +1,20 @@
 # News
 
+## 1.2.0: 2022-11-28
+
+### Improvements
+
+  * Added support for building with not under groonga/plugins/
+
+    For example, this feature supports the following structure.
+
+    ```
+    mariadb/
+      extra/
+        groonga/
+        groonga-normalizer-mysql/
+    ```
+
 ## 1.1.9: 2022-10-29
 
 ### Improvements
