@@ -33,7 +33,7 @@ jobs:
           - label: Debian GNU/Linux bullseye arm64
             id: debian-bullseye-arm64
             task-namespace: apt
-            rake_arguments: apt:build APT_TARGETS=debian-bullseye
+            rake_arguments: apt:build APT_TARGETS=debian-bullseye-arm64
             repositories_path: packages/apt/repositories/
           - label: CentOS 7
             id: centos-7
@@ -53,7 +53,7 @@ jobs:
           - label: AlmaLinux 8 aarch64
             id: almalinux-8-aarch64
             task-namespace: yum
-            rake_arguments: yum:build YUM_TARGETS=almalinux-8
+            rake_arguments: yum:build YUM_TARGETS=almalinux-8-aarch64
             repositories_path: packages/yum/repositories/
           - label: AlmaLinux 9
             id: almalinux-9
