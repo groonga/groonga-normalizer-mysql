@@ -50,6 +50,11 @@ jobs:
             task-namespace: yum
             rake_arguments: yum:build YUM_TARGETS=almalinux-8
             repositories_path: packages/yum/repositories/
+          - label: AlmaLinux 8 aarch64
+            id: almalinux-8-aarch64
+            task-namespace: yum
+            rake_arguments: yum:build YUM_TARGETS=almalinux-8
+            repositories_path: packages/yum/repositories/
           - label: AlmaLinux 9
             id: almalinux-9
             task-namespace: yum
@@ -70,6 +75,7 @@ jobs:
           sudo apt -V install \
             devscripts \
             libgroonga-dev \
+            qemu-user-static \
             ruby
       - name: Clone dependencies
         run: |
