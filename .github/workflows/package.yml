@@ -60,6 +60,11 @@ jobs:
             task-namespace: yum
             rake_arguments: yum:build YUM_TARGETS=almalinux-9
             repositories_path: packages/yum/repositories/
+          - label: AlmaLinux 9 aarch64
+            id: almalinux-9-aarch64
+            task-namespace: yum
+            rake_arguments: yum:build YUM_TARGETS=almalinux-9-aarch64
+            repositories_path: packages/yum/repositories/
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
