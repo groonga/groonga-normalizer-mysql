@@ -1,5 +1,12 @@
 # News
 
+## 1.2.1: 2022-12-09
+
+### Improvements
+
+  * Added support for AlmaLinux 8 for ARM64.
+  * Added support for AlmaLinux 9 for ARM64.
+
 ## 1.2.0: 2022-11-28
 
 ### Improvements
