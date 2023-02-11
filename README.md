@@ -65,8 +65,7 @@ are true for
   to fullwidth Katakana with voiced sound mark such as `ガ`.
 
 `NormalizerMySQLUnicodeCIExceptKanaCIKanaWithVoicedSoundMark` and
-`NormalizerMySQLUnicode520CIExceptKanaCIKanaWithVoicedSoundMark` and
-are MySQL incompatible normalizers but they are useful for Japanese
+`NormalizerMySQLUnicode520CIExceptKanaCIKanaWithVoicedSoundMark` are MySQL incompatible normalizers but they are useful for Japanese
 text. For example, `ふらつく` and `ブラック` has different
 means. `NormalizerMySQLUnicodeCI` identifies `ふらつく` with `ブラック`
 but `NormalizerMySQLUnicodeCIExceptKanaCIKanaWithVoicedSoundMark`
