@@ -59,6 +59,7 @@ class GroongaNormalizerMySQLPackageTask < PackagesGroongaOrgPackageTask
       "almalinux-9-aarch64",
       "amazon-linux-2",
       "centos-7",
+      "oracle-linux-8",
     ]
   end
 

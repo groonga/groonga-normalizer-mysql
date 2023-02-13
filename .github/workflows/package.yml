@@ -24,6 +24,7 @@ jobs:
           - Amazon Linux 2
           - AlmaLinux 8
           - AlmaLinux 9
+          - Oracle Linux 8
         include:
           - label: Debian GNU/Linux bullseye amd64
             id: debian-bullseye-amd64
@@ -64,6 +65,11 @@ jobs:
             id: almalinux-9-aarch64
             task-namespace: yum
             rake_arguments: yum:build YUM_TARGETS=almalinux-9-aarch64
+            repositories_path: packages/yum/repositories/
+          - label: Oracle Linux 8
+            id: oracle-linux-8
+            task-namespace: yum
+            rake_arguments: yum:build YUM_TARGETS=oracle-linux-8
             repositories_path: packages/yum/repositories/
     runs-on: ubuntu-latest
     steps:
