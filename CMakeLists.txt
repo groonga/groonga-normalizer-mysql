@@ -1,4 +1,4 @@
-# Copyright(C) 2013-2015  Kouhei Sutou <kou@clear-code.com>
+# Copyright(C) 2013-2023  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -15,7 +15,9 @@
 # Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston,
 # MA 02110-1301, USA
 
-cmake_minimum_required(VERSION 2.8.12)
+# Ubuntu 20.04: 3.16
+# CentOS 7's EPEL: 3.17
+cmake_minimum_required(VERSION 3.16)
 set(GROONGA_NORMALIZER_MYSQL_PROJECT_NAME "groonga-normalizer-mysql")
 project("${GROONGA_NORMALIZER_MYSQL_PROJECT_NAME}")
 
@@ -45,23 +47,13 @@ else()
 endif()
 
 if(GROONGA_NORMALIZER_MYSQL_BUNDLED)
-  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../groonga/include")
-    set(GROONGA_INCLUDE_DIRS
-      "${CMAKE_CURRENT_SOURCE_DIR}/../groonga/include"
-      "${CMAKE_CURRENT_BINARY_DIR}/../groonga/include")
-    set(GROONGA_LIBRARY_DIRS "${CMAKE_CURRENT_BUILD_DIR}/../groonga/lib")
-  else()
-    set(GROONGA_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include")
-    set(GROONGA_LIBRARY_DIRS "${CMAKE_CURRENT_BUILD_DIR}/lib")
-  endif()
-  set(GROONGA_LIBRARIES "libgroonga")
   if(GRN_RELATIVE_PLUGINS_DIR)
-    set(GROONGA_PLUGINS_DIR "${GRN_RELATIVE_PLUGINS_DIR}")
+    set(GRN_PLUGINS_DIR "${GRN_RELATIVE_PLUGINS_DIR}")
   else()
-    set(GROONGA_PLUGINS_DIR "lib/groonga/plugins")
+    set(GRN_PLUGINS_DIR "lib/groonga/plugins")
   endif()
+  add_library(Groonga::libgroonga ALIAS libgroonga)
 else()
-  find_package(PkgConfig REQUIRED)
   include(${CMAKE_CURRENT_SOURCE_DIR}/build/cmake_modules/ReadFileList.cmake)
 
   file(READ
@@ -69,16 +61,15 @@ else()
     GROONGA_REQUIRED_VERSION)
   string(STRIP "${GROONGA_REQUIRED_VERSION}" GROONGA_REQUIRED_VERSION)
 
-  pkg_check_modules(GROONGA REQUIRED "groonga >= ${GROONGA_REQUIRED_VERSION}")
-  _pkgconfig_invoke(groonga GROONGA PLUGINS_DIR "" --variable=pluginsdir)
+  find_package(Groonga ${GROONGA_REQUIRED_VERSION})
+  if(NOT Groonga_FOUND)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(pkg_groonga IMPORTED_TARGETS REQUIRED
+      "groonga >= ${GROONGA_REQUIRED_VERSION}")
+    add_library(Groonga::libgroonga ALIAS PkgConfig::pkg_groonga)
+    _pkgconfig_invoke(groonga GRN PLUGINS_DIR "" --variable=pluginsdir)
+  endif()
 endif()
-
-include_directories(
-  ${CMAKE_BINARY_DIR}
-  ${GROONGA_INCLUDE_DIRS})
-
-link_directories(
-  ${GROONGA_LIBRARY_DIRS})
 
 add_subdirectory(normalizers)
 
