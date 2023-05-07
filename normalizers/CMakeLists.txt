@@ -37,6 +37,8 @@ else()
       OPTIONAL)
   endif()
 endif()
-target_include_directories(mysql_normalizer PRIVATE "${CMAKE_BINARY_DIR}")
+target_include_directories(mysql_normalizer BEFORE PRIVATE
+  "${CMAKE_CURRENT_BINARY_DIR}/.."
+  "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(mysql_normalizer PRIVATE Groonga::libgroonga)
 target_compile_definitions(mysql_normalizer PRIVATE HAVE_CONFIG_H)
