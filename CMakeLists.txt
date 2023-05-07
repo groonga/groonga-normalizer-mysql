@@ -71,6 +71,8 @@ else()
   endif()
 endif()
 
+configure_file(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+
 add_subdirectory(normalizers)
 
 if(NOT GROONGA_NORMALIZER_MYSQL_EMBED)

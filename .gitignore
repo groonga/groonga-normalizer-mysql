@@ -8,6 +8,7 @@ CMakeFiles/
 *.lo
 *.la
 *.cmake
+!/config.h.cmake
 CMakeCache.txt
 Makefile
 Makefile.in
