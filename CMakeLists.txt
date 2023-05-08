@@ -53,6 +53,11 @@ if(GROONGA_NORMALIZER_MYSQL_BUNDLED)
     set(GRN_PLUGINS_DIR "lib/groonga/plugins")
   endif()
   if(GRN_VERSION VERSION_LESS "13.0.2")
+    set(GRN_EMBEDED_BUILD_DIR "${CMAKE_CURRENT_BUILD_DIR}/../groonga")
+    if(EXISTS "${GRN_EMBEDED_BUILD_DIR}")
+      target_include_directories(libgroonga INTERFACE
+	"${GRN_EMBEDED_BUILD_DIR}/include")
+    endif()
     set(GRN_EMBEDED_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../groonga")
     if(EXISTS "${GRN_EMBEDED_SOURCE_DIR}")
       target_include_directories(libgroonga INTERFACE
