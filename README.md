@@ -111,9 +111,9 @@ Then install `groonga-normalizer-mysql` package:
 
 ### macOS - Homebrew
 
-Install `groonga-normalizer-mysql` package:
+Install `groonga` package (which includes `groonga-normalizer-mysql`):
 
-    % brew install groonga-normalizer-mysql
+    % brew install groonga
 
 ### Windows
 
