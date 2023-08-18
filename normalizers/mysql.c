@@ -246,7 +246,6 @@ normalize_character(const char *utf8, int character_length,
 
 static void
 sized_buffer_append(char *buffer,
-                    unsigned int buffer_length,
                     unsigned int *buffer_rest_length,
                     const char *string)
 {
@@ -257,13 +256,12 @@ sized_buffer_append(char *buffer,
     return;
   }
 
-  strncat(buffer, string, buffer_length);
+  strncat(buffer, string, string_length);
   *buffer_rest_length -= string_length;
 }
 
 static void
 sized_buffer_dump_string(char *buffer,
-                         unsigned int buffer_length,
                          unsigned int *buffer_rest_length,
                          const char *string, unsigned int string_length)
 {
@@ -276,16 +274,14 @@ sized_buffer_dump_string(char *buffer,
 #define FORMATTED_BYTE_BUFFER_SIZE 5 /* "0xFF\0" */
     char formatted_byte[FORMATTED_BYTE_BUFFER_SIZE];
     if (i > 0) {
-      sized_buffer_append(buffer, buffer_length, buffer_rest_length,
-                          " ");
+      sized_buffer_append(buffer, buffer_rest_length, " ");
     }
     if (byte == 0) {
       strncpy(formatted_byte, "0x00", FORMATTED_BYTE_BUFFER_SIZE);
     } else {
       snprintf(formatted_byte, FORMATTED_BYTE_BUFFER_SIZE, "%#04x", byte);
     }
-    sized_buffer_append(buffer, buffer_length, buffer_rest_length,
-                        formatted_byte);
+    sized_buffer_append(buffer, buffer_rest_length, formatted_byte);
 #undef FORMATTED_BYTE_BUFFER_SIZE
   }
 }
@@ -302,24 +298,21 @@ snippet(const char *string, unsigned int length, unsigned int target_byte,
   buffer[0] = '\0';
 
   if (target_byte > 0) {
-    sized_buffer_append(buffer, buffer_length, &buffer_rest_length,
-                        elision_mark);
+    sized_buffer_append(buffer, &buffer_rest_length, elision_mark);
   }
 
-  sized_buffer_append(buffer, buffer_length, &buffer_rest_length, "<");
+  sized_buffer_append(buffer, &buffer_rest_length, "<");
   if (target_byte + max_window_length > length) {
     window_length = length - target_byte;
   } else {
     window_length = max_window_length;
   }
-  sized_buffer_dump_string(buffer, buffer_length, &buffer_rest_length,
+  sized_buffer_dump_string(buffer, &buffer_rest_length,
                            string + target_byte, window_length);
-  sized_buffer_append(buffer, buffer_length, &buffer_rest_length,
-                      ">");
+  sized_buffer_append(buffer, &buffer_rest_length, ">");
 
   if (target_byte + window_length < length) {
-    sized_buffer_append(buffer, buffer_length, &buffer_rest_length,
-                        elision_mark);
+    sized_buffer_append(buffer, &buffer_rest_length, elision_mark);
   }
 
   return buffer;
