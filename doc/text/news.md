@@ -1,5 +1,18 @@
 # News
 
+## 1.2.2: 2023-10-17
+
+### Improvements
+
+  * Update how to install on macOS. [GitHub #29][Patched by askdkc]
+  * Added support for Debian 12 (bookworm).
+  * Dropped support for Amazon Linux 2.
+  * Added support for Debian trixie.
+
+### Thanks
+
+ * askdkc
+
 ## 1.2.1: 2022-12-09
 
 ### Improvements
