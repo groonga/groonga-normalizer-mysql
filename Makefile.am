@@ -63,5 +63,5 @@ update-latest-release:
 	  exit 1;					\
 	fi
 	cd $(top_srcdir)/packages &&		\
-	  $(RUBY) -S rake version:udpate	\
+	  $(RUBY) -S rake version:update	\
 	    RELEASE_TIME=$(NEW_RELEASE_DATE)
