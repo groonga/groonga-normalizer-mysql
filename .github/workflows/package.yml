@@ -70,6 +70,24 @@ jobs:
       - name: Build archive
         run: |
           make dist
+      - name: Upload to release
+        if: |
+          github.ref_type == 'tag'
+        run: |
+          ruby \
+            -e 'print("## groonga-normalizer-mysql "); \
+                puts(ARGF.read.split(/^## /)[1].strip)' \
+            doc/text/news.md > release-note.md
+          version=${GITHUB_REF_NAME#v}
+          title="$(head -n1 release-note.md | sed -e 's/^## //')"
+          tail -n +2 release-note.md > release-note-without-version.md
+          gh release create ${GITHUB_REF_NAME} \
+            --discussion-category Announcements \
+            --notes-file release-note-without-version.md \
+            --title "${title}" \
+            groonga-normalizer-mysql-*.tar.gz
+        env:
+          GH_TOKEN: ${{ github.token }}
       - name: Build with docker
         run: |
           cd packages
@@ -83,34 +101,13 @@ jobs:
           path: packages/${{ env.TASK_NAMESPACE }}/repositories/
 
       # Release
-      - name: Create assets
+      - name: Upload to release
         if: |
           github.ref_type == 'tag'
         run: |
-          tar czf ${{ matrix.id }}.tar.gz packages/${{ matrix.task-namespace }}/repositories/
-      - name: Ensure creating release
-        if: |
-          github.ref_type == 'tag'
-        id: create-release
-        uses: actions/github-script@0.4.0
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          result-encoding: string
-          script: |
-            const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor
-            const fs = require("fs");
-            const path = ".github/workflows/ensure-creating-release.js";
-            const script = fs.readFileSync(path).toString();
-            const func = new AsyncFunction("require", "github", "context", script);
-            return await func(require, github, context);
-      - name: Upload to release
-        uses: actions/upload-release-asset@v1.0.1
-        if: |
-          github.ref_type == 'tag'
+          tar czf ${{ matrix.id }}.tar.gz \
+            packages/${{ env.TASK_NAMESPACE }}/repositories/
+          gh release upload ${GITHUB_REF_NAME} \
+            ${{ matrix.id }}.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create-release.outputs.result }}
-          asset_path: ${{ matrix.id }}.tar.gz
-          asset_name: ${{ matrix.id }}.tar.gz
-          asset_content_type: application/gzip
