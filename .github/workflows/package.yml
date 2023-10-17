@@ -75,7 +75,7 @@ jobs:
           rake version:update
           rake ${{ matrix.rake_arguments }}
         env:
-          GROONGA_REPOSITORY: groonga
+          GROONGA_REPOSITORY: ../groonga
       - uses: actions/upload-artifact@v3
         with:
           name: packages-${{ matrix.id }}
