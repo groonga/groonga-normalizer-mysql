@@ -35,7 +35,9 @@ Makefile.in
 /test/tmp
 /packages/*.tar.gz
 /packages/apt/build.sh
+/packages/apt/env.sh
 /packages/apt/repositories/
+/packages/apt/tmp/
 /packages/ubuntu/tmp/
 /packages/yum/build.sh
 /packages/yum/env.sh
