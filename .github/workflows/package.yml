@@ -75,7 +75,7 @@ jobs:
         run: |
           cd packages
           rake version:update
-          rake ${{ matrix.rake_arguments }}
+          rake ${TASK_NAMESPACE}:build
         env:
           GROONGA_REPOSITORY: ../groonga
       - uses: actions/upload-artifact@v3
