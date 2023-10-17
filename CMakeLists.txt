@@ -94,7 +94,7 @@ if(NOT GROONGA_NORMALIZER_MYSQL_EMBED)
     @ONLY)
   install(
     FILES "${CMAKE_CURRENT_BINARY_DIR}/groonga-normalizer-mysql.pc"
-    DESTINATION "lib/pkgconfig/")
+    DESTINATION "${CMAKE_LIBDIR}/pkgconfig/")
 endif()
 
 install(FILES
