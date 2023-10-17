@@ -48,6 +48,8 @@ class GroongaNormalizerMySQLPackageTask < PackagesGroongaOrgPackageTask
     [
       "debian-bullseye",
       "debian-bullseye-arm64",
+      "debian-bookworm",
+      "debian-bookworm-arm64",
     ]
   end
 

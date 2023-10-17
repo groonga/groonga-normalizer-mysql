@@ -17,59 +17,37 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        label:
-          - Debian GNU/Linux bullseye amd64
-          - Debian GNU/Linux bullseye arm64
-          - CentOS 7
-          - Amazon Linux 2
-          - AlmaLinux 8
-          - AlmaLinux 9
-        include:
-          - label: Debian GNU/Linux bullseye amd64
-            id: debian-bullseye-amd64
-            task-namespace: apt
-            rake_arguments: apt:build APT_TARGETS=debian-bullseye
-            repositories_path: packages/apt/repositories/
-          - label: Debian GNU/Linux bullseye arm64
-            id: debian-bullseye-arm64
-            task-namespace: apt
-            rake_arguments: apt:build APT_TARGETS=debian-bullseye-arm64
-            repositories_path: packages/apt/repositories/
-          - label: CentOS 7
-            id: centos-7
-            task-namespace: yum
-            rake_arguments: yum:build YUM_TARGETS=centos-7
-            repositories_path: packages/yum/repositories/
-          - label: Amazon Linux 2
-            id: amazon-linux-2
-            task-namespace: yum
-            rake_arguments: yum:build YUM_TARGETS=amazon-linux-2
-            repositories_path: packages/yum/repositories/
-          - label: AlmaLinux 8
-            id: almalinux-8
-            task-namespace: yum
-            rake_arguments: yum:build YUM_TARGETS=almalinux-8
-            repositories_path: packages/yum/repositories/
-          - label: AlmaLinux 8 aarch64
-            id: almalinux-8-aarch64
-            task-namespace: yum
-            rake_arguments: yum:build YUM_TARGETS=almalinux-8-aarch64
-            repositories_path: packages/yum/repositories/
-          - label: AlmaLinux 9
-            id: almalinux-9
-            task-namespace: yum
-            rake_arguments: yum:build YUM_TARGETS=almalinux-9
-            repositories_path: packages/yum/repositories/
-          - label: AlmaLinux 9 aarch64
-            id: almalinux-9-aarch64
-            task-namespace: yum
-            rake_arguments: yum:build YUM_TARGETS=almalinux-9-aarch64
-            repositories_path: packages/yum/repositories/
+        id:
+          - debian-bullseye-amd64
+          - debian-bullseye-arm64
+          - debian-bookworm-amd64
+          - debian-bookworm-arm64
+          - centos-7
+          - amazon-linux-2
+          - almalinux-8
+          - almalinux-8-aarch64
+          - almalinux-9
+          - almalinux-9-aarch64
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - name: Prepare environment variables
+        run: |
+          set -eux
+          id=${{ matrix.id }}
+          case ${id} in
+            debian-*)
+              echo "APT_TARGETS=${id%-amd64}" >> ${GITHUB_ENV}
+              echo "TASK_NAMESPACE=apt" >> ${GITHUB_ENV}
+              ;;
+            *)
+              echo "YUM_TARGETS=${id}" >> ${GITHUB_ENV}
+              echo "TASK_NAMESPACE=yum" >> ${GITHUB_ENV}
+             ;;
+          esac
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          path: groonga
       - name: Install dependencies
         run: |
           sudo apt update
@@ -82,10 +60,6 @@ jobs:
             libgroonga-dev \
             qemu-user-static \
             ruby
-      - name: Clone dependencies
-        run: |
-          cd ..
-          git clone --depth 1 --recursive https://github.com/groonga/groonga.git
       - name: Generate configure
         run: |
           ./autogen.sh
@@ -101,21 +75,21 @@ jobs:
           rake version:update
           rake ${{ matrix.rake_arguments }}
         env:
-          GROONGA_REPOSITORY: ../../groonga
-      - uses: actions/upload-artifact@master
+          GROONGA_REPOSITORY: groonga
+      - uses: actions/upload-artifact@v3
         with:
           name: packages-${{ matrix.id }}
-          path: ${{ matrix.repositories_path }}
+          path: packages/${{ env.TASK_NAMESPACE }}/repositories/
 
       # Release
       - name: Create assets
         if: |
-          startsWith(github.ref, 'refs/tags/')
+          github.ref_type == 'tag'
         run: |
           tar czf ${{ matrix.id }}.tar.gz packages/${{ matrix.task-namespace }}/repositories/
       - name: Ensure creating release
         if: |
-          startsWith(github.ref, 'refs/tags/')
+          github.ref_type == 'tag'
         id: create-release
         uses: actions/github-script@0.4.0
         with:
@@ -131,7 +105,7 @@ jobs:
       - name: Upload to release
         uses: actions/upload-release-asset@v1.0.1
         if: |
-          startsWith(github.ref, 'refs/tags/')
+          github.ref_type == 'tag'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
