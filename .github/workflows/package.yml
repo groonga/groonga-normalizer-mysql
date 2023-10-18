@@ -12,8 +12,60 @@ on:
     - cron: |
         0 0 * * *
 jobs:
+  source:
+    name: Source
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt -y -V install software-properties-common
+          sudo add-apt-repository -y universe
+          sudo add-apt-repository -y ppa:groonga/ppa
+          sudo apt update
+          sudo apt -V install \
+            libgroonga-dev
+      - name: Generate configure
+        run: |
+          ./autogen.sh
+      - name: Configure for archive
+        run: |
+          ./configure
+      - name: Build archive
+        run: |
+          make dist
+
+      # Artifact
+      - uses: actions/upload-artifact@v3
+        with:
+          name: source
+          path: |
+            groonga-normalizer-mysql-*.tar.gz
+
+      # Release
+      - name: Upload to release
+        if: |
+          github.ref_type == 'tag'
+        run: |
+          ruby \
+            -e 'print("## groonga-normalizer-mysql "); \
+                puts(ARGF.read.split(/^## /)[1].strip)' \
+            doc/text/news.md > release-note.md
+          version=${GITHUB_REF_NAME#v}
+          title="$(head -n1 release-note.md | sed -e 's/^## //')"
+          tail -n +2 release-note.md > release-note-without-version.md
+          gh release create ${GITHUB_REF_NAME} \
+            --discussion-category Announcements \
+            --notes-file release-note-without-version.md \
+            --title "${title}" \
+            groonga-normalizer-mysql-*.tar.gz
+        env:
+          GH_TOKEN: ${{ github.token }}
+
   build:
     name: Build
+    needs: source
     strategy:
       fail-fast: false
       matrix:
@@ -45,55 +97,33 @@ jobs:
               echo "TASK_NAMESPACE=yum" >> ${GITHUB_ENV}
              ;;
           esac
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt -V install \
+            devscripts \
+            qemu-user-static \
+            ruby
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
         with:
           path: groonga
           repository: groonga/groonga
           submodules: recursive
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt -y -V install software-properties-common
-          sudo add-apt-repository -y universe
-          sudo add-apt-repository -y ppa:groonga/ppa
-          sudo apt update
-          sudo apt -V install \
-            devscripts \
-            libgroonga-dev \
-            qemu-user-static \
-            ruby
-      - name: Generate configure
-        run: |
-          ./autogen.sh
-      - name: Configure for archive
-        run: |
-          ./configure
-      - name: Build archive
-        run: |
-          make dist
-      - name: Upload to release
+      - uses: actions/download-artifact@v3
+        with:
+          name: source
+      - name: Update version
         if: |
-          github.ref_type == 'tag'
-        run: |
-          ruby \
-            -e 'print("## groonga-normalizer-mysql "); \
-                puts(ARGF.read.split(/^## /)[1].strip)' \
-            doc/text/news.md > release-note.md
-          version=${GITHUB_REF_NAME#v}
-          title="$(head -n1 release-note.md | sed -e 's/^## //')"
-          tail -n +2 release-note.md > release-note-without-version.md
-          gh release create ${GITHUB_REF_NAME} \
-            --discussion-category Announcements \
-            --notes-file release-note-without-version.md \
-            --title "${title}" \
-            groonga-normalizer-mysql-*.tar.gz
-        env:
-          GH_TOKEN: ${{ github.token }}
-      - name: Build with docker
+          github.ref_type != 'tag'
         run: |
           cd packages
           rake version:update
+        env:
+          GROONGA_REPOSITORY: ../groonga
+      - name: Build with docker
+        run: |
+          cd packages
           rake ${TASK_NAMESPACE}:build
         env:
           GROONGA_REPOSITORY: ../groonga
