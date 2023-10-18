@@ -121,10 +121,24 @@ jobs:
           rake version:update
         env:
           GROONGA_REPOSITORY: ../groonga
+      - name: Login to GitHub Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build with docker
         run: |
           cd packages
+          rake docker:pull || :
           rake ${TASK_NAMESPACE}:build
+        env:
+          GROONGA_REPOSITORY: ../groonga
+      - name: Push the built Docker image
+        continue-on-error: true
+        run: |
+          cd packages
+          rake docker:push
         env:
           GROONGA_REPOSITORY: ../groonga
       - uses: actions/upload-artifact@v3
