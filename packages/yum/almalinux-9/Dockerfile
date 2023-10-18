@@ -13,5 +13,7 @@ RUN \
   dnf config-manager --set-enabled crb && \
   dnf groupinstall -y ${quiet} "Development Tools" && \
   dnf install -y ${quiet} \
+    ccache \
+    cmake \
     groonga-devel && \
   dnf clean ${quiet} all

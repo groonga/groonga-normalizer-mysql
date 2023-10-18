@@ -3,10 +3,10 @@ Section: libs
 Priority: optional
 Maintainer: Groonga Project <packages@groonga.org>
 Build-Depends:
+  cmake,
   debhelper (>= 9),
-  autotools-dev,
-  pkg-config,
-  libgroonga-dev (>= 3.0.0)
+  libgroonga-dev (>= 3.0.0),
+  pkg-config
 Standards-Version: 3.9.3
 Homepage: https://github.com/groonga/groonga-normalizer-mysql
 

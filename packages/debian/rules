@@ -7,11 +7,10 @@
 export DH_OPTIONS
 
 %:
-	dh $@
+	dh $@ --buildsystem=cmake
 
 # disable 'make check'.
 override_dh_auto_test:
 
 override_dh_install:
-	find $(CURDIR) -name '*.la' -delete
 	find $(CURDIR) -name 'lgpl-2.0.txt' -delete

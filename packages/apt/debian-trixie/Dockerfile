@@ -23,6 +23,8 @@ RUN \
   apt update ${quiet} && \
   apt install -y -V ${quiet} \
     build-essential \
+    ccache \
+    cmake \
     debhelper \
     devscripts \
     libgroonga-dev \

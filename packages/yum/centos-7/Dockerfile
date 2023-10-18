@@ -10,5 +10,7 @@ RUN \
     epel-release && \
   yum groupinstall -y ${quiet} "Development Tools" && \
   yum install -y ${quiet} \
+    ccache \
+    cmake3 \
     groonga-devel && \
   yum clean ${quiet} all

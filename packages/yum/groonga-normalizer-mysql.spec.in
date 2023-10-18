@@ -2,6 +2,16 @@
 
 %global _initddir %{_sysconfdir}/init.d/
 
+%if ! %{defined cmake}
+%define cmake %{cmake3}
+%endif
+%if ! %{defined cmake_build}
+%define cmake_build %{cmake3_build}
+%endif
+%if ! %{defined cmake_install}
+%define cmake_install %{cmake3_install}
+%endif
+
 Name:		groonga-normalizer-mysql
 Version:	@VERSION@
 Release:	1%{?dist}
@@ -33,15 +43,13 @@ This package provides development files for groonga-normalizer-mysql.
 
 
 %build
-%configure \
-  --disable-static
-sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
-sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
-make %{?_smp_mflags}
+%cmake \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_SYSCONFDIR:PATH=%{_sysconfdir} \
+%cmake_build
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p"
-rm $RPM_BUILD_ROOT%{_libdir}/groonga/plugins/*/*.la
+%cmake_install
 
 %files
 %dir %{_libdir}/groonga

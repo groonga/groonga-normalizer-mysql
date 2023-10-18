@@ -1,1 +1,2 @@
-usr/lib/groonga/plugins/normalizers/mysql*
+usr/lib/*/groonga/plugins/normalizers/mysql*
+usr/lib/*/pkgconfig/*
