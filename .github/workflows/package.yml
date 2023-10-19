@@ -35,6 +35,11 @@ jobs:
       - name: Build archive
         run: |
           make dist
+      - name: Create .zip archive
+        run: |
+          version=$(cat version)
+          tar xf groonga-normalizer-mysql-${version}.tar.gz
+          zip -r groonga-normalizer-mysql-${version}{.zip,}
 
       # Artifact
       - uses: actions/upload-artifact@v3
@@ -42,6 +47,7 @@ jobs:
           name: source
           path: |
             groonga-normalizer-mysql-*.tar.gz
+            groonga-normalizer-mysql-*.zip
 
       # Release
       - name: Upload to release
@@ -59,7 +65,8 @@ jobs:
             --discussion-category Announcements \
             --notes-file release-note-without-version.md \
             --title "${title}" \
-            groonga-normalizer-mysql-*.tar.gz
+            groonga-normalizer-mysql-*.tar.gz \
+            groonga-normalizer-mysql-*.zip
         env:
           GH_TOKEN: ${{ github.token }}
 
