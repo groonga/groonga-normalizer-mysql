@@ -30,7 +30,8 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = groonga-normalizer-mysql.pc
 
 EXTRA_DIST =					\
-	CMakeLists.txt
+	CMakeLists.txt				\
+	config.h.cmake
 
 update-tables:
 	cd normalizers && $(MAKE) update-tables
