@@ -19,7 +19,6 @@ ACLOCAL_AMFLAGS = -I m4
 SUBDIRS =					\
 	build					\
 	normalizers				\
-	packages				\
 	test					\
 	doc
 
