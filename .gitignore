@@ -43,6 +43,7 @@ Makefile.in
 /packages/yum/env.sh
 /packages/yum/repositories/
 /packages/yum/tmp/
-/packages/source/files/
+/packages/source/repositories/
+/packages/source/tmp/
 /.gdb_history
 /misc

@@ -34,13 +34,13 @@ class GroongaNormalizerMySQLPackageTask < PackagesGroongaOrgPackageTask
   end
 
   def define_archive_task
-    [@archive_name, deb_archive_name, rpm_archive_name].each do |archive_name|
-      file archive_name => original_archive_path.to_s do
-        sh("tar", "xf", original_archive_path.to_s)
-        archive_base_name = File.basename(archive_name, ".tar.gz")
-        sh("tar", "czf", archive_name, archive_base_name)
-        rm_r(archive_base_name)
-      end
+    file "../#{@archive_name}" do
+      source_archive_url = built_package_url(:source, @archive_name)
+      download(source_archive_url, "..")
+    end
+
+    file @archive_name => "../#{@archive_name}" do
+      ln_s("../#{@archive_name}", @archive_name)
     end
   end
 
@@ -74,6 +74,13 @@ class GroongaNormalizerMySQLPackageTask < PackagesGroongaOrgPackageTask
     end
   end
 
+  def source_targets_default
+    [
+      "#{@archive_base_name}.tar.gz",
+      "#{@archive_base_name}.zip",
+    ]
+  end
+
   def use_built_package?
     true
   end
@@ -101,6 +108,8 @@ class GroongaNormalizerMySQLPackageTask < PackagesGroongaOrgPackageTask
       end
     when :yum
       "packages-#{target}"
+    when :source
+      target
     else
       raise NotImplementedError
     end
@@ -115,16 +124,20 @@ class GroongaNormalizerMySQLPackageTask < PackagesGroongaOrgPackageTask
       else
         url << "#{target}-amd64.tar.gz"
       end
-    when :windows
-      url << "#{target}"
-    else
+    when :yum
       url << "#{target}.tar.gz"
+    else
+      url << "#{target}"
     end
     url
   end
 
   def built_package_n_split_components
     3
+  end
+
+  def tag_name
+    "v#{@version}"
   end
 end
 

@@ -173,9 +173,6 @@ AC_CONFIG_FILES([
   build/Makefile
   build/cmake_modules/Makefile
   normalizers/Makefile
-  packages/Makefile
-  packages/ubuntu/Makefile
-  packages/source/Makefile
   test/Makefile
   doc/Makefile
   doc/text/Makefile
