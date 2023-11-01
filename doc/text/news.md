@@ -1,5 +1,11 @@
 # News
 
+## 1.2.3: 2023-11-01
+
+### Fixes
+
+  * Added a file that required for source archive.
+
 ## 1.2.2: 2023-10-17
 
 ### Improvements
