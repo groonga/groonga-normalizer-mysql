@@ -46,6 +46,7 @@ This package provides development files for groonga-normalizer-mysql.
 %cmake \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_INSTALL_SYSCONFDIR:PATH=%{_sysconfdir} \
+  -DCMAKE_LIBDIR=%{_libdir} \
 %cmake_build
 
 %install
