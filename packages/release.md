@@ -40,6 +40,15 @@ doc/text/news.md を編集して変更点を記載する。
   % git commit
   % git push
 
+### ソースアーカイブ作成(Ubuntu向けパッケージ Nightlyビルド用)
+
+  % ./configure \
+      --prefix=/tmp/local \
+      --with-launchpad-uploader-pgp-key=xxxxxx \
+      --with-groonga-source-path=../groonga.clean \
+      PKG_CONFIG_PATH=/tmp/local/lib/pkgconfig
+  % make dist
+
 ### CIの確認
 
 以下の2つを確認する。
@@ -51,20 +60,10 @@ doc/text/news.md を編集して変更点を記載する。
 
   % make tag
 
-### ソースアーカイブ作成
-
-  % ./configure \
-      --prefix=/tmp/local \
-      --with-launchpad-uploader-pgp-key=xxxxxx \
-      --with-groonga-source-path=../groonga.clean \
-      PKG_CONFIG_PATH=/tmp/local/lib/pkgconfig
-  % make dist
-
 ### ソースアーカイブのアップロード
 
-  % cd packages/source
-  % make download
-  % make upload
+  % cd packages
+  % rake source
 
 ### リリース用パッケージのダウンロードとアップロード
 
