@@ -78,7 +78,7 @@ else()
   find_package(Groonga ${GROONGA_REQUIRED_VERSION})
   if(NOT Groonga_FOUND)
     find_package(PkgConfig REQUIRED)
-    pkg_check_modules(pkg_groonga IMPORTED_TARGETS REQUIRED
+    pkg_check_modules(pkg_groonga REQUIRED IMPORTED_TARGETS
       "groonga >= ${GROONGA_REQUIRED_VERSION}")
     add_library(Groonga::libgroonga ALIAS PkgConfig::pkg_groonga)
     _pkgconfig_invoke(groonga GRN PLUGINS_DIR "" --variable=pluginsdir)
