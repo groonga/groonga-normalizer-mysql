@@ -117,7 +117,7 @@ jobs:
           path: groonga
           repository: groonga/groonga
           submodules: recursive
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: source
       - name: Update version
