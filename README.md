@@ -88,22 +88,21 @@ and install `groonga-normalizer-mysql` package:
 
     % sudo apt-get -y install groonga-normalizer-mysql
 
-### CentOS
-
-Install `groonga-repository` package:
-
-    % sudo rpm -ivh https://packages.groonga.org/centos/groonga-release-latest.noarch.rpm
-    % sudo yum makecache
-
-Then install `groonga-normalizer-mysql` package:
-
-    % sudo yum install -y groonga-normalizer-mysql
-
 ### AlmaLinux 8
 
 Install `groonga-repository` package:
 
     % sudo dnf install -y https://packages.groonga.org/almalinux/8/groonga-release-latest.noarch.rpm
+
+Then install `groonga-normalizer-mysql` package:
+
+    % sudo dnf install -y --enablerepo=epel groonga-normalizer-mysql
+
+### AlmaLinux 9
+
+Install `groonga-repository` package:
+
+    % sudo dnf install -y https://packages.groonga.org/almalinux/9/groonga-release-latest.noarch.rpm
 
 Then install `groonga-normalizer-mysql` package:
 
