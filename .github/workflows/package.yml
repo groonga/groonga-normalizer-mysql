@@ -86,6 +86,8 @@ jobs:
           - almalinux-9
           - almalinux-9-aarch64
     runs-on: ubuntu-latest
+    env:
+      APACHE_ARROW_REPOSITORY: ${{ github.workspace }}/apache-arrow
     steps:
       - name: Prepare environment variables
         run: |
@@ -114,6 +116,10 @@ jobs:
           path: groonga
           repository: groonga/groonga
           submodules: recursive
+      - uses: actions/checkout@v4
+        with:
+          path: apache-arrow
+          repository: apache/arrow
       - uses: actions/download-artifact@v4
         with:
           name: source
