@@ -11,7 +11,6 @@ RUN \
     https://packages.groonga.org/amazon-linux/$(cut -d: -f6 /etc/system-release-cpe | cut -d. -f1)/groonga-release-latest.noarch.rpm && \
   dnf groupinstall -y ${quiet} "Development Tools" && \
   dnf install -y ${quiet} \
-    ccache \
     cmake \
     groonga-devel && \
   dnf clean ${quiet} all
