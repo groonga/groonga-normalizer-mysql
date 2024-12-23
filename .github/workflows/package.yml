@@ -86,7 +86,9 @@ jobs:
           - almalinux-9
           - almalinux-9-aarch64
           - amazon-linux-2023
-          - amazon-linux-2023-aarch64
+          # Groonga doesn't provide the package for
+          # amazon-linux-2023-aarch64 yet.
+          # - amazon-linux-2023-aarch64
     runs-on: ubuntu-latest
     env:
       APACHE_ARROW_REPOSITORY: ${{ github.workspace }}/apache-arrow
