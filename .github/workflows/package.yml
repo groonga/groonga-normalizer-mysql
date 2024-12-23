@@ -85,6 +85,8 @@ jobs:
           - almalinux-8-aarch64
           - almalinux-9
           - almalinux-9-aarch64
+          - amazon-linux-2023
+          - amazon-linux-2023-aarch64
     runs-on: ubuntu-latest
     env:
       APACHE_ARROW_REPOSITORY: ${{ github.workspace }}/apache-arrow

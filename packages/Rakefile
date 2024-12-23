@@ -59,6 +59,8 @@ class GroongaNormalizerMySQLPackageTask < PackagesGroongaOrgPackageTask
       "almalinux-8-aarch64",
       "almalinux-9",
       "almalinux-9-aarch64",
+      "amazon-linux-2023",
+      "amazon-linux-2023-aarch64",
     ]
   end
 
