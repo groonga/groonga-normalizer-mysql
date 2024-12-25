@@ -193,4 +193,4 @@ jobs:
         run: |
           gh release upload ${GITHUB_REF_NAME} release-artifacts/*
         env:
-          GH_TOKEN: ${{ secrets.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
