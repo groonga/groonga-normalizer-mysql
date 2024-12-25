@@ -220,3 +220,42 @@ this program is derived work of `MYSQL_SOURCE/strings/ctype-utf8.c`,
 `MYSQL_SOURCE/strings/uca900_data.h`,
 `MYSQL_SOURCE/strings/uca900_ja_data.h`. This program is the same
 license as them and they are licensed under LGPLv2 only.
+
+## For developers
+
+### How to release
+
+#### Add a release note for a new release
+
+```bash
+editor doc/text/news.md
+```
+
+#### Update package versions
+
+```bash
+APACHE_ARROW_REPOSITORY=${APACHE_ARROW_REPOSITORY_PATH} \
+  GROONGA_REPOSITORY=${GROOGNA_REPOSITORY_PATH} \
+  rake release:version:update
+```
+
+#### Tag
+
+```bash
+rake release:tag
+```
+
+#### Publish Ubuntu packages
+
+```bash
+APACHE_ARROW_REPOSITORY=${APACHE_ARROW_REPOSITORY_PATH} \
+  GROONGA_REPOSITORY=${GROOGNA_REPOSITORY_PATH} \
+  LAUNCHPAD_UPLOADER_PGP_KEY=${YOUR_GPG_KEY_ID} \
+  rake -C packages ubuntu:upload
+```
+
+#### Bump version for new development
+
+```bash
+rake dev:version:bump NEW_VERSION=${NEW_VERSION}
+```
