@@ -9,11 +9,7 @@ normalize NormalizerMySQLUnicodeCIExceptKanaCIKanaWithVoicedSoundMark   "ぁぃ�
   ],
   {
     "normalized": "ぁぃぅぇぉっゃゅょゎ",
-    "types": [
-
-    ],
-    "checks": [
-
-    ]
+    "types": [],
+    "checks": []
   }
 ]

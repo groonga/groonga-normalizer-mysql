@@ -9,11 +9,7 @@ normalize   'NormalizerMySQLUnicode900("weight_level", 2)'   "AÀÁÂÃÄÅaàá
   ],
   {
     "normalized": "AÀÁÂÃÄÅAÀÁÂÃÄÅĀĀĂĂĄĄ",
-    "types": [
-
-    ],
-    "checks": [
-
-    ]
+    "types": [],
+    "checks": []
   }
 ]

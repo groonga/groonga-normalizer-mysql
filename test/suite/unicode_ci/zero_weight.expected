@@ -12,7 +12,8 @@ normalize NormalizerMySQLUnicodeCI "aﾞあﾞz" WITH_CHECKS|WITH_TYPES
     "types": [
       "alpha",
       "hiragana",
-      "alpha"
+      "alpha",
+      "null"
     ],
     "checks": [
       1,

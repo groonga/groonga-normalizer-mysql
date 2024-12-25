@@ -9,11 +9,7 @@ normalize NormalizerMySQLUnicode520CIExceptKanaCIKanaWithVoicedSoundMark   "ガ�
   ],
   {
     "normalized": "がぎぐげござじずぜぞだぢづでどばびぶべぼ",
-    "types": [
-
-    ],
-    "checks": [
-
-    ]
+    "types": [],
+    "checks": []
   }
 ]

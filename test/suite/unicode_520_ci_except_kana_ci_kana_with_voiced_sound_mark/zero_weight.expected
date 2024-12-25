@@ -12,7 +12,8 @@ normalize NormalizerMySQLUnicode520CIExceptKanaCIKanaWithVoicedSoundMark   "aﾞ
     "types": [
       "alpha",
       "hiragana",
-      "alpha"
+      "alpha",
+      "null"
     ],
     "checks": [
       1,

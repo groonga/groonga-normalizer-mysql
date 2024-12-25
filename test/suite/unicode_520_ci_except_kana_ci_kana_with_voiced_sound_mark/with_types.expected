@@ -19,10 +19,9 @@ normalize NormalizerMySQLUnicode520CIExceptKanaCIKanaWithVoicedSoundMark   "a1!ï
       "hiragana",
       "kanji",
       "others",
-      "others"
+      "others",
+      "null"
     ],
-    "checks": [
-
-    ]
+    "checks": []
   }
 ]

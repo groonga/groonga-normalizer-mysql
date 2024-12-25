@@ -19,10 +19,9 @@ normalize NormalizerMySQLGeneralCI "a1!！あアｱ亜💕 " WITH_TYPES
       "alpha",
       "kanji",
       "others",
-      "others"
+      "others",
+      "null"
     ],
-    "checks": [
-
-    ]
+    "checks": []
   }
 ]

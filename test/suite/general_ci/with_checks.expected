@@ -9,9 +9,7 @@ normalize NormalizerMySQLGeneralCI "ｱ㌕ＡZ" WITH_CHECKS
   ],
   {
     "normalized": "ｱ㌕ＡZ",
-    "types": [
-
-    ],
+    "types": [],
     "checks": [
       3,
       0,

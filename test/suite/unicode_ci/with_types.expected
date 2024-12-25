@@ -19,10 +19,9 @@ normalize NormalizerMySQLUnicodeCI "a1!！あアｱ亜💕 " WITH_TYPES
       "hiragana",
       "kanji",
       "others",
-      "others"
+      "others",
+      "null"
     ],
-    "checks": [
-
-    ]
+    "checks": []
   }
 ]
