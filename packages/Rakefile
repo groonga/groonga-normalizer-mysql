@@ -22,7 +22,8 @@ class GroongaNormalizerMySQLPackageTask < PackagesGroongaOrgPackageTask
   end
 
   def detect_version
-    ENV["VERSION"] || (top_directory + "version").read.chomp
+    ENV["VERSION"] ||
+      (top_directory + "CMakeLists.txt").read[/VERSION "(.*?)"/, 1]
   end
 
   def detect_required_groonga_version
