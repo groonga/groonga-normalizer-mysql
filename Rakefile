@@ -44,9 +44,7 @@ namespace :release do
 
   desc "Tag"
   task :tag do
-    latest_news = Dir.glob("doc/source/news/*.*").max do |a, b|
-      File.basename(a).to_f - File.basename(b).to_f
-    end
+    latest_news = "doc/text/news.md"
     latest_release_note = File.read(latest_news).split(/^## /)[1]
     latest_release_note_version = latest_release_note.lines.first[/[\d.]+/]
     if latest_release_note_version != version
