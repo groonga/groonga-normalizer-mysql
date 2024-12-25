@@ -155,7 +155,7 @@ jobs:
             # packages/packages-debian-bookworm-amd64 ->
             # debian-bookworm
             os=$(echo ${packages_path} | \
-                grep -E -o '(almalinux|amazon-linux|debian)-[^-]+')
+                   grep -E -o '(almalinux|amazon-linux|debian)-[^-]+')
             mkdir -p release/${os}/
 
             # packages/packages-debian-bookworm-amd64/debian/bookworm/source/ ->
