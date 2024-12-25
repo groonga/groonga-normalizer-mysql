@@ -75,7 +75,7 @@ done
 
 grntest_options=("$@")
 if [ "${use_gdb}" == "true" ]; then
-  grntest_options=("--n-workers" "0", "${grntest_options[@]}")
+  grntest_options=("--n-workers" "1" "${grntest_options[@]}")
 fi
 if [ "${CI}" = "true" ]; then
   grntest_options=("--reporter" "mark" "${grntest_options[@]}")
