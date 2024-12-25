@@ -108,6 +108,16 @@ Then install `groonga-normalizer-mysql` package:
 
     % sudo dnf install -y --enablerepo=epel groonga-normalizer-mysql
 
+### Amazon Linux 2023
+
+Install `groonga-repository` package:
+
+    % sudo dnf install -y https://packages.groonga.org/amazon-linux/2023/groonga-release-latest.noarch.rpm
+
+Then install `groonga-normalizer-mysql` package:
+
+    % sudo dnf install -y --enablerepo=epel groonga-normalizer-mysql
+
 ### macOS - Homebrew
 
 Install `groonga` package (which includes `groonga-normalizer-mysql`):
