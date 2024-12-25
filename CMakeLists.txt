@@ -1,4 +1,4 @@
-# Copyright(C) 2013-2023  Sutou Kouhei <kou@clear-code.com>
+# Copyright (C) 2013-2024  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -19,7 +19,8 @@
 # CentOS 7's EPEL: 3.17
 cmake_minimum_required(VERSION 3.16)
 set(GROONGA_NORMALIZER_MYSQL_PROJECT_NAME "groonga-normalizer-mysql")
-project("${GROONGA_NORMALIZER_MYSQL_PROJECT_NAME}")
+project("${GROONGA_NORMALIZER_MYSQL_PROJECT_NAME}"
+  VERSION "1.2.4")
 
 include(GNUInstallDirs)
 
@@ -39,8 +40,6 @@ set(GROONGA_NORMALIZER_MYSQL_EMBED
   CACHE
   BOOL
   "Build as a static library to embed into an application")
-
-file(READ "${CMAKE_CURRENT_SOURCE_DIR}/version" VERSION)
 
 if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
   set(GROONGA_NORMALIZER_MYSQL_BUNDLED FALSE)
@@ -68,8 +67,6 @@ if(GROONGA_NORMALIZER_MYSQL_BUNDLED)
   endif()
   add_library(Groonga::libgroonga ALIAS libgroonga)
 else()
-  include(${CMAKE_CURRENT_SOURCE_DIR}/build/cmake_modules/ReadFileList.cmake)
-
   file(READ
     ${CMAKE_CURRENT_SOURCE_DIR}/required_groonga_version
     GROONGA_REQUIRED_VERSION)

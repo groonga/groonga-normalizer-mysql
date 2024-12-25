@@ -17,29 +17,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt -y -V install software-properties-common
-          sudo add-apt-repository -y universe
-          sudo add-apt-repository -y ppa:groonga/ppa
-          sudo apt update
-          sudo apt -V install \
-            libgroonga-dev
-      - name: Generate configure
-        run: |
-          ./autogen.sh
-      - name: Configure for archive
-        run: |
-          ./configure
       - name: Build archive
         run: |
-          make dist
-      - name: Create .zip archive
-        run: |
-          version=$(cat version)
-          tar xf groonga-normalizer-mysql-${version}.tar.gz
-          zip -r groonga-normalizer-mysql-${version}{.zip,}
+          rake dist
 
       # Artifact
       - uses: actions/upload-artifact@v4

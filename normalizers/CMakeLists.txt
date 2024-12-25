@@ -1,4 +1,4 @@
-# Copyright(C) 2013-2023  Sutou Kouhei <kou@clear-code.com>
+# Copyright (C) 2013-2024  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -16,7 +16,18 @@
 # MA 02110-1301, USA
 
 set(NORMALIZERS_DIR "${GRN_PLUGINS_DIR}/normalizers")
-read_file_list(${CMAKE_CURRENT_SOURCE_DIR}/mysql_sources.am MYSQL_SOURCES)
+set(MYSQL_SOURCES
+  mysql.c
+  mysql_general_ci_table.h
+  mysql_unicode_ci_table.h
+  mysql_unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_table.h
+  mysql_unicode_520_ci_table.h
+  mysql_unicode_520_ci_except_kana_ci_kana_with_voiced_sound_mark_table.h
+  mysql_unicode_900_ai_ci_table.h
+  mysql_unicode_900_as_ci_table.h
+  mysql_unicode_900_as_cs_table.h
+  mysql_unicode_900_ja_as_cs_table.h
+  mysql_unicode_900_ja_as_cs_ks_table.h)
 if(GROONGA_NORMALIZER_MYSQL_EMBED)
   add_library(mysql_normalizer STATIC ${MYSQL_SOURCES})
   set_property(TARGET mysql_normalizer APPEND PROPERTY
