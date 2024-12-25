@@ -39,6 +39,12 @@ namespace :release do
       cd("packages") do
         ruby("-S", "rake", "version:update")
       end
+      sh("git",
+         "add",
+         "packages/debian/changelog",
+         "packages/yum/groonga-normalizer-mysql.spec.in")
+      sh("git", "commit", "-m", "packages: update versions")
+      sh("git", "push")
     end
   end
 
