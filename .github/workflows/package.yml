@@ -79,8 +79,6 @@ jobs:
         id:
           - debian-bookworm-amd64
           - debian-bookworm-arm64
-          - debian-trixie-amd64
-          - debian-trixie-arm64
           - almalinux-8
           - almalinux-8-aarch64
           - almalinux-9
