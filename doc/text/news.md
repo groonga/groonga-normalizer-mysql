@@ -1,5 +1,15 @@
 # News
 
+## 1.2.4: 2024-12-25
+
+### Improvements
+
+  * Dropped support for Debian GNU/Linux bullseye.
+
+  * Dropped support for CentOS 7.
+
+  * Added support for Amazon Linux 2023.
+
 ## 1.2.3: 2023-11-01
 
 ### Fixes
