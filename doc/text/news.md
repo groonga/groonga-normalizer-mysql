@@ -10,6 +10,8 @@
 
   * Added support for Amazon Linux 2023.
 
+  * Dropped support for GNU Autotools.
+
 ## 1.2.3: 2023-11-01
 
 ### Fixes
