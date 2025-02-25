@@ -30,6 +30,7 @@ jobs:
         id:
           - debian-bookworm-amd64
           - debian-bookworm-arm64
+          - ubuntu-noble-amd64
           - almalinux-8-x86_64
           - almalinux-8-aarch64
           - almalinux-9-x86_64
@@ -52,7 +53,7 @@ jobs:
           docker_os=${os/-/}
           version=${os_version##*-}
           architecture=${id##*-}
-          if [ ${os} = "debian" ] ;then
+          if [ "${os}" = "debian" ] || [ "${os}" = "ubuntu" ]; then
             echo "APT_TARGETS=${id%-amd64}" >> ${GITHUB_ENV}
             echo "TASK_NAMESPACE=apt" >> ${GITHUB_ENV}
           else
@@ -151,7 +152,7 @@ jobs:
             # packages/packages-debian-bookworm-amd64 ->
             # debian-bookworm
             os=$(echo ${packages_path} | \
-                   grep -E -o '(almalinux|amazon-linux|debian)-[^-]+')
+                   grep -E -o '(almalinux|amazon-linux|debian|ubuntu)-[^-]+')
             mkdir -p release/${os}/
 
             # packages/packages-debian-bookworm-amd64/debian/bookworm/source/ ->
