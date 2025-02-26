@@ -50,7 +50,7 @@ class GroongaNormalizerMySQLPackageTask < PackagesGroongaOrgPackageTask
       "debian-bookworm",
       "debian-bookworm-arm64",
       "ubuntu-noble",
-      "ubuntu-noble-arm64"
+      "ubuntu-noble-arm64",
     ]
   end
 
