@@ -40,6 +40,9 @@ jobs:
           # Groonga doesn't provide the package for
           # amazon-linux-2023-aarch64 yet.
           # - amazon-linux-2023-aarch64
+    # condition && true-case || false-case
+    # ==
+    # condition ? true-case : false-case
     runs-on: >-
       ${{ (contains(matrix.id, 'arm64') ||
            contains(matrix.id, 'aarch64')) && 'ubuntu-24.04-arm' ||
