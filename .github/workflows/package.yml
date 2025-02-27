@@ -40,7 +40,9 @@ jobs:
           # Groonga doesn't provide the package for
           # amazon-linux-2023-aarch64 yet.
           # - amazon-linux-2023-aarch64
-    runs-on: ubuntu-latest
+    runs-on: >-
+      ${{ contains(matrix.id, 'arm64') && 'ubuntu-24.04-arm' ||
+                                          'ubuntu-latest' }}
     env:
       APACHE_ARROW_REPOSITORY: ${{ github.workspace }}/apache-arrow
     steps:
