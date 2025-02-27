@@ -37,9 +37,7 @@ jobs:
           - almalinux-9-x86_64
           - almalinux-9-aarch64
           - amazon-linux-2023-x86_64
-          # Groonga doesn't provide the package for
-          # amazon-linux-2023-aarch64 yet.
-          # - amazon-linux-2023-aarch64
+          - amazon-linux-2023-aarch64
     # condition && true-case || false-case
     # ==
     # condition ? true-case : false-case
