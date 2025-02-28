@@ -1,5 +1,23 @@
 # News
 
+## 1.2.5: 2025-02-28
+
+### Improvements
+
+#### Package Distribution Update
+
+In previous releases, Ubuntu packages were available only through the PPA on
+Launchpad (ppa:groonga/ppa). Starting with this release, packages are also
+distributed via our Groonga APT repository at https://packages.groonga.org.
+
+While the groonga-normalizer-mysql package itself remains unchanged, the
+underlying Groonga dependency is different. Packages from our Groonga APT
+repository (https://packages.groonga.org/) include Groonga built with Apache
+Arrow enabled, which unlocks extra features such as parallel offline index
+building.
+
+We will announce how to use Groonga APT repository soon.
+
 ## 1.2.4: 2024-12-25
 
 ### Improvements
