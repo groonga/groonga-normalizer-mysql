@@ -13,7 +13,7 @@ distributed via our Groonga APT repository at https://packages.groonga.org.
 While the groonga-normalizer-mysql package itself remains unchanged, the
 underlying Groonga dependency is different. Packages from our Groonga APT
 repository (https://packages.groonga.org/) include Groonga built with Apache
-Arrow enabled, which unlocks extra features such as offline parallel index
+Arrow enabled, which unlocks extra features such as parallel offline index
 building.
 
 We will announce how to use Groonga APT repository soon.
