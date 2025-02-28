@@ -7,7 +7,7 @@
 #### Package Distribution Update
 
 In previous releases, Ubuntu packages were available only through the PPA on
-Launchpad(ppa:groonga/ppa). Starting with this release, packages are also
+Launchpad (ppa:groonga/ppa). Starting with this release, packages are also
 distributed via our Groonga APT repository at https://packages.groonga.org.
 
 While the groonga-normalizer-mysql package itself remains unchanged, the
