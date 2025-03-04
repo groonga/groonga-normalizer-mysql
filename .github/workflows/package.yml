@@ -78,7 +78,6 @@ jobs:
           sudo apt update
           sudo apt -V install \
             devscripts \
-            qemu-user-static \
             ruby
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
