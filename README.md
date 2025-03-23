@@ -14,9 +14,22 @@ Here are MySQL compatible normalizers:
 * `NormalizerMySQLGeneralCI` for `utf8mb4_general_ci`
 * `NormalizerMySQLUnicodeCI` for `utf8mb4_unicode_ci`
 * `NormalizerMySQLUnicode520CI` for `utf8mb4_unicode_520_ci`
-* `NormalizerMySQLUnicode900` for `utf8mb4_0900_ai_ci`,
-  `utf8mb4_0900_as_ci`, `utf8mb4_0900_as_cs`, `utf8mb4_ja_0900_as_cs` and
-  `utf8mb4_ja_0900_as_cs_ks`.
+* `NormalizerMySQLUnicode900` (deprecated by `NormalizerMySQLUnicode`) for:
+  * `utf8mb4_0900_ai_ci` (`NormalizerMySQLUnicode900`)
+  * `utf8mb4_0900_as_ci` (`NormalizerMySQLUnicode900("weight_level", 2)`)
+  * `utf8mb4_0900_as_cs` (`NormalizerMySQLUnicode900("weight_level", 3)`)
+  * `utf8mb4_ja_0900_as_cs` (`NormalizerMySQLUnicode900("locale", "ja", "weight_level", 3)`)
+  * `utf8mb4_ja_0900_as_cs_ks` (`NormalizerMySQLUnicode900("locale", "ja", "weight_level", 4)`)
+* `NormalizerMySQLUnicode` for:
+  * `utf8mb4_0900_ai_ci` (`NormalizerMySQLUnicode("version", "9.0.0")`)
+  * `utf8mb4_0900_as_ci` (`NormalizerMySQLUnicode("version", "9.0.0", "accent_sensitive", true)`)
+  * `utf8mb4_0900_as_cs` (`NormalizerMySQLUnicode("version", "9.0.0", "accent_sensitive", true, "case_sensitive", true)`)
+  * `utf8mb4_ja_0900_as_cs` (`NormalizerMySQLUnicode("version", "9.0.0", "accent_sensitive", true, "case_sensitive", true, "locale", "ja")`)
+  * `utf8mb4_ja_0900_as_cs_ks` (`NormalizerMySQLUnicode("version", "9.0.0", "accent_sensitive", true, "case_sensitive", true, "locale", "ja", "kana_sensitive", true)`)
+  * `utf8mb4_uca1400_ai_ci` (`NormalizerMySQLUnicode("version", "14.0.0")`)
+  * `utf8mb4_uca1400_ai_cs` (`NormalizerMySQLUnicode("version", "14.0.0", "case_sensitive", true)`)
+  * `utf8mb4_uca1400_as_ci` (`NormalizerMySQLUnicode("version", "14.0.0", "accent_sensitive", true)`)
+  * `utf8mb4_uca1400_as_cs` (`NormalizerMySQLUnicode("version", "14.0.0", "accent_sensitive", true, "case_sensistive", true)`)
 
 Here are custom normalizers:
 
@@ -76,14 +89,14 @@ doesn't identify them.
 
 ### Debian GNU/Linux
 
-[Add apt-line for the Groonga deb package repository](http://groonga.org/docs/install/debian.html)
+[Add apt-line for the Groonga deb package repository](https://groonga.org/docs/install/debian.html)
 and install `groonga-normalizer-mysql` package:
 
     % sudo apt-get -y install groonga-normalizer-mysql
 
 ### Ubuntu
 
-[Add apt-line for the Groonga deb package repository](http://groonga.org/docs/install/ubuntu.html)
+[Add apt-line for the Groonga deb package repository](https://groonga.org/docs/install/ubuntu.html)
 and install `groonga-normalizer-mysql` package:
 
     % sudo apt-get -y install groonga-normalizer-mysql
@@ -137,7 +150,7 @@ Install the following build tools:
 
 #### Build Groonga
 
-Download the latest Groonga source from [packages.groonga.org](http://packages.groonga.org/source/groonga/). Source file name is formatted as `groonga-X.Y.Z.zip`.
+Download the latest Groonga source from [GitHub releases](https://github.com/groonga/groonga/releases/). Source file name is formatted as `groonga-X.Y.Z.zip`.
 
 Extract the source and move to the source folder:
 
@@ -158,7 +171,7 @@ Install:
 
 #### Build groonga-normalizer-mysql
 
-Download the latest groonga-normalizer-mysql source from [packages.groonga.org](http://packages.groonga.org/source/groonga-normalizer-mysql/). Source file name is formatted as `groonga-normalizer-X.Y.Z.zip`.
+Download the latest groonga-normalizer-mysql source from [GitHub releases](https://github.com/groonga/groonga-normalizer-mysql/releases/). Source file name is formatted as `groonga-normalizer-X.Y.Z.zip`.
 
 Extract the source and move to the source folder:
 
@@ -220,6 +233,13 @@ this program is derived work of `MYSQL_SOURCE/strings/ctype-utf8.c`,
 `MYSQL_SOURCE/strings/uca900_data.h`,
 `MYSQL_SOURCE/strings/uca900_ja_data.h`. This program is the same
 license as them and they are licensed under LGPLv2 only.
+
+This program also uses normalization table defined in MariaDB source
+code. The table is generated from
+https://www.unicode.org/Public/UCA/14.0.0/allkeys.txt . So the
+normalization table is licensed under
+https://www.unicode.org/copyright.html . It's compatible with LGPLv2
+only. So the program can use LGPLv2 only.
 
 ## For developers
 

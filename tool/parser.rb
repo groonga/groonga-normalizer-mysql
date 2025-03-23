@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2018  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2025  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -157,7 +157,7 @@ class CTypeUTF8Parser
 end
 
 class UCAParser
-  def initialize(options)
+  def initialize(options={})
     @options = options
     @pages = {}
   end
@@ -199,6 +199,38 @@ class UCAParser
     end
   end
 
+  def weight_based_characters
+    sorted_pages = @pages.sort_by do |page, characters|
+      page
+    end
+    weight_based_chars = {}
+    use_secondary_level = @options[:use_secondary_level]
+    use_tertiary_level = @options[:use_tertiary_level]
+    sorted_pages.each do |page, characters|
+      characters.each do |character|
+        weights = character.weights
+        target_weights = [
+          weights[0],
+          use_secondary_level ? weights[1] : nil,
+          # Only the first element is used for the following cases
+          # that are mentioned in
+          # maraidb-11.8.1/strings/ctype-uca.inl:
+          #
+          # U+0061; [.2075.0020.0002] # LATIN SMALL LETTER A
+          # U+00E1; [.2075.0020.0002][.0000.0024.0002] # LATIN SMALL LETTER A WITH ACUTE
+          #
+          # U+0041; [.2075.0020.0008] # LATIN CAPITAL LETTER A
+          # U+00C1; [.2075.0020.0008][.0000.0024.0002] # LATIN CAPITAL LETTER A WITH ACUTE
+          use_tertiary_level ? (weights[2] || [])[0, 1] : nil,
+        ]
+        pp [character, target_weights]
+        weight_based_chars[target_weights] ||= []
+        weight_based_chars[target_weights] << character
+      end
+    end
+    weight_based_chars
+  end
+
   private
   def remove_last_all_zero_weights(weights)
     normalized_weights = []
@@ -211,29 +243,9 @@ class UCAParser
     normalized_weights
   end
 
-  def weight_based_characters(level)
-    sorted_pages = @pages.sort_by do |page, characters|
-      page
-    end
-    weight_based_characters = {}
-    sorted_pages.each do |page, characters|
-      characters.each do |character|
-        weights = character.weights
-        target_weights = weights.collect do |weight|
-          weight[0, level]
-        end
-        target_weights = remove_last_all_zero_weights(target_weights)
-        weight_based_characters[target_weights] ||= []
-        weight_based_characters[target_weights] << character
-      end
-    end
-    weight_based_characters
-  end
-
   def group_characters
     grouped_characters = []
-    level = @options[:weight_level] || 1
-    weight_based_characters(level).each do |weight, characters|
+    weight_based_characters.each do |weight, characters|
       grouped_characters.concat(split_characters(characters))
     end
     grouped_characters
@@ -258,7 +270,7 @@ class UCAParser
 end
 
 class CTypeUCAParser < UCAParser
-  def initialize(version=nil, options)
+  def initialize(version=nil, options={})
     super(options)
     @version = version
     @lengths = []
@@ -551,7 +563,7 @@ class UCA900Parser < UCAParser
   def normalize_pages
     all_characters = {}
     primary_weights = {}
-    @pages.each do |page, weight_sets|
+    @pages.each do |page, weights|
       @pages[page] = weight_sets.collect.with_index do |weights, i|
         weights = remove_last_all_zero_weights(weights)
         code_point = (page << 8) + i
@@ -595,6 +607,66 @@ class UCA900Parser < UCAParser
         if @options[:debug]
           p [utf8, rule, base_character.weights, target_character.weights]
         end
+      end
+    end
+  end
+end
+
+class UCA1400Parser < UCAParser
+  def parse(input)
+    parse_data(input)
+  end
+
+  private
+  def parse_data(input)
+    current_page = nil
+    nth_character = nil
+    nth_weight = nil
+    input.each_line do |line|
+      case line.chomp
+      when / uca1400_p([\da-fA-F]{3})(|_secondary|_tertiary)\[\]=/
+        current_page = Integer($1, 16)
+        case $2
+        when ""
+          nth_weight = 0
+        when "_secondary"
+          nth_weight = 1
+        when "_tertiary"
+          nth_weight = 2
+        end
+        if nth_weight.zero?
+          if @pages[current_page]
+            raise "Duplicated page: #{current_page}: <#{line}>"
+          end
+          @pages[current_page] = []
+        end
+        nth_character = 0
+      when /\A0x[\da-zA-F]{4},/
+        next if current_page.nil?
+        next if nth_character.nil?
+        next if nth_weight.nil?
+        line.split(/,? /).each do |weight_raw|
+          next unless weight_raw.start_with?("0x")
+          if nth_weight.zero?
+            code_point = (current_page << 8) + nth_character
+            character = Character.new([], code_point)
+            @pages[current_page][nth_character] ||= character
+          end
+          weight = weight_raw.split(",").collect do |part|
+            Integer(part, 16)
+          end
+          until weight.empty?
+            break unless weight.last.zero?
+            weight.pop
+          end
+          weight = nil if weight.empty?
+          @pages[current_page][nth_character].weights[nth_weight] = weight
+          nth_character += 1
+        end
+      when /^\};$/
+        current_page = nil
+        nth_character = nil
+        nth_weight = nil
       end
     end
   end

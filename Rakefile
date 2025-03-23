@@ -1,6 +1,6 @@
 # -*- ruby -*-
 #
-# Copyright (C) 2024  Sutou Kouhei <kou@clear-code.com>
+# Copyright (C) 2024-2025  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -92,6 +92,34 @@ namespace :dev do
       sh("git", "add", "CMakeLists.txt")
       sh("git", "commit", "-m", "Bump version")
       sh("git", "push")
+    end
+  end
+end
+
+namespace :table do
+  namespace :generate do
+    desc "Generate uca1400 tables"
+    task :uca1400 do
+      mariadb_build_dir = ENV["MARIADB_BUILD_DIR"]
+      if mariadb_build_dir.nil?
+        raise "MARIADB_BUILD_DIR environment variable is missing"
+      end
+      [
+        [false, false, "_ai_ci"],
+        [false, true, "_ai_cs"],
+        [true, false, "_as_ci"],
+        [true, true, "_as_cs"],
+      ].each do |use_secondary_level, use_tertiary_level, suffix|
+        command_line = [
+          "tool/generate_uca1400_table.rb",
+          "--suffix=#{suffix}",
+        ]
+        command_line << "--use-secondary-level" if use_secondary_level
+        command_line << "--use-tertiary-level" if use_tertiary_level
+        command_line << "#{mariadb_build_dir}/strings/ctype-uca1400data.h"
+        ruby(*command_line,
+             out: "normalizers/mysql_unicode_1400#{suffix}_table.h")
+      end
     end
   end
 end

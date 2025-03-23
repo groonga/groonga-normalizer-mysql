@@ -1,0 +1,5 @@
+register normalizers/mysql
+
+normalize \
+  'NormalizerMySQLUnicode("version", "9.0.0", "accent_sensitive", true, "case_sensitive", true)' \
+  "はハ"

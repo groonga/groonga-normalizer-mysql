@@ -1,6 +1,6 @@
 /* -*- c-basic-offset: 2 -*- */
 /*
-  Copyright(C) 2013-2018  Kouhei Sutou <kou@clear-code.com>
+  Copyright(C) 2013-2025  Sutou Kouhei <kou@clear-code.com>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -42,6 +42,10 @@
 #include "mysql_unicode_900_as_cs_table.h"
 #include "mysql_unicode_900_ja_as_cs_table.h"
 #include "mysql_unicode_900_ja_as_cs_ks_table.h"
+#include "mysql_unicode_1400_ai_ci_table.h"
+#include "mysql_unicode_1400_ai_cs_table.h"
+#include "mysql_unicode_1400_as_ci_table.h"
+#include "mysql_unicode_1400_as_cs_table.h"
 
 #ifdef __GNUC__
 #  define GNUC_UNUSED __attribute__((__unused__))
@@ -938,6 +942,397 @@ mysql_unicode_900_next(grn_ctx *ctx,
   return NULL;
 }
 
+typedef enum {
+  MYSQL_UNICODE_VERSION_900,
+  MYSQL_UNICODE_VERSION_1400,
+} mysql_unicode_version;
+
+static const char *
+mysql_unicode_version_to_string(mysql_unicode_version version)
+{
+  switch (version) {
+  case MYSQL_UNICODE_VERSION_900:
+    return "900";
+  case MYSQL_UNICODE_VERSION_1400:
+    return "1400";
+  }
+  return "unknown";
+}
+
+typedef enum {
+  MYSQL_UNICODE_LOCALE_NONE,
+  MYSQL_UNICODE_LOCALE_JA,
+} mysql_unicode_locale;
+
+static const char *
+mysql_unicode_locale_to_string(mysql_unicode_locale locale)
+{
+  switch (locale) {
+  case MYSQL_UNICODE_LOCALE_NONE:
+    return "none";
+  case MYSQL_UNICODE_LOCALE_JA:
+    return "ja";
+  }
+  return "unknown";
+}
+
+typedef struct {
+  mysql_unicode_version version;
+  bool accent_sensitive;
+  bool case_sensitive;
+  bool kana_sensitive;
+  mysql_unicode_locale locale;
+} mysql_unicode_options;
+
+static void
+mysql_unicode_options_init(mysql_unicode_options *options)
+{
+  options->version = MYSQL_UNICODE_VERSION_1400;
+  options->accent_sensitive = false;
+  options->case_sensitive = false;
+  options->kana_sensitive = false;
+  options->locale = MYSQL_UNICODE_LOCALE_NONE;
+}
+
+static void *
+mysql_unicode_open_options(grn_ctx *ctx,
+                           GNUC_UNUSED grn_obj *normalizer,
+                           grn_obj *raw_options,
+                           GNUC_UNUSED void *user_data)
+{
+  const char *normalizer_type_label = "mysql-unicode";
+  mysql_unicode_options *options;
+
+  options = GRN_PLUGIN_MALLOC(ctx, sizeof(*options));
+  if (!options) {
+    GRN_PLUGIN_ERROR(ctx,
+                     GRN_NO_MEMORY_AVAILABLE,
+                     "[normalizer][%s] "
+                     "failed to allocate memory for options",
+                     normalizer_type_label);
+    return NULL;
+  }
+
+  mysql_unicode_options_init(options);
+
+  GRN_OPTION_VALUES_EACH_BEGIN(ctx, raw_options, i, name, name_length) {
+    grn_raw_string name_raw;
+    name_raw.value = name;
+    name_raw.length = name_length;
+
+    if (GRN_RAW_STRING_EQUAL_CSTRING(name_raw, "version")) {
+      grn_raw_string version_raw;
+      grn_id domain;
+      version_raw.length =
+        grn_vector_get_element(ctx,
+                               raw_options,
+                               i,
+                               &(version_raw.value),
+                               NULL, &domain);
+      if (!grn_type_id_is_text_family(ctx, domain)) {
+        GRN_PLUGIN_FREE(ctx, options);
+        options = NULL;
+        {
+          grn_obj value;
+          grn_obj inspected;
+          GRN_OBJ_INIT(&value, GRN_BULK, 0, domain);
+          grn_bulk_write(ctx, &value, version_raw.value, version_raw.length);
+          GRN_TEXT_INIT(&inspected, 0);
+          grn_inspect(ctx, &value, &inspected);
+          GRN_OBJ_FIN(ctx, &value);
+          GRN_PLUGIN_ERROR(ctx,
+                           GRN_INVALID_ARGUMENT,
+                           "[normalizer][%s] "
+                           "version must be text: <%.*s>",
+                           normalizer_type_label,
+                           (int)GRN_TEXT_LEN(&inspected),
+                           GRN_TEXT_VALUE(&inspected));
+          GRN_OBJ_FIN(ctx, &inspected);
+        }
+        break;
+      }
+      if (GRN_RAW_STRING_EQUAL_CSTRING(version_raw, "9.0.0")) {
+        options->version = MYSQL_UNICODE_VERSION_900;
+      } else if (GRN_RAW_STRING_EQUAL_CSTRING(version_raw, "14.0.0")) {
+        options->version = MYSQL_UNICODE_VERSION_1400;
+      } else {
+        GRN_PLUGIN_FREE(ctx, options);
+        options = NULL;
+        GRN_PLUGIN_ERROR(ctx,
+                         GRN_INVALID_ARGUMENT,
+                         "[normalizer][%s] "
+                         "version must be <900> or <1400>: <%.*s>",
+                         normalizer_type_label,
+                         (int)(version_raw.length),
+                         version_raw.value);
+        break;
+      }
+    } else if (GRN_RAW_STRING_EQUAL_CSTRING(name_raw, "accent_sensitive")) {
+      options->accent_sensitive =
+        grn_vector_get_element_bool(ctx,
+                                    raw_options,
+                                    i,
+                                    options->accent_sensitive);
+    } else if (GRN_RAW_STRING_EQUAL_CSTRING(name_raw, "case_sensitive")) {
+      options->case_sensitive =
+        grn_vector_get_element_bool(ctx,
+                                    raw_options,
+                                    i,
+                                    options->case_sensitive);
+    } else if (GRN_RAW_STRING_EQUAL_CSTRING(name_raw, "kana_sensitive")) {
+      options->kana_sensitive =
+        grn_vector_get_element_bool(ctx,
+                                    raw_options,
+                                    i,
+                                    options->kana_sensitive);
+    } else if (GRN_RAW_STRING_EQUAL_CSTRING(name_raw, "locale")) {
+      grn_raw_string locale_raw;
+      grn_id domain;
+      locale_raw.length =
+        grn_vector_get_element(ctx,
+                               raw_options,
+                               i,
+                               &(locale_raw.value),
+                               NULL,
+                               &domain);
+      if (!grn_type_id_is_text_family(ctx, domain)) {
+        GRN_PLUGIN_FREE(ctx, options);
+        options = NULL;
+        {
+          grn_obj value;
+          grn_obj inspected;
+          GRN_OBJ_INIT(&value, GRN_BULK, 0, domain);
+          grn_bulk_write(ctx, &value, locale_raw.value, locale_raw.length);
+          GRN_TEXT_INIT(&inspected, 0);
+          grn_inspect(ctx, &value, &inspected);
+          GRN_OBJ_FIN(ctx, &value);
+          GRN_PLUGIN_ERROR(ctx,
+                           GRN_INVALID_ARGUMENT,
+                           "[normalizer][%s] "
+                           "locale must be text: <%.*s>",
+                           normalizer_type_label,
+                           (int)GRN_TEXT_LEN(&inspected),
+                           GRN_TEXT_VALUE(&inspected));
+          GRN_OBJ_FIN(ctx, &inspected);
+        }
+        break;
+      }
+      if (GRN_RAW_STRING_EQUAL_CSTRING(locale_raw, "none")) {
+        options->locale = MYSQL_UNICODE_LOCALE_NONE;
+      } else if (GRN_RAW_STRING_EQUAL_CSTRING(locale_raw, "ja")) {
+        options->locale = MYSQL_UNICODE_LOCALE_JA;
+      } else {
+        GRN_PLUGIN_FREE(ctx, options);
+        options = NULL;
+        GRN_PLUGIN_ERROR(ctx,
+                         GRN_INVALID_ARGUMENT,
+                         "[normalizer][%s] "
+                         "locale must be <none> or <ja>: <%.*s>",
+                         normalizer_type_label,
+                         (int)(locale_raw.length),
+                         locale_raw.value);
+        break;
+      }
+    }
+  } GRN_OPTION_VALUES_EACH_END();
+
+  if (!options) {
+    return NULL;
+  }
+
+  if (options->version == MYSQL_UNICODE_VERSION_900) {
+    if (options->locale == MYSQL_UNICODE_LOCALE_JA) {
+      if (!options->accent_sensitive) {
+        GRN_PLUGIN_ERROR(ctx,
+                         GRN_INVALID_ARGUMENT,
+                         "[normalizer][%s][%s][ja] "
+                         "accent_sensitive must be true",
+                         normalizer_type_label,
+                         mysql_unicode_version_to_string(options->version));
+        GRN_PLUGIN_FREE(ctx, options);
+        return NULL;
+      }
+      if (!options->case_sensitive) {
+        GRN_PLUGIN_ERROR(ctx,
+                         GRN_INVALID_ARGUMENT,
+                         "[normalizer][%s][%s][ja] "
+                         "case_sensitive must be true",
+                         normalizer_type_label,
+                         mysql_unicode_version_to_string(options->version));
+        GRN_PLUGIN_FREE(ctx, options);
+        return NULL;
+      }
+    } else {
+      if (options->kana_sensitive) {
+        GRN_PLUGIN_ERROR(ctx, GRN_INVALID_ARGUMENT,
+                         "[normalizer][%s][%s] "
+                         "kana_sensitive=true is available only with locale=ja: "
+                         "<%s>",
+                         normalizer_type_label,
+                         mysql_unicode_version_to_string(options->version),
+                         mysql_unicode_locale_to_string(options->locale));
+        GRN_PLUGIN_FREE(ctx, options);
+        return NULL;
+      }
+    }
+    if (!options->accent_sensitive && options->case_sensitive) {
+      GRN_PLUGIN_ERROR(ctx,
+                       GRN_INVALID_ARGUMENT,
+                       "[normalizer][%s][%s] "
+                       "can't mix accent_sensitive=false and case_sensitive=true",
+                       normalizer_type_label,
+                       mysql_unicode_version_to_string(options->version));
+      GRN_PLUGIN_FREE(ctx, options);
+      return NULL;
+    }
+  } else if (options->version == MYSQL_UNICODE_VERSION_1400) {
+    if (options->locale != MYSQL_UNICODE_LOCALE_NONE) {
+      GRN_PLUGIN_ERROR(ctx,
+                       GRN_INVALID_ARGUMENT,
+                       "[normalizer][%s][%s] "
+                       "locale must be <none>: <%s>",
+                       normalizer_type_label,
+                       mysql_unicode_version_to_string(options->version),
+                       mysql_unicode_locale_to_string(options->locale));
+      GRN_PLUGIN_FREE(ctx, options);
+      return NULL;
+    }
+    if (options->kana_sensitive) {
+      GRN_PLUGIN_ERROR(ctx, GRN_INVALID_ARGUMENT,
+                       "[normalizer][%s][%s] "
+                       "can't use kana_sensitive=true",
+                       normalizer_type_label,
+                       mysql_unicode_version_to_string(options->version));
+      GRN_PLUGIN_FREE(ctx, options);
+      return NULL;
+    }
+  }
+
+  return options;
+}
+
+static void
+mysql_unicode_close_options(grn_ctx *ctx, void *data)
+{
+  mysql_unicode_options *options = data;
+  GRN_PLUGIN_FREE(ctx, options);
+}
+
+static grn_obj *
+mysql_unicode_next(grn_ctx *ctx,
+                   GNUC_UNUSED int n_args,
+                   grn_obj **args,
+                   GNUC_UNUSED grn_user_data *user_data)
+{
+  const char *normalizer_type_label = "mysql-unicode";
+  grn_obj *string = args[0];
+  grn_encoding encoding;
+  grn_obj *table;
+  mysql_unicode_options *options;
+  mysql_unicode_options options_raw;
+
+  encoding = grn_string_get_encoding(ctx, string);
+  if (encoding != GRN_ENC_UTF8) {
+    GRN_PLUGIN_ERROR(ctx,
+                     GRN_FUNCTION_NOT_IMPLEMENTED,
+                     "[normalizer][%s] "
+                     "UTF-8 encoding is only supported: %s",
+                     normalizer_type_label,
+                     grn_encoding_to_string(encoding));
+    return NULL;
+  }
+
+  table = grn_string_get_table(ctx, string);
+  if (table) {
+    options = grn_table_cache_normalizer_options(ctx,
+                                                 table,
+                                                 string,
+                                                 mysql_unicode_open_options,
+                                                 mysql_unicode_close_options,
+                                                 NULL);
+    if (ctx->rc != GRN_SUCCESS) {
+      return NULL;
+    }
+  } else {
+    mysql_unicode_options_init(&options_raw);
+    options = &options_raw;
+  }
+  switch (options->version) {
+  case MYSQL_UNICODE_VERSION_900:
+    if (options->accent_sensitive) {
+      if (options->case_sensitive) {
+        if (options->locale == MYSQL_UNICODE_LOCALE_JA) {
+          if (options->kana_sensitive) {
+            normalize(ctx, string,
+                      normalizer_type_label,
+                      unicode_900_ja_as_cs_ks_table,
+                      sizeof(unicode_900_ja_as_cs_ks_table) / sizeof(uint32_t *),
+                      NULL);
+          } else {
+            normalize(ctx, string,
+                      normalizer_type_label,
+                      unicode_900_ja_as_cs_table,
+                      sizeof(unicode_900_ja_as_cs_table) / sizeof(uint32_t *),
+                      NULL);
+          }
+        } else {
+          normalize(ctx, string,
+                    normalizer_type_label,
+                    unicode_900_as_cs_table,
+                    sizeof(unicode_900_as_cs_table) / sizeof(uint32_t *),
+                    NULL);
+        }
+      } else {
+        normalize(ctx, string,
+                  normalizer_type_label,
+                  unicode_900_as_ci_table,
+                  sizeof(unicode_900_as_ci_table) / sizeof(uint32_t *),
+                  NULL);
+      }
+    } else {
+      normalize(ctx, string,
+                normalizer_type_label,
+                unicode_900_ai_ci_table,
+                sizeof(unicode_900_ai_ci_table) / sizeof(uint32_t *),
+                NULL);
+    }
+    break;
+  case MYSQL_UNICODE_VERSION_1400:
+    if (options->accent_sensitive) {
+      if (options->case_sensitive) {
+        normalize(ctx, string,
+                  normalizer_type_label,
+                  unicode_1400_as_cs_table,
+                  sizeof(unicode_1400_as_cs_table) / sizeof(uint32_t *),
+                  NULL);
+      } else {
+        normalize(ctx, string,
+                  normalizer_type_label,
+                  unicode_1400_as_ci_table,
+                  sizeof(unicode_1400_as_ci_table) / sizeof(uint32_t *),
+                  NULL);
+      }
+    } else {
+      if (options->case_sensitive) {
+        normalize(ctx, string,
+                  normalizer_type_label,
+                  unicode_1400_ai_cs_table,
+                  sizeof(unicode_1400_ai_cs_table) / sizeof(uint32_t *),
+                  NULL);
+      } else {
+        normalize(ctx, string,
+                  normalizer_type_label,
+                  unicode_1400_ai_ci_table,
+                  sizeof(unicode_1400_ai_ci_table) / sizeof(uint32_t *),
+                  NULL);
+      }
+    }
+    break;
+  }
+
+  return NULL;
+}
+
 grn_rc
 GRN_PLUGIN_INIT(grn_ctx *ctx)
 {
@@ -976,6 +1371,12 @@ GRN_PLUGIN_REGISTER(grn_ctx *ctx)
                           -1,
                           NULL,
                           mysql_unicode_900_next,
+                          NULL);
+  grn_normalizer_register(ctx,
+                          "NormalizerMySQLUnicode",
+                          -1,
+                          NULL,
+                          mysql_unicode_next,
                           NULL);
   return GRN_SUCCESS;
 }

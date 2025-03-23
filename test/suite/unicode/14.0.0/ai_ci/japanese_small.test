@@ -1,0 +1,5 @@
+register normalizers/mysql
+
+normalize \
+  'NormalizerMySQLUnicode("version", "14.0.0")' \
+  "よょ"

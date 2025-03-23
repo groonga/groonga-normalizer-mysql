@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2024  Sutou Kouhei <kou@clear-code.com>
+# Copyright (C) 2013-2025  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -27,7 +27,11 @@ set(MYSQL_SOURCES
   mysql_unicode_900_as_ci_table.h
   mysql_unicode_900_as_cs_table.h
   mysql_unicode_900_ja_as_cs_table.h
-  mysql_unicode_900_ja_as_cs_ks_table.h)
+  mysql_unicode_900_ja_as_cs_ks_table.h
+  mysql_unicode_1400_ai_ci_table.h
+  mysql_unicode_1400_ai_cs_table.h
+  mysql_unicode_1400_as_ci_table.h
+  mysql_unicode_1400_as_cs_table.h)
 if(GROONGA_NORMALIZER_MYSQL_EMBED)
   add_library(mysql_normalizer STATIC ${MYSQL_SOURCES})
   set_property(TARGET mysql_normalizer APPEND PROPERTY

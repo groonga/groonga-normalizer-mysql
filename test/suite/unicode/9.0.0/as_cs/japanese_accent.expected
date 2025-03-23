@@ -1,0 +1,4 @@
+register normalizers/mysql
+[[0,0.0,0.0],true]
+normalize   'NormalizerMySQLUnicode("version", "9.0.0", "accent_sensitive", true, "case_sensitive", true)'   "ぱばパバ"
+[[0,0.0,0.0],{"normalized":"ぱばパバ","types":[],"checks":[]}]

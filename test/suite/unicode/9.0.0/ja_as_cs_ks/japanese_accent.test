@@ -1,0 +1,6 @@
+register normalizers/mysql
+
+normalize \
+  'NormalizerMySQLUnicode("version", "9.0.0", "locale", "ja", \
+                          "accent_sensitive", true, "case_sensitive", true, "kana_sensitive", true)' \
+  "ぱばパバ"
