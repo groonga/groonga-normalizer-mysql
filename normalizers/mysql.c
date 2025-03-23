@@ -26,26 +26,26 @@
 #  define GRN_PLUGIN_FUNCTION_TAG normalizers_mysql
 #endif
 
-#include <groonga/normalizer.h>
 #include <groonga/nfkc.h>
+#include <groonga/normalizer.h>
 
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "mysql_general_ci_table.h"
-#include "mysql_unicode_ci_table.h"
-#include "mysql_unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_table.h"
-#include "mysql_unicode_520_ci_table.h"
-#include "mysql_unicode_520_ci_except_kana_ci_kana_with_voiced_sound_mark_table.h"
-#include "mysql_unicode_900_ai_ci_table.h"
-#include "mysql_unicode_900_as_ci_table.h"
-#include "mysql_unicode_900_as_cs_table.h"
-#include "mysql_unicode_900_ja_as_cs_table.h"
-#include "mysql_unicode_900_ja_as_cs_ks_table.h"
 #include "mysql_unicode_1400_ai_ci_table.h"
 #include "mysql_unicode_1400_ai_cs_table.h"
 #include "mysql_unicode_1400_as_ci_table.h"
 #include "mysql_unicode_1400_as_cs_table.h"
+#include "mysql_unicode_520_ci_except_kana_ci_kana_with_voiced_sound_mark_table.h"
+#include "mysql_unicode_520_ci_table.h"
+#include "mysql_unicode_900_ai_ci_table.h"
+#include "mysql_unicode_900_as_ci_table.h"
+#include "mysql_unicode_900_as_cs_table.h"
+#include "mysql_unicode_900_ja_as_cs_ks_table.h"
+#include "mysql_unicode_900_ja_as_cs_table.h"
+#include "mysql_unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_table.h"
+#include "mysql_unicode_ci_table.h"
 
 #ifdef __GNUC__
 #  define GNUC_UNUSED __attribute__((__unused__))
@@ -54,7 +54,7 @@
 #endif
 
 #ifdef _MSC_VER
-#  define inline _inline
+#  define inline   _inline
 #  define snprintf _snprintf
 #endif
 
@@ -120,43 +120,31 @@ utf8_to_unichar(const char *utf8, int byte_size)
   const unsigned char *bytes = (const unsigned char *)utf8;
 
   switch (byte_size) {
-  case 1 :
+  case 1:
     unichar = bytes[0] & 0x7f;
     break;
-  case 2 :
+  case 2:
     unichar = ((bytes[0] & 0x1f) << 6) + (bytes[1] & 0x3f);
     break;
-  case 3 :
-    unichar =
-      ((bytes[0] & 0x0f) << 12) +
-      ((bytes[1] & 0x3f) << 6) +
-      ((bytes[2] & 0x3f));
+  case 3:
+    unichar = ((bytes[0] & 0x0f) << 12) + ((bytes[1] & 0x3f) << 6) +
+              ((bytes[2] & 0x3f));
     break;
-  case 4 :
-    unichar =
-      ((bytes[0] & 0x07) << 18) +
-      ((bytes[1] & 0x3f) << 12) +
-      ((bytes[2] & 0x3f) << 6) +
-      ((bytes[3] & 0x3f));
+  case 4:
+    unichar = ((bytes[0] & 0x07) << 18) + ((bytes[1] & 0x3f) << 12) +
+              ((bytes[2] & 0x3f) << 6) + ((bytes[3] & 0x3f));
     break;
-  case 5 :
-    unichar =
-      ((bytes[0] & 0x03) << 24) +
-      ((bytes[1] & 0x3f) << 18) +
-      ((bytes[2] & 0x3f) << 12) +
-      ((bytes[3] & 0x3f) << 6) +
-      ((bytes[4] & 0x3f));
+  case 5:
+    unichar = ((bytes[0] & 0x03) << 24) + ((bytes[1] & 0x3f) << 18) +
+              ((bytes[2] & 0x3f) << 12) + ((bytes[3] & 0x3f) << 6) +
+              ((bytes[4] & 0x3f));
     break;
-  case 6 :
-    unichar =
-      ((bytes[0] & 0x01) << 30) +
-      ((bytes[1] & 0x3f) << 24) +
-      ((bytes[2] & 0x3f) << 18) +
-      ((bytes[3] & 0x3f) << 12) +
-      ((bytes[4] & 0x3f) << 6) +
-      ((bytes[5] & 0x3f));
+  case 6:
+    unichar = ((bytes[0] & 0x01) << 30) + ((bytes[1] & 0x3f) << 24) +
+              ((bytes[2] & 0x3f) << 18) + ((bytes[3] & 0x3f) << 12) +
+              ((bytes[4] & 0x3f) << 6) + ((bytes[5] & 0x3f));
     break;
-  default :
+  default:
     unichar = 0;
     break;
   }
@@ -165,47 +153,41 @@ utf8_to_unichar(const char *utf8, int byte_size)
 }
 
 static inline void
-decompose_character(const char *rest, int character_length,
-                    size_t *page, uint32_t *low_code)
+decompose_character(const char *rest,
+                    int character_length,
+                    size_t *page,
+                    uint32_t *low_code)
 {
   switch (character_length) {
-  case 1 :
+  case 1:
     *page = 0x00;
     *low_code = rest[0] & 0x7f;
     break;
-  case 2 :
+  case 2:
     *page = (rest[0] & 0x1c) >> 2;
     *low_code = ((rest[0] & 0x03) << 6) + (rest[1] & 0x3f);
     break;
-  case 3 :
+  case 3:
     *page = ((rest[0] & 0x0f) << 4) + ((rest[1] & 0x3c) >> 2);
     *low_code = ((rest[1] & 0x03) << 6) + (rest[2] & 0x3f);
     break;
-  case 4 :
-    *page =
-      ((rest[0] & 0x07) << 10) +
-      ((rest[1] & 0x3f) << 4) +
-      ((rest[2] & 0x3c) >> 2);
+  case 4:
+    *page = ((rest[0] & 0x07) << 10) + ((rest[1] & 0x3f) << 4) +
+            ((rest[2] & 0x3c) >> 2);
     *low_code = ((rest[2] & 0x03) << 6) + (rest[3] & 0x3f);
     break;
-  case 5 :
-    *page =
-      ((rest[0] & 0x03) << 16) +
-      ((rest[1] & 0x3f) << 10) +
-      ((rest[2] & 0x3f) << 4) +
-      ((rest[3] & 0x3c) >> 2);
+  case 5:
+    *page = ((rest[0] & 0x03) << 16) + ((rest[1] & 0x3f) << 10) +
+            ((rest[2] & 0x3f) << 4) + ((rest[3] & 0x3c) >> 2);
     *low_code = ((rest[3] & 0x03) << 6) + (rest[4] & 0x3f);
     break;
-  case 6 :
-    *page =
-      ((rest[0] & 0x01) << 22) +
-      ((rest[1] & 0x3f) << 16) +
-      ((rest[2] & 0x3f) << 10) +
-      ((rest[3] & 0x3f) << 4) +
-      ((rest[4] & 0x3c) >> 2);
+  case 6:
+    *page = ((rest[0] & 0x01) << 22) + ((rest[1] & 0x3f) << 16) +
+            ((rest[2] & 0x3f) << 10) + ((rest[3] & 0x3f) << 4) +
+            ((rest[4] & 0x3c) >> 2);
     *low_code = ((rest[4] & 0x03) << 6) + (rest[5] & 0x3f);
     break;
-  default :
+  default:
     *page = (size_t)-1;
     *low_code = 0x00;
     break;
@@ -213,7 +195,8 @@ decompose_character(const char *rest, int character_length,
 }
 
 static inline void
-normalize_character(const char *utf8, int character_length,
+normalize_character(const char *utf8,
+                    int character_length,
                     uint32_t **normalize_table,
                     size_t normalize_table_size,
                     char *normalized,
@@ -267,7 +250,8 @@ sized_buffer_append(char *buffer,
 static void
 sized_buffer_dump_string(char *buffer,
                          unsigned int *buffer_rest_length,
-                         const char *string, unsigned int string_length)
+                         const char *string,
+                         unsigned int string_length)
 {
   const unsigned char *bytes;
   unsigned int i;
@@ -291,8 +275,11 @@ sized_buffer_dump_string(char *buffer,
 }
 
 static const char *
-snippet(const char *string, unsigned int length, unsigned int target_byte,
-        char *buffer, unsigned int buffer_length)
+snippet(const char *string,
+        unsigned int length,
+        unsigned int target_byte,
+        char *buffer,
+        unsigned int buffer_length)
 {
   const char *elision_mark = "...";
   unsigned int max_window_length = 12;
@@ -311,8 +298,10 @@ snippet(const char *string, unsigned int length, unsigned int target_byte,
   } else {
     window_length = max_window_length;
   }
-  sized_buffer_dump_string(buffer, &buffer_rest_length,
-                           string + target_byte, window_length);
+  sized_buffer_dump_string(buffer,
+                           &buffer_rest_length,
+                           string + target_byte,
+                           window_length);
   sized_buffer_append(buffer, &buffer_rest_length, ">");
 
   if (target_byte + window_length < length) {
@@ -323,7 +312,8 @@ snippet(const char *string, unsigned int length, unsigned int target_byte,
 }
 
 static void
-normalize(grn_ctx *ctx, grn_obj *string,
+normalize(grn_ctx *ctx,
+          grn_obj *string,
           const char *normalizer_type_label,
           uint32_t **normalize_table,
           size_t normalize_table_size,
@@ -347,8 +337,7 @@ normalize(grn_ctx *ctx, grn_obj *string,
   remove_blank_p = flags & GRN_STRING_REMOVE_BLANK;
   grn_string_get_original(ctx, string, &original, &original_length_in_bytes);
   {
-    unsigned int max_normalized_length_in_bytes =
-      original_length_in_bytes + 1;
+    unsigned int max_normalized_length_in_bytes = original_length_in_bytes + 1;
     normalized = GRN_PLUGIN_MALLOC(ctx, max_normalized_length_in_bytes);
   }
   if (flags & GRN_STRING_WITH_TYPES) {
@@ -370,8 +359,7 @@ normalize(grn_ctx *ctx, grn_obj *string,
     unsigned int normalized_character_length;
     unsigned int previous_normalized_length_in_bytes =
       normalized_length_in_bytes;
-    unsigned int previous_normalized_n_characters =
-      normalized_n_characters;
+    unsigned int previous_normalized_n_characters = normalized_n_characters;
 
     character_length = grn_plugin_charlen(ctx, rest, rest_length, encoding);
     if (character_length == 0) {
@@ -390,16 +378,17 @@ normalize(grn_ctx *ctx, grn_obj *string,
                                             &normalized_n_characters);
     }
     if (!custom_normalized) {
-      normalize_character(rest, character_length,
-                          normalize_table, normalize_table_size,
+      normalize_character(rest,
+                          character_length,
+                          normalize_table,
+                          normalize_table_size,
                           normalized,
                           &normalized_character_length,
                           &normalized_length_in_bytes,
                           &normalized_n_characters);
     }
 
-    if (remove_blank_p &&
-        normalized_character_length == 1 &&
+    if (remove_blank_p && normalized_character_length == 1 &&
         normalized[previous_normalized_length_in_bytes] == ' ') {
       if (current_type > types) {
         current_type[-1] |= GRN_CHAR_BLANK;
@@ -442,7 +431,8 @@ normalize(grn_ctx *ctx, grn_obj *string,
 
   if (rest_length > 0) {
     char buffer[SNIPPET_BUFFER_SIZE];
-    GRN_PLUGIN_LOG(ctx, GRN_LOG_DEBUG,
+    GRN_PLUGIN_LOG(ctx,
+                   GRN_LOG_DEBUG,
                    "[normalizer][%s] failed to normalize at %u byte: %s",
                    normalizer_type_label,
                    original_length_in_bytes - rest_length,
@@ -481,8 +471,11 @@ mysql_general_ci_next(GNUC_UNUSED grn_ctx *ctx,
                      grn_encoding_to_string(encoding));
     return NULL;
   }
-  normalize(ctx, string, normalizer_type_label,
-            general_ci_table, sizeof(general_ci_table) / sizeof(uint32_t *),
+  normalize(ctx,
+            string,
+            normalizer_type_label,
+            general_ci_table,
+            sizeof(general_ci_table) / sizeof(uint32_t *),
             NULL);
   return NULL;
 }
@@ -507,47 +500,50 @@ mysql_unicode_ci_next(GNUC_UNUSED grn_ctx *ctx,
                      grn_encoding_to_string(encoding));
     return NULL;
   }
-  normalize(ctx, string, normalizer_type_label,
-            unicode_ci_table, sizeof(unicode_ci_table) / sizeof(uint32_t *),
+  normalize(ctx,
+            string,
+            normalizer_type_label,
+            unicode_ci_table,
+            sizeof(unicode_ci_table) / sizeof(uint32_t *),
             NULL);
   return NULL;
 }
 
-#define HALFWIDTH_KATAKANA_LETTER_KA 0xff76
-#define HALFWIDTH_KATAKANA_LETTER_KI 0xff77
-#define HALFWIDTH_KATAKANA_LETTER_KU 0xff78
-#define HALFWIDTH_KATAKANA_LETTER_KE 0xff79
-#define HALFWIDTH_KATAKANA_LETTER_KO 0xff7a
+#define HALFWIDTH_KATAKANA_LETTER_KA              0xff76
+#define HALFWIDTH_KATAKANA_LETTER_KI              0xff77
+#define HALFWIDTH_KATAKANA_LETTER_KU              0xff78
+#define HALFWIDTH_KATAKANA_LETTER_KE              0xff79
+#define HALFWIDTH_KATAKANA_LETTER_KO              0xff7a
 
-#define HALFWIDTH_KATAKANA_LETTER_SA 0xff7b
-#define HALFWIDTH_KATAKANA_LETTER_SI 0xff7c
-#define HALFWIDTH_KATAKANA_LETTER_SU 0xff7d
-#define HALFWIDTH_KATAKANA_LETTER_SE 0xff7e
-#define HALFWIDTH_KATAKANA_LETTER_SO 0xff7f
+#define HALFWIDTH_KATAKANA_LETTER_SA              0xff7b
+#define HALFWIDTH_KATAKANA_LETTER_SI              0xff7c
+#define HALFWIDTH_KATAKANA_LETTER_SU              0xff7d
+#define HALFWIDTH_KATAKANA_LETTER_SE              0xff7e
+#define HALFWIDTH_KATAKANA_LETTER_SO              0xff7f
 
-#define HALFWIDTH_KATAKANA_LETTER_TA 0xff80
-#define HALFWIDTH_KATAKANA_LETTER_TI 0xff81
-#define HALFWIDTH_KATAKANA_LETTER_TU 0xff82
-#define HALFWIDTH_KATAKANA_LETTER_TE 0xff83
-#define HALFWIDTH_KATAKANA_LETTER_TO 0xff84
+#define HALFWIDTH_KATAKANA_LETTER_TA              0xff80
+#define HALFWIDTH_KATAKANA_LETTER_TI              0xff81
+#define HALFWIDTH_KATAKANA_LETTER_TU              0xff82
+#define HALFWIDTH_KATAKANA_LETTER_TE              0xff83
+#define HALFWIDTH_KATAKANA_LETTER_TO              0xff84
 
-#define HALFWIDTH_KATAKANA_LETTER_HA 0xff8a
-#define HALFWIDTH_KATAKANA_LETTER_HI 0xff8b
-#define HALFWIDTH_KATAKANA_LETTER_HU 0xff8c
-#define HALFWIDTH_KATAKANA_LETTER_HE 0xff8d
-#define HALFWIDTH_KATAKANA_LETTER_HO 0xff8e
+#define HALFWIDTH_KATAKANA_LETTER_HA              0xff8a
+#define HALFWIDTH_KATAKANA_LETTER_HI              0xff8b
+#define HALFWIDTH_KATAKANA_LETTER_HU              0xff8c
+#define HALFWIDTH_KATAKANA_LETTER_HE              0xff8d
+#define HALFWIDTH_KATAKANA_LETTER_HO              0xff8e
 
 #define HALFWIDTH_KATAKANA_VOICED_SOUND_MARK      0xff9e
 #define HALFWIDTH_KATAKANA_SEMI_VOICED_SOUND_MARK 0xff9f
 
-#define HIRAGANA_LETTER_KA                0x304b
-#define HIRAGANA_VOICED_SOUND_MARK_OFFSET 1
-#define HIRAGANA_VOICED_SOUND_MARK_GAP    2
+#define HIRAGANA_LETTER_KA                        0x304b
+#define HIRAGANA_VOICED_SOUND_MARK_OFFSET         1
+#define HIRAGANA_VOICED_SOUND_MARK_GAP            2
 
-#define HIRAGANA_LETTER_HA         0x306f
-#define HIRAGANA_HA_LINE_BA_OFFSET 1
-#define HIRAGANA_HA_LINE_PA_OFFSET 2
-#define HIRAGANA_HA_LINE_GAP       3
+#define HIRAGANA_LETTER_HA                        0x306f
+#define HIRAGANA_HA_LINE_BA_OFFSET                1
+#define HIRAGANA_HA_LINE_PA_OFFSET                2
+#define HIRAGANA_HA_LINE_GAP                      3
 
 static grn_bool
 normalize_halfwidth_katakana_with_voiced_sound_mark(
@@ -600,29 +596,28 @@ normalize_halfwidth_katakana_with_voiced_sound_mark(
     if (next_character_length != 3) {
       return GRN_FALSE;
     }
-    next_unichar = utf8_to_unichar(utf8 + *character_length,
-                                   next_character_length);
+    next_unichar =
+      utf8_to_unichar(utf8 + *character_length, next_character_length);
     if (next_unichar == HALFWIDTH_KATAKANA_VOICED_SOUND_MARK) {
       if (is_voiced_sound_markable_halfwidth_katakana) {
         unsigned int n_bytes;
         if (is_ha_line) {
-          n_bytes = unichar_to_utf8(HIRAGANA_LETTER_HA +
-                                    HIRAGANA_HA_LINE_BA_OFFSET +
-                                    ((unichar - HALFWIDTH_KATAKANA_LETTER_HA) *
-                                     HIRAGANA_HA_LINE_GAP),
-                                    normalized + *normalized_length_in_bytes);
+          n_bytes = unichar_to_utf8(
+            HIRAGANA_LETTER_HA + HIRAGANA_HA_LINE_BA_OFFSET +
+              ((unichar - HALFWIDTH_KATAKANA_LETTER_HA) * HIRAGANA_HA_LINE_GAP),
+            normalized + *normalized_length_in_bytes);
         } else {
           int small_tu_offset = 0;
           if (HALFWIDTH_KATAKANA_LETTER_TU <= unichar &&
               unichar <= HALFWIDTH_KATAKANA_LETTER_TO) {
             small_tu_offset = 1;
           }
-          n_bytes = unichar_to_utf8(HIRAGANA_LETTER_KA +
-                                    HIRAGANA_VOICED_SOUND_MARK_OFFSET +
-                                    small_tu_offset +
-                                    ((unichar - HALFWIDTH_KATAKANA_LETTER_KA) *
-                                     HIRAGANA_VOICED_SOUND_MARK_GAP),
-                                    normalized + *normalized_length_in_bytes);
+          n_bytes = unichar_to_utf8(
+            HIRAGANA_LETTER_KA + HIRAGANA_VOICED_SOUND_MARK_OFFSET +
+              small_tu_offset +
+              ((unichar - HALFWIDTH_KATAKANA_LETTER_KA) *
+               HIRAGANA_VOICED_SOUND_MARK_GAP),
+            normalized + *normalized_length_in_bytes);
         }
         *character_length += next_character_length;
         *normalized_character_length = n_bytes;
@@ -633,11 +628,10 @@ normalize_halfwidth_katakana_with_voiced_sound_mark(
     } else if (next_unichar == HALFWIDTH_KATAKANA_SEMI_VOICED_SOUND_MARK) {
       if (is_semi_voiced_sound_markable_halfwidth_katakana) {
         unsigned int n_bytes;
-        n_bytes = unichar_to_utf8(HIRAGANA_LETTER_HA +
-                                  HIRAGANA_HA_LINE_PA_OFFSET +
-                                  ((unichar - HALFWIDTH_KATAKANA_LETTER_HA) *
-                                   HIRAGANA_HA_LINE_GAP),
-                                  normalized + *normalized_length_in_bytes);
+        n_bytes = unichar_to_utf8(
+          HIRAGANA_LETTER_HA + HIRAGANA_HA_LINE_PA_OFFSET +
+            ((unichar - HALFWIDTH_KATAKANA_LETTER_HA) * HIRAGANA_HA_LINE_GAP),
+          normalized + *normalized_length_in_bytes);
         *character_length += next_character_length;
         *normalized_character_length = n_bytes;
         *normalized_length_in_bytes += n_bytes;
@@ -672,11 +666,14 @@ mysql_unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_next(
                      grn_encoding_to_string(encoding));
     return NULL;
   }
-  normalize(ctx, string,
-            normalizer_type_label,
-            unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_table,
-            sizeof(unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_table) / sizeof(uint32_t *),
-            normalize_halfwidth_katakana_with_voiced_sound_mark);
+  normalize(
+    ctx,
+    string,
+    normalizer_type_label,
+    unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_table,
+    sizeof(unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_table) /
+      sizeof(uint32_t *),
+    normalize_halfwidth_katakana_with_voiced_sound_mark);
   return NULL;
 }
 
@@ -700,7 +697,9 @@ mysql_unicode_520_ci_next(GNUC_UNUSED grn_ctx *ctx,
                      grn_encoding_to_string(encoding));
     return NULL;
   }
-  normalize(ctx, string, normalizer_type_label,
+  normalize(ctx,
+            string,
+            normalizer_type_label,
             unicode_520_ci_table,
             sizeof(unicode_520_ci_table) / sizeof(uint32_t *),
             NULL);
@@ -729,11 +728,14 @@ mysql_unicode_520_ci_except_kana_ci_kana_with_voiced_sound_mark_next(
                      grn_encoding_to_string(encoding));
     return NULL;
   }
-  normalize(ctx, string,
-            normalizer_type_label,
-            unicode_520_ci_except_kana_ci_kana_with_voiced_sound_mark_table,
-            sizeof(unicode_520_ci_except_kana_ci_kana_with_voiced_sound_mark_table) / sizeof(uint32_t *),
-            normalize_halfwidth_katakana_with_voiced_sound_mark);
+  normalize(
+    ctx,
+    string,
+    normalizer_type_label,
+    unicode_520_ci_except_kana_ci_kana_with_voiced_sound_mark_table,
+    sizeof(unicode_520_ci_except_kana_ci_kana_with_voiced_sound_mark_table) /
+      sizeof(uint32_t *),
+    normalize_halfwidth_katakana_with_voiced_sound_mark);
   return NULL;
 }
 
@@ -775,11 +777,12 @@ mysql_unicode_900_open_options(grn_ctx *ctx,
 
   mysql_unicode_900_options_init(options);
 
-  GRN_OPTION_VALUES_EACH_BEGIN(ctx, raw_options, i, name, name_length) {
+  GRN_OPTION_VALUES_EACH_BEGIN(ctx, raw_options, i, name, name_length)
+  {
     /* TODO: Use grn_raw_string. */
-#define STRING_EQUAL(raw_string, raw_string_length, c_string)   \
-    (raw_string_length == strlen(c_string) &&                   \
-     strncmp(raw_string, c_string, raw_string_length) == 0)
+#define STRING_EQUAL(raw_string, raw_string_length, c_string)                  \
+  (raw_string_length == strlen(c_string) &&                                    \
+   strncmp(raw_string, c_string, raw_string_length) == 0)
     if (STRING_EQUAL(name, name_length, "weight_level")) {
       options->weight_level =
         grn_vector_get_element_uint8(ctx,
@@ -832,7 +835,8 @@ mysql_unicode_900_open_options(grn_ctx *ctx,
       }
     }
 #undef NAME_EQUAL
-  } GRN_OPTION_VALUES_EACH_END();
+  }
+  GRN_OPTION_VALUES_EACH_END();
 
   return options;
 }
@@ -870,12 +874,13 @@ mysql_unicode_900_next(grn_ctx *ctx,
 
   table = grn_string_get_table(ctx, string);
   if (table) {
-    options = grn_table_cache_normalizer_options(ctx,
-                                                 table,
-                                                 string,
-                                                 mysql_unicode_900_open_options,
-                                                 mysql_unicode_900_close_options,
-                                                 NULL);
+    options =
+      grn_table_cache_normalizer_options(ctx,
+                                         table,
+                                         string,
+                                         mysql_unicode_900_open_options,
+                                         mysql_unicode_900_close_options,
+                                         NULL);
     if (ctx->rc != GRN_SUCCESS) {
       return NULL;
     }
@@ -884,28 +889,32 @@ mysql_unicode_900_next(grn_ctx *ctx,
     options = &options_raw;
   }
   if (options->weight_level == 1) {
-    normalize(ctx, string,
+    normalize(ctx,
+              string,
               normalizer_type_label,
               unicode_900_ai_ci_table,
               sizeof(unicode_900_ai_ci_table) / sizeof(uint32_t *),
               NULL);
   } else if (options->weight_level == 2) {
-    normalize(ctx, string,
+    normalize(ctx,
+              string,
               normalizer_type_label,
               unicode_900_as_ci_table,
               sizeof(unicode_900_as_ci_table) / sizeof(uint32_t *),
               NULL);
   } else if (options->weight_level == 3) {
     switch (options->locale) {
-    case MYSQL_UNICODE_900_LOCALE_JA :
-      normalize(ctx, string,
+    case MYSQL_UNICODE_900_LOCALE_JA:
+      normalize(ctx,
+                string,
                 normalizer_type_label,
                 unicode_900_ja_as_cs_table,
                 sizeof(unicode_900_ja_as_cs_table) / sizeof(uint32_t *),
                 NULL);
       break;
-    default :
-      normalize(ctx, string,
+    default:
+      normalize(ctx,
+                string,
                 normalizer_type_label,
                 unicode_900_as_cs_table,
                 sizeof(unicode_900_as_cs_table) / sizeof(uint32_t *),
@@ -914,14 +923,15 @@ mysql_unicode_900_next(grn_ctx *ctx,
     }
   } else if (options->weight_level == 4) {
     switch (options->locale) {
-    case MYSQL_UNICODE_900_LOCALE_JA :
-      normalize(ctx, string,
+    case MYSQL_UNICODE_900_LOCALE_JA:
+      normalize(ctx,
+                string,
                 normalizer_type_label,
                 unicode_900_ja_as_cs_ks_table,
                 sizeof(unicode_900_ja_as_cs_ks_table) / sizeof(uint32_t *),
                 NULL);
       break;
-    default :
+    default:
       GRN_PLUGIN_ERROR(ctx,
                        GRN_FUNCTION_NOT_IMPLEMENTED,
                        "[normalizer][%s] "
@@ -1015,7 +1025,8 @@ mysql_unicode_open_options(grn_ctx *ctx,
 
   mysql_unicode_options_init(options);
 
-  GRN_OPTION_VALUES_EACH_BEGIN(ctx, raw_options, i, name, name_length) {
+  GRN_OPTION_VALUES_EACH_BEGIN(ctx, raw_options, i, name, name_length)
+  {
     grn_raw_string name_raw;
     name_raw.value = name;
     name_raw.length = name_length;
@@ -1023,12 +1034,12 @@ mysql_unicode_open_options(grn_ctx *ctx,
     if (GRN_RAW_STRING_EQUAL_CSTRING(name_raw, "version")) {
       grn_raw_string version_raw;
       grn_id domain;
-      version_raw.length =
-        grn_vector_get_element(ctx,
-                               raw_options,
-                               i,
-                               &(version_raw.value),
-                               NULL, &domain);
+      version_raw.length = grn_vector_get_element(ctx,
+                                                  raw_options,
+                                                  i,
+                                                  &(version_raw.value),
+                                                  NULL,
+                                                  &domain);
       if (!grn_type_id_is_text_family(ctx, domain)) {
         GRN_PLUGIN_FREE(ctx, options);
         options = NULL;
@@ -1088,13 +1099,12 @@ mysql_unicode_open_options(grn_ctx *ctx,
     } else if (GRN_RAW_STRING_EQUAL_CSTRING(name_raw, "locale")) {
       grn_raw_string locale_raw;
       grn_id domain;
-      locale_raw.length =
-        grn_vector_get_element(ctx,
-                               raw_options,
-                               i,
-                               &(locale_raw.value),
-                               NULL,
-                               &domain);
+      locale_raw.length = grn_vector_get_element(ctx,
+                                                 raw_options,
+                                                 i,
+                                                 &(locale_raw.value),
+                                                 NULL,
+                                                 &domain);
       if (!grn_type_id_is_text_family(ctx, domain)) {
         GRN_PLUGIN_FREE(ctx, options);
         options = NULL;
@@ -1134,7 +1144,8 @@ mysql_unicode_open_options(grn_ctx *ctx,
         break;
       }
     }
-  } GRN_OPTION_VALUES_EACH_END();
+  }
+  GRN_OPTION_VALUES_EACH_END();
 
   if (!options) {
     return NULL;
@@ -1164,24 +1175,27 @@ mysql_unicode_open_options(grn_ctx *ctx,
       }
     } else {
       if (options->kana_sensitive) {
-        GRN_PLUGIN_ERROR(ctx, GRN_INVALID_ARGUMENT,
-                         "[normalizer][%s][%s] "
-                         "kana_sensitive=true is available only with locale=ja: "
-                         "<%s>",
-                         normalizer_type_label,
-                         mysql_unicode_version_to_string(options->version),
-                         mysql_unicode_locale_to_string(options->locale));
+        GRN_PLUGIN_ERROR(
+          ctx,
+          GRN_INVALID_ARGUMENT,
+          "[normalizer][%s][%s] "
+          "kana_sensitive=true is available only with locale=ja: "
+          "<%s>",
+          normalizer_type_label,
+          mysql_unicode_version_to_string(options->version),
+          mysql_unicode_locale_to_string(options->locale));
         GRN_PLUGIN_FREE(ctx, options);
         return NULL;
       }
     }
     if (!options->accent_sensitive && options->case_sensitive) {
-      GRN_PLUGIN_ERROR(ctx,
-                       GRN_INVALID_ARGUMENT,
-                       "[normalizer][%s][%s] "
-                       "can't mix accent_sensitive=false and case_sensitive=true",
-                       normalizer_type_label,
-                       mysql_unicode_version_to_string(options->version));
+      GRN_PLUGIN_ERROR(
+        ctx,
+        GRN_INVALID_ARGUMENT,
+        "[normalizer][%s][%s] "
+        "can't mix accent_sensitive=false and case_sensitive=true",
+        normalizer_type_label,
+        mysql_unicode_version_to_string(options->version));
       GRN_PLUGIN_FREE(ctx, options);
       return NULL;
     }
@@ -1198,7 +1212,8 @@ mysql_unicode_open_options(grn_ctx *ctx,
       return NULL;
     }
     if (options->kana_sensitive) {
-      GRN_PLUGIN_ERROR(ctx, GRN_INVALID_ARGUMENT,
+      GRN_PLUGIN_ERROR(ctx,
+                       GRN_INVALID_ARGUMENT,
                        "[normalizer][%s][%s] "
                        "can't use kana_sensitive=true",
                        normalizer_type_label,
@@ -1263,34 +1278,40 @@ mysql_unicode_next(grn_ctx *ctx,
       if (options->case_sensitive) {
         if (options->locale == MYSQL_UNICODE_LOCALE_JA) {
           if (options->kana_sensitive) {
-            normalize(ctx, string,
+            normalize(ctx,
+                      string,
                       normalizer_type_label,
                       unicode_900_ja_as_cs_ks_table,
-                      sizeof(unicode_900_ja_as_cs_ks_table) / sizeof(uint32_t *),
+                      sizeof(unicode_900_ja_as_cs_ks_table) /
+                        sizeof(uint32_t *),
                       NULL);
           } else {
-            normalize(ctx, string,
+            normalize(ctx,
+                      string,
                       normalizer_type_label,
                       unicode_900_ja_as_cs_table,
                       sizeof(unicode_900_ja_as_cs_table) / sizeof(uint32_t *),
                       NULL);
           }
         } else {
-          normalize(ctx, string,
+          normalize(ctx,
+                    string,
                     normalizer_type_label,
                     unicode_900_as_cs_table,
                     sizeof(unicode_900_as_cs_table) / sizeof(uint32_t *),
                     NULL);
         }
       } else {
-        normalize(ctx, string,
+        normalize(ctx,
+                  string,
                   normalizer_type_label,
                   unicode_900_as_ci_table,
                   sizeof(unicode_900_as_ci_table) / sizeof(uint32_t *),
                   NULL);
       }
     } else {
-      normalize(ctx, string,
+      normalize(ctx,
+                string,
                 normalizer_type_label,
                 unicode_900_ai_ci_table,
                 sizeof(unicode_900_ai_ci_table) / sizeof(uint32_t *),
@@ -1300,13 +1321,15 @@ mysql_unicode_next(grn_ctx *ctx,
   case MYSQL_UNICODE_VERSION_1400:
     if (options->accent_sensitive) {
       if (options->case_sensitive) {
-        normalize(ctx, string,
+        normalize(ctx,
+                  string,
                   normalizer_type_label,
                   unicode_1400_as_cs_table,
                   sizeof(unicode_1400_as_cs_table) / sizeof(uint32_t *),
                   NULL);
       } else {
-        normalize(ctx, string,
+        normalize(ctx,
+                  string,
                   normalizer_type_label,
                   unicode_1400_as_ci_table,
                   sizeof(unicode_1400_as_ci_table) / sizeof(uint32_t *),
@@ -1314,13 +1337,15 @@ mysql_unicode_next(grn_ctx *ctx,
       }
     } else {
       if (options->case_sensitive) {
-        normalize(ctx, string,
+        normalize(ctx,
+                  string,
                   normalizer_type_label,
                   unicode_1400_ai_cs_table,
                   sizeof(unicode_1400_ai_cs_table) / sizeof(uint32_t *),
                   NULL);
       } else {
-        normalize(ctx, string,
+        normalize(ctx,
+                  string,
                   normalizer_type_label,
                   unicode_1400_ai_ci_table,
                   sizeof(unicode_1400_ai_ci_table) / sizeof(uint32_t *),
@@ -1342,30 +1367,44 @@ GRN_PLUGIN_INIT(grn_ctx *ctx)
 grn_rc
 GRN_PLUGIN_REGISTER(grn_ctx *ctx)
 {
-  grn_normalizer_register(ctx, "NormalizerMySQLGeneralCI", -1,
-                          NULL, mysql_general_ci_next, NULL);
-  grn_normalizer_register(ctx, "NormalizerMySQLUnicodeCI", -1,
-                          NULL, mysql_unicode_ci_next, NULL);
   grn_normalizer_register(ctx,
-                          "NormalizerMySQLUnicodeCI"
-                          "Except"
-                          "KanaCI"
-                          "KanaWithVoicedSoundMark",
+                          "NormalizerMySQLGeneralCI",
                           -1,
                           NULL,
-                          mysql_unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_next,
+                          mysql_general_ci_next,
                           NULL);
-  grn_normalizer_register(ctx, "NormalizerMySQLUnicode520CI", -1,
-                          NULL, mysql_unicode_520_ci_next, NULL);
   grn_normalizer_register(ctx,
-                          "NormalizerMySQLUnicode520CI"
-                          "Except"
-                          "KanaCI"
-                          "KanaWithVoicedSoundMark",
+                          "NormalizerMySQLUnicodeCI",
                           -1,
                           NULL,
-                          mysql_unicode_520_ci_except_kana_ci_kana_with_voiced_sound_mark_next,
+                          mysql_unicode_ci_next,
                           NULL);
+  grn_normalizer_register(
+    ctx,
+    "NormalizerMySQLUnicodeCI"
+    "Except"
+    "KanaCI"
+    "KanaWithVoicedSoundMark",
+    -1,
+    NULL,
+    mysql_unicode_ci_except_kana_ci_kana_with_voiced_sound_mark_next,
+    NULL);
+  grn_normalizer_register(ctx,
+                          "NormalizerMySQLUnicode520CI",
+                          -1,
+                          NULL,
+                          mysql_unicode_520_ci_next,
+                          NULL);
+  grn_normalizer_register(
+    ctx,
+    "NormalizerMySQLUnicode520CI"
+    "Except"
+    "KanaCI"
+    "KanaWithVoicedSoundMark",
+    -1,
+    NULL,
+    mysql_unicode_520_ci_except_kana_ci_kana_with_voiced_sound_mark_next,
+    NULL);
   grn_normalizer_register(ctx,
                           "NormalizerMySQLUnicode900",
                           -1,
