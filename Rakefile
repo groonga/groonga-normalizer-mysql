@@ -82,8 +82,7 @@ namespace :dev do
   namespace :version do
     desc "Bump version for new development"
     task :bump do
-      new_version = ENV["NEW_VERSION"]
-      raise "NEW_VERSION environment variable is missing" if new_version.nil?
+      new_version = ENV["NEW_VERSION"] || version.succ
       cmake_lists_txt_content = File.read("CMakeLists.txt")
       cmake_lists_txt_content.gsub!(/VERSION ".+?"/) do
         "VERSION \"#{new_version}\""
