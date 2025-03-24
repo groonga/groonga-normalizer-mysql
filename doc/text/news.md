@@ -1,5 +1,34 @@
 # News
 
+## 1.2.6: 2025-03-24
+
+### Improvements
+
+#### Added `NormalizerMySQLUnicode`
+
+It's for `utf8mb4_uca1400_*` collations added by MariaDB 11.5. You can
+replace existing `NormalizerMySQLUnicode900` that is for
+`utf8mb4_0900_*` collations in MySQL with this. So
+`NormalizerMySQLUnicode900` is deprecated.
+
+Here is a list how to use this for MySQL/MariaDB compatible
+collations:
+
+* `utf8mb4_0900_ai_ci`: `NormalizerMySQLUnicode("version", "9.0.0")`
+* `utf8mb4_0900_as_ci`: `NormalizerMySQLUnicode("version", "9.0.0", "accent_sensitive", true)`
+* `utf8mb4_0900_as_cs`: `NormalizerMySQLUnicode("version", "9.0.0", "accent_sensitive", true, "case_sensitive", true)`
+* `utf8mb4_ja_0900_as_cs`: `NormalizerMySQLUnicode("version", "9.0.0", "accent_sensitive", true, "case_sensitive", true, "locale", "ja")`
+* `utf8mb4_ja_0900_as_cs_ks`: `NormalizerMySQLUnicode("version", "9.0.0", "accent_sensitive", true, "case_sensitive", true, "locale", "ja", "kana_sensitive", true)`
+* `utf8mb4_uca1400_ai_ci`: `NormalizerMySQLUnicode("version", "14.0.0")`
+* `utf8mb4_uca1400_ai_cs`: `NormalizerMySQLUnicode("version", "14.0.0", "case_sensitive", true)`
+* `utf8mb4_uca1400_as_ci`: `NormalizerMySQLUnicode("version", "14.0.0", "accent_sensitive", true)`
+* `utf8mb4_uca1400_as_cs`: `NormalizerMySQLUnicode("version", "14.0.0", "accent_sensitive", true, "case_sensistive", true)`
+
+Note that `NormalizerMySQLUnicode` always doesn't change any trailing
+spaces. (It's a "NO PAD" collation in MySQL context.) Precisely,
+`NormalizerMySQLUnicode` is compatible with `utf8mb4_uca1400_nopad_*`
+not `utf8mb4_uca1400_*`. We may add "PAD" mode later.
+
 ## 1.2.5: 2025-02-28
 
 ### Improvements
