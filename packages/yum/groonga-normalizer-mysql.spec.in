@@ -62,6 +62,9 @@ This package provides development files for groonga-normalizer-mysql.
 %{_libdir}/pkgconfig/groonga-normalizer-mysql.pc
 
 %changelog
+* Mon Mar 24 2025 Sutou Kouhei <kou@clear-code.com> - 1.2.6-1
+- New upstream release.
+
 * Mon Mar 03 2025 Horimoto Yasuhiro <horimoto@clear-code.com> - 1.2.5-1
 - New upstream release.
 
