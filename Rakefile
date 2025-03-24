@@ -96,6 +96,13 @@ namespace :dev do
   end
 end
 
+desc "Release"
+task release: [
+  "release:version:update",
+  "release:tag",
+  "dev:version:bump"
+]
+
 namespace :table do
   namespace :generate do
     desc "Generate uca1400 tables"
