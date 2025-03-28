@@ -215,8 +215,9 @@ jobs:
           cp release-artifacts/release-source/groonga-normalizer-mysql-*.tar.gz ./
           sudo apt update
           sudo apt install -y \
-            devscripts \
-            gpg
+            build-essential \
+            debhelper \
+            devscripts
       - uses: actions/checkout@v4
         with:
           path: apache-arrow
