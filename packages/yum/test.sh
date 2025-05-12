@@ -33,8 +33,6 @@ esac
 case ${os} in
   amazon-linux)
     DNF="dnf"
-    ${DNF} install -y \
-      https://apache.jfrog.io/artifactory/arrow/amazon-linux/${version}/apache-arrow-release-latest.rpm
     ;;
   *)
     case ${version} in
@@ -43,15 +41,14 @@ case ${os} in
         ;;
       *)
         DNF="dnf --enablerepo=crb"
-        ${DNF} install -y \
-          https://apache.jfrog.io/artifactory/arrow/${os}/${version}/apache-arrow-release-latest.rpm
         ;;
     esac
     ;;
 esac
 
 ${DNF} install -y \
-  https://packages.groonga.org/${os}/${version}/groonga-release-latest.noarch.rpm
+  https://packages.groonga.org/${os}/${version}/groonga-release-latest.noarch.rpm \
+  https://packages.apache.org/artifactory/arrow/${os}/${version}/apache-arrow-release-latest.rpm
 
 repositories_dir=/host/packages/yum/repositories
 ${DNF} install -y \
