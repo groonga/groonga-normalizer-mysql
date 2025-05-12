@@ -36,7 +36,7 @@ case "${distribution}" in
 esac
 architecture=$(dpkg --print-architecture)
 
-wget https://apache.jfrog.io/artifactory/arrow/${distribution}/apache-arrow-apt-source-latest-${code_name}.deb
+wget https://packages.apache.org/artifactory/arrow/${distribution}/apache-arrow-apt-source-latest-${code_name}.deb
 apt install -V -y ./apache-arrow-apt-source-latest-${code_name}.deb
 
 wget https://packages.groonga.org/${distribution}/groonga-apt-source-latest-${code_name}.deb
