@@ -19,4 +19,6 @@
 
 #pragma once
 
+#ifndef GROONGA_NORMALIZER_MYSQL_EMBED
 #cmakedefine GROONGA_NORMALIZER_MYSQL_EMBED
+#endif
