@@ -1,3 +1,9 @@
+groonga-normalizer-mysql (1.2.7-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Horimoto Yasuhiro <horimoto@clear-code.com>  Wed, 30 Jul 2025 07:44:40 -0000
+
 groonga-normalizer-mysql (1.2.6-1) unstable; urgency=low
 
   * New upstream release.
