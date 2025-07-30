@@ -20,7 +20,7 @@
 cmake_minimum_required(VERSION 3.16)
 set(GROONGA_NORMALIZER_MYSQL_PROJECT_NAME "groonga-normalizer-mysql")
 project("${GROONGA_NORMALIZER_MYSQL_PROJECT_NAME}"
-  VERSION "1.2.7")
+  VERSION "1.2.8")
 
 include(GNUInstallDirs)
 
