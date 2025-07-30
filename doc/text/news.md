@@ -1,5 +1,14 @@
 # News
 
+## 1.2.7: 2025-07-30
+
+### Fixes
+
+#### Fix macro redefinition for GROONGA_NORMALIZER_MYSQL_EMBED
+
+The `GROONGA_NORMALIZER_MYSQL_EMBED` macro was defined twice, causing
+compilation failures when building with MariaDB. [GitHub #53]
+
 ## 1.2.6: 2025-03-24
 
 ### Improvements
