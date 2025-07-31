@@ -251,31 +251,15 @@ only. So the program can use LGPLv2 only.
 editor doc/text/news.md
 ```
 
-#### Update package versions
+#### Run rake release to release a new version
 
 ```bash
-APACHE_ARROW_REPOSITORY=${APACHE_ARROW_REPOSITORY_PATH} \
-  GROONGA_REPOSITORY=${GROOGNA_REPOSITORY_PATH} \
-  rake release:version:update
+rake release
 ```
 
-#### Tag
+release task execute the following tasks:
 
-```bash
-rake release:tag
-```
-
-#### Publish Ubuntu packages
-
-```bash
-APACHE_ARROW_REPOSITORY=${APACHE_ARROW_REPOSITORY_PATH} \
-  GROONGA_REPOSITORY=${GROOGNA_REPOSITORY_PATH} \
-  LAUNCHPAD_UPLOADER_PGP_KEY=${YOUR_GPG_KEY_ID} \
-  rake -C packages ubuntu:upload
-```
-
-#### Bump version for new development
-
-```bash
-rake dev:version:bump NEW_VERSION=${NEW_VERSION}
-```
+- rake release:version:update
+- rake release:tag
+- rake -C packages ubuntu:upload
+- rake dev:version:bump
