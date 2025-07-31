@@ -180,8 +180,6 @@ jobs:
           path: "*.tar.gz"
 
   release:
-    if: |
-      github.ref_type == 'tag'
     name: Release
     needs: prepare-for-release
     runs-on: ubuntu-latest
@@ -194,39 +192,50 @@ jobs:
           path: release-artifacts
           pattern: release-*
           merge-multiple: true
-      - name: Upload
+      - name: Show files
+        run: find ./release-artifacts -type f
+      - name: Generate release note
         run: |
           ruby \
             -e 'print("## groonga-normalizer-mysql "); \
                 puts(ARGF.read.split(/^## /)[1].strip)' \
-            doc/text/news.md > release-note.md
-          version=${GITHUB_REF_NAME#v}
+            doc/text/news.md | tee release-note.md
+          tail -n +2 release-note.md | tee release-note-without-version.md
+      - name: Publish release page
+        if: |
+          github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
           title="$(head -n1 release-note.md | sed -e 's/^## //')"
-          tail -n +2 release-note.md > release-note-without-version.md
           gh release create ${GITHUB_REF_NAME} \
             --discussion-category Announcements \
             --notes-file release-note-without-version.md \
             --title "${title}" \
             release-artifacts/*
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Prepare for Launchpad publishing
         run: |
-          cp release-artifacts/release-source/groonga-normalizer-mysql-*.tar.gz ./
+          cp release-artifacts/groonga-normalizer-mysql-*.tar.gz ./
           sudo apt update
           sudo apt install -y \
             build-essential \
             debhelper \
             devscripts
       - uses: actions/checkout@v4
+        if: |
+          github.ref_type == 'tag'
         with:
           path: apache-arrow
           repository: apache/arrow
       - uses: actions/checkout@v4
+        if: |
+          github.ref_type == 'tag'
         with:
           path: groonga
           repository: groonga/groonga
       - name: Publish to Launchpad
+        if: |
+          github.ref_type == 'tag'
         env:
           APACHE_ARROW_REPOSITORY: ${{ github.workspace }}/apache-arrow
           GROONGA_REPOSITORY: ${{ github.workspace }}/groonga
