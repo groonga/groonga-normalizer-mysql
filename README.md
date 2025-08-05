@@ -263,7 +263,7 @@ release task execute the following tasks:
 - rake release:tag
 - rake dev:version:bump
 
-#### Confirm building a package for Ubuntu
+#### Confirm the built package for Ubuntu
 
 A package for Ubuntu build and publish automatically on GitHub Actions.
 So, we only confirm result of build and publish on [LaunchPad](https://launchpad.net/~groonga/+archive/ubuntu/ppa/+packages).
