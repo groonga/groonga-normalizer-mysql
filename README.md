@@ -266,4 +266,4 @@ release task execute the following tasks:
 #### Confirm building a package for Ubuntu
 
 A package for Ubuntu build and publish automatically on GitHub Actions.
-So, we only confirm result of build and publish on LaunchPad( https://launchpad.net/~groonga/+archive/ubuntu/ppa/+packages ).
+So, we only confirm result of build and publish on [LaunchPad](https://launchpad.net/~groonga/+archive/ubuntu/ppa/+packages).
