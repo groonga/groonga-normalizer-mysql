@@ -1,5 +1,11 @@
 # News
 
+## 1.2.9: 2025-09-09
+
+### Improvements
+
+#### Added support for Debian 13
+
 ## 1.2.8: 2025-07-31
 
 ### Fixes
