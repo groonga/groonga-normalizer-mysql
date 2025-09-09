@@ -4,7 +4,10 @@
 
 ### Improvements
 
-* Added support for Debian 13
+#### Provided package for Debian 13
+
+Debian 13 package is now available.
+You can install groonga-normalizer-mysql o Debian 13 using the `apt`.
 
 ## 1.2.8: 2025-07-31
 
