@@ -4,7 +4,7 @@
 
 ### Improvements
 
-#### Added support for Debian 13
+* Added support for Debian 13
 
 ## 1.2.8: 2025-07-31
 
