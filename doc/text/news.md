@@ -1,5 +1,11 @@
 # News
 
+## 1.3.0: 2025-09-30
+
+### Improvements
+
+* Added support for AlmaLinux 10.
+
 ## 1.2.9: 2025-09-09
 
 ### Improvements
