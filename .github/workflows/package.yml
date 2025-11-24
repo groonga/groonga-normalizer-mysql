@@ -10,7 +10,7 @@ jobs:
     name: Source
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Build archive
         run: |
           rake dist
@@ -83,13 +83,13 @@ jobs:
           sudo apt -V install \
             devscripts \
             ruby
-      - uses: actions/checkout@v5
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
         with:
           path: groonga
           repository: groonga/groonga
           submodules: recursive
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           path: apache-arrow
           repository: apache/arrow
@@ -190,7 +190,7 @@ jobs:
     timeout-minutes: 10
     environment: release
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/download-artifact@v6
         with:
           path: release-artifacts
@@ -225,13 +225,13 @@ jobs:
             build-essential \
             debhelper \
             devscripts
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         if: |
           github.ref_type == 'tag'
         with:
           path: apache-arrow
           repository: apache/arrow
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         if: |
           github.ref_type == 'tag'
         with:
