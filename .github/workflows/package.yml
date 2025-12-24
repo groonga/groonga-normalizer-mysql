@@ -9,6 +9,7 @@ jobs:
   source:
     name: Source
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6
       - name: Build archive
@@ -24,6 +25,7 @@ jobs:
   build:
     name: Build
     needs: source
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
