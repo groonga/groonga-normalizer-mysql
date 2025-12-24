@@ -17,6 +17,9 @@
 # Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston,
 # MA 02110-1301, USA
 
+require "json"
+require "open-uri"
+
 version = File.read("CMakeLists.txt")[/VERSION "(.*?)"/, 1]
 
 desc "Create source archives"
@@ -75,6 +78,49 @@ namespace :release do
        "-m",
        "groonga-normalizer-mysql #{version}!!!")
     sh("git", "push", "origin", "v#{version}")
+  end
+
+  desc "Release to Arch Linux"
+  task :arch_linux do
+    github_repository = "groonga/groonga-normalizer-mysql"
+    releases_url = "https://api.github.com/repos/#{github_repository}/releases"
+    latest_released_version = URI(releases_url).open do |input|
+      JSON.parse(input.read)[0]["tag_name"].delete_prefix("v")
+    end
+    sha512_url = "https://github.com/#{github_repository}/releases/download/" +
+                 "v#{latest_released_version}/" +
+                 "groonga-normalizer-mysql-#{latest_released_version}.tar.gz.sha512"
+    sha512 = URI(sha512_url).open do |input|
+      input.read.split[0]
+    end
+    pkgbuild = File.expand_path("ci/arch-linux/PKGBUILD")
+    pkgbuild_content = File.read(pkgbuild)
+    pkgbuild_content.gsub!(/^pkgver=.*$/) {"pkgver=#{latest_released_version}"}
+    pkgbuild_content.gsub!(/^pkgrel=.*$/) {"pkgrel=1"}
+    pkgbuild_content.gsub!(/^  "\h{128}"$/) {"  \"#{sha512}\""}
+    File.write(pkgbuild, pkgbuild_content)
+    sh("git", "add", pkgbuild)
+    sh("git",
+       "commit",
+       "-m", "arch-linux: Update to #{latest_released_version}")
+    sh("git", "push")
+
+    Dir.mktmpdir do |dir|
+      cd(dir) do
+        sh("git",
+           "clone",
+           "ssh://aur@aur.archlinux.org/groonga-normalizer-mysql.git")
+        cd("groonga-normalizer-mysql") do
+          cp(pkgbuild, "./")
+          sh("makepkg", "--printsrcinfo", out: ".SRCINFO")
+          sh("git", "add", "PKGBUILD", ".SRCINFO")
+          sh("git",
+             "commit",
+             "-m", "groonga-normalizer-mysql-#{latest_released_version}-1")
+          sh("git", "push")
+        end
+      end
+    end
   end
 end
 

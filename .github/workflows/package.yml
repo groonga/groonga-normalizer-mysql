@@ -15,6 +15,13 @@ jobs:
       - name: Build archive
         run: |
           rake dist
+          version=$(grep 'VERSION ".*"' CMakeLists.txt | grep -o '[0-9.]*')
+          for sha in sha256 sha512; do
+            ${sha}sum groonga-normalizer-mysql-${version}.tar.gz > \
+               groonga-normalizer-mysql-${version}.tar.gz.${sha}
+            ${sha}sum groonga-normalizer-mysql-${version}.zip > \
+               groonga-normalizer-mysql-${version}.zip.${sha}
+          done
       - uses: actions/upload-artifact@v6
         with:
           name: release-source
