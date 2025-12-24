@@ -183,9 +183,58 @@ jobs:
           name: release-packages
           path: "*.tar.gz"
 
+
+  arch-linux:
+    name: Arch Linux
+    needs: source
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v7
+        with:
+          name: release-source
+      - name: Cache ccache
+        uses: actions/cache@v5
+        with:
+          path: ccache
+          key: arch-linux-ccache-${{ hashFiles('normalizers/**') }}
+          restore-keys: arch-linux-ccache-
+      - name: Login to GitHub Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Pull
+        continue-on-error: true
+        run: |
+          docker compose pull arch-linux
+      - name: Build
+        run: |
+          docker compose build arch-linux
+      - name: Run
+        run: |
+          mkdir -p ccache
+          chmod -R go+rwx ccache
+          docker compose run \
+            -e CCACHE_DIR=/source/ccache \
+            arch-linux
+      - name: Push
+        if: github.ref_name == 'main'
+        continue-on-error: true
+        run: |
+          docker compose push arch-linux
+      - uses: actions/upload-artifact@v6
+        with:
+          name: release-arch-linux
+          path: "*.pkg.tar.*"
+
   release:
     name: Release
-    needs: prepare-for-release
+    needs:
+      - prepare-for-release
+      - arch-linux
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: release
