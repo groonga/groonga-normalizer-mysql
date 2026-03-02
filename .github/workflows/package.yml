@@ -22,7 +22,7 @@ jobs:
             ${sha}sum groonga-normalizer-mysql-${version}.zip > \
                groonga-normalizer-mysql-${version}.zip.${sha}
           done
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: release-source
           path: |
@@ -133,7 +133,7 @@ jobs:
           rake docker:push
         env:
           GROONGA_REPOSITORY: ../groonga
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: packages-${{ matrix.id }}
           path: packages/${{ env.TASK_NAMESPACE }}/repositories/
@@ -187,7 +187,7 @@ jobs:
             # debian-bookworm/debian/...
             tar czf ${os}.tar.gz -C $(dirname ${release_os_path}) ${os}
           done
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: release-packages
           path: "*.tar.gz"
@@ -234,7 +234,7 @@ jobs:
         continue-on-error: true
         run: |
           docker compose push arch-linux
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: release-arch-linux
           path: "*.pkg.tar.*"
