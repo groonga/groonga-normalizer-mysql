@@ -206,7 +206,7 @@ jobs:
         with:
           name: release-source
       - name: Cache ccache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ccache
           key: arch-linux-ccache-${{ hashFiles('normalizers/**') }}
