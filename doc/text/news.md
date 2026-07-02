@@ -1,5 +1,12 @@
 # News
 
+## 1.3.1: 2026-07-03
+
+### Improvements
+
+* Added support for Ubuntu 26.04 LTS (resolute).
+* Dropped support for Debian 12 (bookworm).
+
 ## 1.3.0: 2025-09-30
 
 ### Improvements
