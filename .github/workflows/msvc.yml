@@ -1,0 +1,127 @@
+# Copyright (C) 2026  Sutou Kouhei <kou@clear-code.com>
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Library General Public
+# License as published by the Free Software Foundation; version 2
+# of the License.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Library General Public License for more details.
+#
+# You should have received a copy of the GNU Library General Public
+# License along with this library; if not, write to the Free
+# Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston,
+# MA 02110-1301, USA
+
+name: MSVC
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: |
+        0 0 * * *
+concurrency:
+  group: ${{ github.head_ref || github.sha }}-${{ github.workflow }}
+  cancel-in-progress: true
+jobs:
+  test:
+    name: Test
+    env:
+      VC_ARCHITECTURE: x64
+    runs-on: windows-2022
+    timeout-minutes: 60
+    steps:
+      - name: Disable crash dialog
+        run: |
+          reg add "HKCU\SOFTWARE\Microsoft\Windows\Windows Error Reporting" `
+            /v DontShowUI `
+            /t REG_DWORD `
+            /d 1 `
+            /f
+      - name: Use JST
+        run: |
+          Set-TimeZone -Id "Tokyo Standard Time"
+      - uses: actions/checkout@v7
+      - name: Set environments
+        run: |
+          Write-Output "CMAKE_BUILD_PARALLEL_LEVEL=${Env:NUMBER_OF_PROCESSORS}" | `
+            Out-File -FilePath ${Env:GITHUB_ENV} -Encoding utf8 -Append
+          Write-Output "VC_PREFIX=C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC" | `
+            Out-File -FilePath ${Env:GITHUB_ENV} -Encoding utf8 -Append
+          Write-Output "GROONGA_INSTALL_FOLDER=${Env:GITHUB_WORKSPACE}\..\groonga-install" | `
+            Out-File -FilePath ${Env:GITHUB_ENV} -Encoding utf8 -Append
+          Write-Output "BUILD_FOLDER=${Env:GITHUB_WORKSPACE}\..\build" | `
+            Out-File -FilePath ${Env:GITHUB_ENV} -Encoding utf8 -Append
+          Write-Output "CCACHE_DIR=${Env:GITHUB_WORKSPACE}\ccache" | `
+            Out-File -FilePath ${Env:GITHUB_ENV} -Encoding utf8 -Append
+      - uses: actions/checkout@v7
+        with:
+          path: groonga
+          repository: groonga/groonga
+          submodules: recursive
+      - name: Cache ccache
+        uses: actions/cache@v6
+        with:
+          path: ccache
+          key: msvc-ccache-${{ hashFiles('groonga/lib/**', 'groonga/include/**', 'groonga/plugins/**', 'normalizers/**') }}
+          restore-keys: msvc-ccache-
+      - name: Prepare ccache
+        run: |
+          choco install ccache
+          ccache --show-stats --verbose --version
+          Write-Output "CMAKE_C_COMPILER_LAUNCHER=ccache" | `
+            Out-File -FilePath ${Env:GITHUB_ENV} -Encoding utf8 -Append
+          Write-Output "CMAKE_CXX_COMPILER_LAUNCHER=ccache" | `
+            Out-File -FilePath ${Env:GITHUB_ENV} -Encoding utf8 -Append
+      - name: Install Groonga main
+        shell: cmd
+        run: |
+          call "%VC_PREFIX%\Auxiliary\Build\vcvarsall.bat" %VC_ARCHITECTURE% || exit /B
+          set CMAKE_ARGS=-S groonga
+          set CMAKE_ARGS=%CMAKE_ARGS% -B ..\groonga-build
+          set CMAKE_ARGS=%CMAKE_ARGS% -G Ninja
+          set CMAKE_ARGS=%CMAKE_ARGS% "-DCMAKE_INSTALL_PREFIX=%GROONGA_INSTALL_FOLDER%"
+          set CMAKE_ARGS=%CMAKE_ARGS% -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          set CMAKE_ARGS=%CMAKE_ARGS% -DGRN_WITH_WINDOWS_BACK_TRACE=OFF
+          set CMAKE_ARGS=%CMAKE_ARGS% -DGRN_WITH_XSIMD=no
+          cmake %CMAKE_ARGS% || exit /B
+          cmake --build ..\groonga-build || exit /B
+          cmake --install ..\groonga-build || exit /B
+          ccache --show-stats --verbose --version
+      - name: Build
+        shell: cmd
+        run: |
+          call "%VC_PREFIX%\Auxiliary\Build\vcvarsall.bat" %VC_ARCHITECTURE% || exit /B
+          set CMAKE_ARGS=-S .
+          set CMAKE_ARGS=%CMAKE_ARGS% -B "%BUILD_FOLDER%"
+          set CMAKE_ARGS=%CMAKE_ARGS% -G Ninja
+          set CMAKE_ARGS=%CMAKE_ARGS% "-DCMAKE_PREFIX_PATH=%GROONGA_INSTALL_FOLDER%"
+          set CMAKE_ARGS=%CMAKE_ARGS% -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          cmake %CMAKE_ARGS% || exit /B
+          cmake --build "%BUILD_FOLDER%" || exit /B
+          ccache --show-stats --verbose --version
+
+      # Test
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ruby
+      - name: Install grntest
+        run: |
+          $Env:MAKEFLAGS = "-j${Env:NUMBER_OF_PROCESSORS}"
+          gem install grntest
+      - name: Test
+        run: |
+          # Use the built normalizers/mysql.dll instead of the
+          # installed one.
+          $Env:GRN_PLUGINS_DIR = "${Env:BUILD_FOLDER}"
+          grntest `
+            --base-directory test `
+            --groonga "${Env:GROONGA_INSTALL_FOLDER}\bin\groonga.exe" `
+            --interface http `
+            --n-retries 2 `
+            --read-timeout=30 `
+            --reporter mark `
+            --timeout 360 `
+            test\suite

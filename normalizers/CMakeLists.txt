@@ -55,3 +55,6 @@ target_include_directories(mysql_normalizer BEFORE PRIVATE
   "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(mysql_normalizer PRIVATE Groonga::libgroonga)
 target_compile_definitions(mysql_normalizer PRIVATE HAVE_CONFIG_H)
+if(MSVC)
+  target_compile_options(mysql_normalizer PRIVATE /W3)
+endif()
