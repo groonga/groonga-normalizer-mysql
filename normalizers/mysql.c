@@ -244,7 +244,7 @@ sized_buffer_append(char *buffer,
   }
 
   strncat(buffer, string, string_length);
-  *buffer_rest_length -= string_length;
+  *buffer_rest_length -= (unsigned int)string_length;
 }
 
 static void
