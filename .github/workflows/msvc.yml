@@ -99,6 +99,7 @@ jobs:
           set CMAKE_ARGS=%CMAKE_ARGS% -G Ninja
           set CMAKE_ARGS=%CMAKE_ARGS% "-DCMAKE_PREFIX_PATH=%GROONGA_INSTALL_FOLDER%"
           set CMAKE_ARGS=%CMAKE_ARGS% -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          set CMAKE_ARGS=%CMAKE_ARGS% -DCMAKE_COMPILE_WARNING_AS_ERROR=ON
           cmake %CMAKE_ARGS% || exit /B
           cmake --build "%BUILD_FOLDER%" || exit /B
           ccache --show-stats --verbose --version
