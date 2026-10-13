@@ -77,6 +77,7 @@ esac
 ${DNF} install -y \
        gcc \
        groonga \
+       libffi-devel \
        make
 if [ ${os} != "amazon-linux" ]; then
     ${DNF} install -y redhat-rpm-config
