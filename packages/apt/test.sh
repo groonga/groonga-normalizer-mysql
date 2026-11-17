@@ -59,6 +59,7 @@ cd /test
 apt install -V -y \
   gcc \
   groonga-bin \
+  libc6-dev \
   make \
   ruby-dev \
   tzdata
