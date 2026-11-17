@@ -275,29 +275,44 @@ jobs:
             --notes-file release-note-without-version.md \
             --title "${title}" \
             release-artifacts/*
-      - name: Prepare for Launchpad publishing
+
+  launchpad:
+    name: Launchpad
+    if: |
+      github.ref_type == 'tag'
+    needs: release
+    runs-on: ubuntu-latest
+    environment: release
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        code-name:
+          - jammy
+          - noble
+          - resolute
+    steps:
+      - uses: actions/checkout@v7
+      - name: Download source archive
         run: |
-          cp release-artifacts/groonga-normalizer-mysql-*.tar.gz ./
+          wget \
+            "https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/groonga-normalizer-mysql-${GITHUB_REF_NAME#v}.tar.gz"
+      - name: Prepare
+        run: |
           sudo apt update
           sudo apt install -y \
             build-essential \
             debhelper \
             devscripts
       - uses: actions/checkout@v7
-        if: |
-          github.ref_type == 'tag'
         with:
           path: apache-arrow
           repository: apache/arrow
       - uses: actions/checkout@v7
-        if: |
-          github.ref_type == 'tag'
         with:
           path: groonga
           repository: groonga/groonga
-      - name: Publish to Launchpad
-        if: |
-          github.ref_type == 'tag'
+      - name: Publish
         env:
           APACHE_ARROW_REPOSITORY: ${{ github.workspace }}/apache-arrow
           GROONGA_REPOSITORY: ${{ github.workspace }}/groonga
@@ -306,4 +321,4 @@ jobs:
         run: |
           echo "${LAUNCHPAD_DEPLOY_KEY}" | gpg --import
           echo "trusted-key ${LAUNCHPAD_UPLOADER_PGP_KEY}" > ~/.gnupg/gpg.conf
-          rake -C packages ubuntu
+          rake -C packages ubuntu:upload:${{ matrix.code-name }}
